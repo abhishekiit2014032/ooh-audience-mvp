@@ -17,10 +17,13 @@ import pandas as pd  # noqa: E402
 import plotly.graph_objects as go  # noqa: E402
 import pydeck as pdk  # noqa: E402
 import streamlit as st  # noqa: E402
+import streamlit.components.v1 as components  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 
 from ooh import narrative as narrative_mod  # noqa: E402
 from ooh import news as news_mod  # noqa: E402
+from ooh import sources as sources_mod  # noqa: E402
+from ooh.brain_viz import brain_html, diagram_data  # noqa: E402
 from ooh.activation import PLATFORM_MIN_RADIUS_KM  # noqa: E402
 from ooh.config import (AssumptionConfig, Params, RoadClass, env_key, load_assumptions,  # noqa: E402
                         load_placements)
@@ -32,6 +35,7 @@ st.set_page_config(page_title="OOH Audience Intelligence", layout="wide")
 
 PAGES = [
     "Map",
+    "Data sources",
     "Placement detail",
     "Compare locations",
     "Duplication and plan",
@@ -119,6 +123,63 @@ def news_list(items: list[dict], limit: int | None = None) -> None:
                     unsafe_allow_html=True)
 
 
+MOTION_CSS = """
+<style>
+@keyframes oohFadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes oohPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(54,179,126,.55); } 70% { box-shadow: 0 0 0 7px rgba(54,179,126,0); } }
+[data-testid="stMain"] [data-testid="stElementContainer"],
+[data-testid="stMain"] [data-testid="stExpander"] { animation: oohFadeUp .28s ease-out both; }
+.ooh-card { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.ooh-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,.35); border-color: #4C9AFF !important; }
+.ooh-live { display:inline-block; width:8px; height:8px; border-radius:50%; background:#36B37E; margin-right:6px;
+            animation: oohPulse 1.8s infinite; vertical-align: middle; }
+[data-testid="stSidebar"] label { transition: color .15s ease, transform .15s ease; }
+[data-testid="stSidebar"] [role="radiogroup"] label:hover { color: #4C9AFF; transform: translateX(3px); }
+[data-testid="stPlotlyChart"], [data-testid="stDeckGlJsonChart"] { border-radius: 10px; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  [data-testid="stMain"] [data-testid="stElementContainer"], [data-testid="stMain"] [data-testid="stExpander"],
+  .ooh-live { animation: none; }
+  .ooh-card, .ooh-card:hover { transition: none; transform: none; }
+}
+</style>
+"""
+
+
+def kpi_strip(items: list[tuple[str, float, str, str]]) -> None:
+    """Headline numbers that settle into place (count up from 85 % of the value). (title, value, unit, label)"""
+    import json as _json
+
+    data = _json.dumps([{"t": t, "v": v, "u": u, "l": l, "c": BADGE_COLORS.get(l, ("#41464b", "#e2e3e5"))}
+                        for t, v, u, l in items])
+    components.html(f"""
+<div id="k" style="display:grid;grid-template-columns:repeat({len(items)},1fr);gap:12px;
+     font-family:'Source Sans Pro','Source Sans 3',-apple-system,sans-serif;color:#e6e9ef"></div>
+<script>
+const D = {data}; const root = document.getElementById('k');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fmt(x) {{ const a = Math.abs(x); if (a >= 1e6) return (x/1e6).toFixed(2) + 'M';
+  if (a >= 1e4) return (x/1e3).toFixed(1) + 'k'; return Math.round(x).toLocaleString(); }}
+D.forEach((d, i) => {{
+  const c = document.createElement('div');
+  c.style.cssText = 'background:linear-gradient(160deg,#182033,#11161f);border:1px solid #2a3242;border-radius:12px;' +
+    'padding:12px 14px;transition:transform .18s,border-color .18s;opacity:0;transform:translateY(6px)';
+  c.onmouseenter = () => {{ c.style.transform = 'translateY(-3px)'; c.style.borderColor = '#4C9AFF'; }};
+  c.onmouseleave = () => {{ c.style.transform = 'none'; c.style.borderColor = '#2a3242'; }};
+  c.innerHTML = `<div style="font-size:12.5px;color:#8b93a7">${{d.t}}
+     <span style="background:${{d.c[1]}};color:${{d.c[0]}};border-radius:4px;padding:0 5px;font-size:10px;font-weight:700;margin-left:4px">${{d.l}}</span></div>
+     <div style="font-size:30px;font-weight:700;line-height:1.25"><span class="n">0</span>
+     <span style="font-size:13px;font-weight:400;color:#8b93a7">${{d.u}}</span></div>`;
+  root.appendChild(c);
+  setTimeout(() => {{ c.style.transition = 'opacity .35s, transform .35s, border-color .18s';
+                     c.style.opacity = 1; c.style.transform = 'none'; }}, 40 + i * 70);
+  const n = c.querySelector('.n'), start = reduce ? d.v : d.v * 0.85, t0 = performance.now(), T = 700;
+  function step(t) {{ const k = Math.min(1, (t - t0) / T), e = 1 - Math.pow(1 - k, 3);
+    n.textContent = fmt(start + (d.v - start) * e); if (k < 1) requestAnimationFrame(step); }}
+  requestAnimationFrame(step);
+}});
+</script>""", height=96)
+
+
 # --------------------------------------------------------------------------- UI helpers
 
 
@@ -131,7 +192,7 @@ def badge(label: str) -> str:
 def metric_card(title: str, m: Metric, unit: str = "", pct: bool = False) -> None:
     f = (lambda v: f"{v:.0%}") if pct else fmt_num
     st.markdown(
-        f"<div style='border:1px solid rgba(128,128,128,0.35);border-radius:8px;padding:10px 12px;"
+        f"<div class='ooh-card' style='border:1px solid rgba(128,128,128,0.35);border-radius:8px;padding:10px 12px;"
         f"margin-bottom:8px'>"
         f"<div style='font-size:0.8rem;opacity:0.75'>{title} {badge(m.label)}</div>"
         f"<div style='font-size:1.6rem;font-weight:650;line-height:1.3'>{f(m.value)}"
@@ -308,6 +369,12 @@ def page_detail(res: Results, pid: str, params: Params, use_llm: bool, brand: st
                 f"towards traffic on {s.road_name}. Share of voice {p.share_of_voice:.2f}. "
                 f"Example brief: {brand}.")
 
+    kpi_strip([
+        ("Impressions / day", m["impressions_day"].value, "", m["impressions_day"].label),
+        ("Unique people / month", m["unique_month"].value, "", m["unique_month"].label),
+        ("Car-relevant / month", prof.relevant_reach.value, "", prof.relevant_reach.label),
+        ("Mean visibility", r.reach.mean_visibility * 100, "/ 100", "ESTIMATE"),
+    ])
     st.subheader("The planner's five questions")
     u, rr = m["unique_month"], prof.relevant_reach
     rank = sorted(res.placements.values(), key=lambda x: -x.profile.relevant_reach.value)
@@ -663,6 +730,49 @@ def page_news(pid: str, use_llm: bool, pcfg) -> None:
                "classify the headlines.")
 
 
+def page_sources() -> None:
+    st.header("Data sources")
+    data = diagram_data()
+    srcs = data["sources"]
+    connected = [x for x in srcs if x["status"] != "not connected"]
+    sample = [x for x in srcs if x["status"] == "sample"]
+    live = [x for x in srcs if x["status"] in ("live", "cached")]
+    ai = data["engine"]["ai"]
+    st.markdown(
+        f"<span class='ooh-live'></span>**{len(live)}** live or cached · **{len(connected)}** of {len(srcs)} "
+        f"connected · **{len(sample)}** still placeholders · Claude: **{ai['status']}**. "
+        "Geometry and traffic data do the counting; Claude only explains the numbers and sorts news.",
+        unsafe_allow_html=True)
+    components.html(brain_html(data), height=820, scrolling=False)
+
+    st.subheader("Confidence by source")
+    df = pd.DataFrame([{
+        "Source": x["name"], "Status": x["status"], "Confidence": x["score"], "Potential": x["potential"],
+        "Label of its numbers": x["label"], "Feeds": ", ".join(x["feeds_names"]),
+        "Note": x["status_note"], "Upgrade": x["upgrade"], "Link": x["url"],
+    } for x in sorted(srcs, key=lambda x: -x["score"])])
+    st.dataframe(df, hide_index=True, width="stretch", height=460, column_config={
+        "Confidence": st.column_config.ProgressColumn("Confidence", min_value=0, max_value=100, format="%d"),
+        "Potential": st.column_config.ProgressColumn("Potential once connected", min_value=0, max_value=100,
+                                                     format="%d"),
+        "Link": st.column_config.LinkColumn("Link"),
+    })
+    with st.expander("How the confidence score works"):
+        st.latex(r"\text{score} = 100 \times s \times (0.40\,p + 0.35\,d + 0.25\,f)")
+        st.markdown(
+            "- **p, provenance:** who stands behind the data (official publication 1.0, commercial 0.85, "
+            "OpenStreetMap 0.75, model assumption 0.4).\n"
+            "- **d, directness:** how directly it measures what the model uses it for.\n"
+            "- **f, freshness:** live today 1.0, cached within 30 days 0.85, static publication 0.6.\n"
+            "- **s, status factor:** live, cached or configured 1.0; placeholder (SAMPLE) 0.35; not connected 0.\n"
+            "- **Potential** is the score once connected and live (s = 1, f = 1).\n\n"
+            f"The score is a planning heuristic {badge('ASSUMPTION')}. It is separate from the VERIFIED / "
+            "ESTIMATE / SAMPLE labels on individual numbers, and it never enters the reach calculation.",
+            unsafe_allow_html=True)
+    st.caption("Status is read locally: API keys present, cache dates and is_sample flags. Opening this page "
+               "calls no external service.")
+
+
 def page_assumptions(res: Results, acfg: AssumptionConfig, params: Params) -> None:
     st.header("Assumptions and sources")
     st.markdown(" ".join(f"{badge(k)} {v}" for k, v in {
@@ -687,28 +797,14 @@ def page_assumptions(res: Results, acfg: AssumptionConfig, params: Params) -> No
                "factors and speeds are ASSUMPTIONS.")
 
     st.subheader("Data sources")
-    keys = {k: env_key(k) is not None for k in ["TOMTOM_API_KEY", "DUBAI_PULSE_KEY", "ANTHROPIC_API_KEY",
-                                               "MAPILLARY_TOKEN"]}
-    osm = {r.prep.area_source for r in res.placements.values()}
-    src = pd.DataFrame([
-        ["OpenStreetMap (OSMnx / Overpass)", "; ".join(sorted(osm)),
-         "SAMPLE" if any("SAMPLE" in s for s in osm) else "VERIFIED", "https://www.openstreetmap.org"],
-        ["RTA capacity figure", "2,000 vehicles/lane/hour from 14,000 vph on 7 lanes", "VERIFIED",
-         "https://www.timeoutdubai.com"],
-        ["TomTom Traffic Flow / Volume", "key set: flow speeds used; volume not called (UAE coverage unconfirmed)"
-         if keys["TOMTOM_API_KEY"] else "no key: capacity fallback and OSM speeds", "ESTIMATE",
-         "https://developer.tomtom.com/traffic-stats/documentation/product-information/introduction"],
-        ["Dubai Pulse metro ridership", "data/inputs/metro_ridership.csv", "SAMPLE", "https://www.dubaipulse.gov.ae"],
-        ["Meta Ads Manager reach estimate", "data/inputs/meta_reach.json", "SAMPLE", "https://adsmanager.facebook.com"],
-        ["Dubai Statistics Center", "data/inputs/dsc_population.json", "SAMPLE", "https://www.dsc.gov.ae"],
-        ["Media owner play log", "data/inputs/play_log.csv", "SAMPLE", ""],
-        ["Google News RSS / GDELT", "Area news headlines, last 30 days (context only)", "VERIFIED",
-         "https://news.google.com"],
-        ["Anthropic Claude API", "narratives" if keys["ANTHROPIC_API_KEY"] else "no key: template narratives",
-         "ESTIMATE", "https://docs.claude.com"],
-    ], columns=["source", "used as", "label", "link"])
-    st.dataframe(src, hide_index=True, width="stretch",
-                 column_config={"link": st.column_config.LinkColumn("link")})
+    st.dataframe(pd.DataFrame([{"source": x.name, "status": x.status, "confidence": x.score, "label": x.label,
+                                "used for": ", ".join(sources_mod.OUTPUTS[o] for o in x.feeds), "link": x.url}
+                               for x in sources_mod.registry()]),
+                 hide_index=True, width="stretch",
+                 column_config={"link": st.column_config.LinkColumn("link"),
+                                "confidence": st.column_config.ProgressColumn("confidence", min_value=0,
+                                                                              max_value=100, format="%d")})
+    st.caption("Full detail, the scoring formula and the flow diagram are on the Data sources page.")
 
     st.subheader("Snapping log")
     st.dataframe(pd.DataFrame(res.snap_log), hide_index=True, width="stretch")
@@ -729,6 +825,7 @@ def page_assumptions(res: Results, acfg: AssumptionConfig, params: Params) -> No
 
 def main() -> None:
     acfg, pcfg = load_assumptions(), load_placements()
+    st.markdown(MOTION_CSS, unsafe_allow_html=True)
     page, pid, overrides, road_rows, use_llm = sidebar(acfg, pcfg)
     okey = tuple(sorted(overrides.items()))
     results = get_results(okey, road_rows)
@@ -736,6 +833,8 @@ def main() -> None:
 
     if page == "Map":
         page_map(results, params)
+    elif page == "Data sources":
+        page_sources()
     elif page == "Placement detail":
         page_detail(results, pid, params, use_llm, pcfg.campaign.brand)
     elif page == "Compare locations":

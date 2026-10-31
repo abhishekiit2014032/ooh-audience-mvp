@@ -124,6 +124,7 @@ Both are noted in `config/placements.yaml`.
 | Page | What it shows |
 | --- | --- |
 | Map | Dark basemap, pins, exposure cones, visible segments coloured by V, tooltip with factor breakdown |
+| Data sources | Animated diagram: every source flows into the engine (geospatial reach model + Claude) and on to the analytics. Hover or click to trace a source or output; confidence score per source with its breakdown |
 | Placement detail | The planner's five questions, reach funnel (low/base/high), hourly impressions, persona card |
 | Compare locations | H1 to H4: daily impressions, unique monthly, relevant reach, AED per 1,000 relevant impressions |
 | Duplication and plan | Overlap heatmap, overlap rules, greedy plan, combined vs naive reach |
@@ -136,6 +137,21 @@ Both are noted in `config/placements.yaml`.
 The sidebar has a slider for every scalar assumption in `config/assumptions.yaml`. The seven key ones are
 on top; the rest are under "All other assumptions". It also has an editable road-class table, a placement
 picker and a reset button. Geometry is cached once, so a slider change only re-runs the arithmetic.
+
+## Confidence score per data source
+
+`src/ooh/sources.py` is the one registry of sources. The Data sources page, its diagram and the Assumptions
+page all read from it. Each source gets a 0–100 confidence score:
+
+`score = 100 × status × (0.40 provenance + 0.35 directness + 0.25 freshness)`
+
+- **status:** live, cached or configured 1; SAMPLE 0.35; not connected 0.
+- **Potential** is the same score once a source is connected and live.
+- Status is read locally: API keys present, cache dates and `is_sample` flags. The page makes no network calls.
+
+The score is a planning heuristic (ASSUMPTION). It is separate from the labels on individual numbers and
+never enters the reach maths. In the diagram, the geospatial model does the counting; Claude only explains
+the numbers and sorts news.
 
 ## API keys (all optional)
 
