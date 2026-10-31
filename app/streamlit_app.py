@@ -20,6 +20,7 @@ import streamlit as st  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 
 from ooh import narrative as narrative_mod  # noqa: E402
+from ooh import news as news_mod  # noqa: E402
 from ooh.activation import PLATFORM_MIN_RADIUS_KM  # noqa: E402
 from ooh.config import (AssumptionConfig, Params, RoadClass, env_key, load_assumptions,  # noqa: E402
                         load_placements)
@@ -37,6 +38,7 @@ PAGES = [
     "Planned vs actual",
     "Sensitivity",
     "Activation",
+    "Area news",
     "Assumptions and sources",
 ]
 MAIN_SLIDERS = ["utilisation", "occupancy", "monthly_frequency", "cone_radius_m", "half_angle_deg",
@@ -53,6 +55,7 @@ PLOT_LAYOUT = dict(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_b
                    title=dict(x=0, xanchor="left", y=0.98, yanchor="top"))
 LEGEND_TOP = dict(orientation="h", y=1.02, yanchor="bottom", x=1, xanchor="right")
 SERIES = ["#4C9AFF", "#F5A524", "#36B37E", "#E5484D"]
+SIGNAL_COLORS = {"traffic_risk": "#E5484D", "audience_boost": "#36B37E", "category": "#4C9AFF", "other": "#6b7280"}
 _to_wgs = Transformer.from_crs("EPSG:32640", "EPSG:4326", always_xy=True)
 
 
@@ -86,6 +89,34 @@ def get_results(overrides: tuple, road_rows: tuple) -> Results:
 def get_sensitivity(pid: str, overrides: tuple, road_rows: tuple) -> pd.DataFrame:
     params = Params(build_cfg(road_rows), dict(overrides))
     return sensitivity(get_preps()[pid], params)
+
+
+@st.cache_data(ttl=3 * 3600, show_spinner="Fetching the latest news for this area (cached for the day)...")
+def get_news(pid: str, use_llm: bool) -> dict:
+    pcfg = load_placements()
+    placement = next(p for p in pcfg.placements if p.id == pid)
+    return news_mod.area_news(placement, pcfg.campaign.brand, use_llm=use_llm).to_dict()
+
+
+def news_cached_today(pid: str) -> bool:
+    from datetime import date
+
+    from ooh.config import CACHE_DIR
+    return (CACHE_DIR / "api" / "news" / f"{pid}_{date.today().isoformat()}.json").exists()
+
+
+def signal_chip(signal: str) -> str:
+    color = SIGNAL_COLORS.get(signal, "#6b7280")
+    return (f"<span style='border:1px solid {color};color:{color};border-radius:10px;padding:0 7px;"
+            f"font-size:0.72rem;white-space:nowrap'>{news_mod.SIGNALS.get(signal, signal)}</span>")
+
+
+def news_list(items: list[dict], limit: int | None = None) -> None:
+    for it in items[:limit]:
+        reason = f" · <span style='opacity:0.6'>{it['reason']}</span>" if it.get("reason") else ""
+        st.markdown(f"{signal_chip(it['signal'])} [{it['title']}]({it['url']}) "
+                    f"<span style='opacity:0.6;font-size:0.8rem'>{it['source']} · {it['published']}</span>{reason}",
+                    unsafe_allow_html=True)
 
 
 # --------------------------------------------------------------------------- UI helpers
@@ -385,6 +416,19 @@ def page_detail(res: Results, pid: str, params: Params, use_llm: bool, brand: st
         else:
             st.caption("No metro track inside the exposure cone.")
 
+    st.subheader("What's happening nearby")
+    if news_cached_today(pid) or st.button("Load the latest area news", key=f"news_btn_{pid}"):
+        n = get_news(pid, use_llm)
+        risk = [i for i in n["items"] if i["signal"] == "traffic_risk"]
+        st.markdown(f"{n['summary']} {badge('ESTIMATE')}", unsafe_allow_html=True)
+        if risk:
+            st.warning(f"{len(risk)} traffic-risk headline(s) in the last 30 days: check delivery against plan.")
+        news_list(sorted(n["items"], key=lambda i: i["signal"] == "other")[:5])
+        st.caption(f"Headlines: Google News / GDELT, last 30 days (VERIFIED as published). "
+                   f"Classification and summary: {n['summary_source']} (ESTIMATE). Full list on the Area news page.")
+    else:
+        st.caption("Fetches Google News and GDELT headlines for this area (about 30 s the first time each day).")
+
     with st.expander("Traffic flows inside the cone (base case)"):
         flows = sc["base"].flows
         if len(flows):
@@ -586,6 +630,39 @@ def page_activation(res: Results) -> None:
         "- **Data partner terms:** audiences usually stay inside the partner's DSP or clean room.")
 
 
+def page_news(pid: str, use_llm: bool, pcfg) -> None:
+    placement = next(p for p in pcfg.placements if p.id == pid)
+    st.header(f"Area news: {placement.id} · {placement.area}")
+    st.markdown("Latest headlines about the corridor and the area around the face, sorted into signals a planner "
+                "can act on. Context only: news never changes the reach numbers. " + badge("VERIFIED") +
+                " headlines as published · " + badge("ESTIMATE") + " classification", unsafe_allow_html=True)
+    n = get_news(pid, use_llm)
+    if not n["items"]:
+        st.info("No headlines found, or the news feeds were unreachable.")
+    counts = n["counts"]
+    cols = st.columns(4)
+    for col, (key, label) in zip(cols, news_mod.SIGNALS.items()):
+        col.markdown(f"<div style='border-left:3px solid {SIGNAL_COLORS[key]};padding-left:10px'>"
+                     f"<div style='font-size:0.8rem;opacity:0.75'>{label}</div>"
+                     f"<div style='font-size:1.6rem;font-weight:650'>{counts.get(key, 0)}</div></div>",
+                     unsafe_allow_html=True)
+    st.subheader("Summary")
+    st.markdown(n["summary"])
+    st.caption(f"{n['summary_source']}. Fetched {n['fetched_on']}; cached for the day.")
+    signal = st.segmented_control("Show", ["All"] + list(news_mod.SIGNALS.values()), default="All", key="news_filter")
+    items = n["items"] if signal in (None, "All") else [
+        i for i in n["items"] if news_mod.SIGNALS[i["signal"]] == signal]
+    st.subheader(f"Headlines ({len(items)})")
+    news_list(items)
+    if n["errors"]:
+        with st.expander("Feed errors"):
+            for e in n["errors"]:
+                st.caption(e)
+    st.caption("Sources: Google News RSS search (region AE) and the GDELT DOC 2.0 API, last 30 days. Suitable for "
+               "a demo; a commercial product needs a licensed news API. Without ANTHROPIC_API_KEY, keyword rules "
+               "classify the headlines.")
+
+
 def page_assumptions(res: Results, acfg: AssumptionConfig, params: Params) -> None:
     st.header("Assumptions and sources")
     st.markdown(" ".join(f"{badge(k)} {v}" for k, v in {
@@ -625,6 +702,8 @@ def page_assumptions(res: Results, acfg: AssumptionConfig, params: Params) -> No
         ["Meta Ads Manager reach estimate", "data/inputs/meta_reach.json", "SAMPLE", "https://adsmanager.facebook.com"],
         ["Dubai Statistics Center", "data/inputs/dsc_population.json", "SAMPLE", "https://www.dsc.gov.ae"],
         ["Media owner play log", "data/inputs/play_log.csv", "SAMPLE", ""],
+        ["Google News RSS / GDELT", "Area news headlines, last 30 days (context only)", "VERIFIED",
+         "https://news.google.com"],
         ["Anthropic Claude API", "narratives" if keys["ANTHROPIC_API_KEY"] else "no key: template narratives",
          "ESTIMATE", "https://docs.claude.com"],
     ], columns=["source", "used as", "label", "link"])
@@ -669,6 +748,8 @@ def main() -> None:
         page_sensitivity(pid, okey, road_rows)
     elif page == "Activation":
         page_activation(results)
+    elif page == "Area news":
+        page_news(pid, use_llm, pcfg)
     else:
         page_assumptions(results, acfg, params)
 

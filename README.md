@@ -76,7 +76,12 @@ numbers are ESTIMATES, and anything that uses metro ridership or Meta values is 
    incremental relevant reach per AED within the budget.
 9. **Planned vs actual.** Plan = baseline advertiser impressions. Actual = campaign traffic × actual / planned
    plays from the play log. Delivery index = actual / planned, per week.
-10. **Activation.** Exports the exposure zones as GeoJSON plus a centre and radius CSV for a data partner
+10. **Area news (context only).** Google News RSS and GDELT headlines for the corridor and the area,
+    last 30 days, cached daily. Each headline is classified as traffic risk, audience boost, category
+    relevance or other. Claude does the classifying when a key is set; keyword rules otherwise. Traffic-risk
+    headlines flag a delivery risk. News never changes the reach numbers. Google News RSS suits a demo; a
+    commercial product needs a licensed news API.
+11. **Activation.** Exports the exposure zones as GeoJSON plus a centre and radius CSV for a data partner
     or platform. Nothing is executed.
 
 ### Results snapshot (default assumptions, no API keys, OSM cached 2026-10-31)
@@ -125,6 +130,7 @@ Both are noted in `config/placements.yaml`.
 | Planned vs actual | Weekly planned vs actual and the delivery index (SAMPLE) |
 | Sensitivity | Tornado chart: which assumption moves unique reach most |
 | Activation | GeoJSON and CSV downloads, partner routes, privacy limits |
+| Area news | Latest 30 days of headlines for the corridor and area, sorted into traffic risk / audience boost / category relevance |
 | Assumptions and sources | Every parameter with label and source, data sources, snapping log, known limits |
 
 The sidebar has a slider for every scalar assumption in `config/assumptions.yaml`. The seven key ones are
@@ -140,7 +146,7 @@ Copy `.env.example` to `.env` (or set them as Streamlit secrets / environment va
 | `TOMTOM_API_KEY` | Traffic Flow speeds for dwell | OSM maxspeed × 0.8. Traffic Volume is not called: it is contract-based and UAE coverage is unconfirmed |
 | `DUBAI_PULSE_KEY` / `_SECRET` | RTA metro ridership API | `data/inputs/metro_ridership.csv` (SAMPLE) |
 | `MAPILLARY_TOKEN` | Street-imagery line-of-sight check (Phase 2) | 2D building footprints |
-| `ANTHROPIC_API_KEY` | Claude writes persona narratives from the computed numbers only | Template narrative |
+| `ANTHROPIC_API_KEY` | Claude writes persona narratives from the computed numbers only, and classifies and summarises area news from the fetched headlines only | Template narrative; keyword rules for news |
 
 ## Replacing SAMPLE inputs
 
