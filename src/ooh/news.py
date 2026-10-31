@@ -231,16 +231,14 @@ def _claude_classify(placement: Placement, brand: str, items: list[NewsItem]) ->
     headlines = json.dumps([f"{i.published} | {i.title} ({i.source})" for i in items], ensure_ascii=False)
     prompt = CLAUDE_PROMPT.format(placement=placement.name, area=placement.area, corridor=placement.corridor,
                                   brand=brand, headlines=headlines)
-    from .narrative import MODEL
+    from .narrative import MODEL, claude_client
 
     key = hashlib.sha1((MODEL + prompt).encode()).hexdigest()
     path = _cache_file(f"claude_{key}.json")
     if path.exists():
         return json.loads(path.read_text()), MODEL
     try:
-        import anthropic
-
-        client = anthropic.Anthropic()
+        client = claude_client()
         response = client.beta.messages.create(
             model=MODEL,
             max_tokens=4096,

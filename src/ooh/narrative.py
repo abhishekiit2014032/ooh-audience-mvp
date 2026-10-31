@@ -18,6 +18,19 @@ from .metrics import fmt_num
 log = logging.getLogger(__name__)
 
 MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-5-5")
+API_BASE_URL = "https://api.anthropic.com"
+
+
+def claude_client():
+    """Anthropic client for the app's own key.
+
+    The base URL is pinned to the public API (override with OOH_ANTHROPIC_BASE_URL), so a
+    process-wide ANTHROPIC_BASE_URL set by another tool cannot redirect the app's key.
+    """
+    import anthropic
+
+    return anthropic.Anthropic(api_key=env_key("ANTHROPIC_API_KEY"),
+                               base_url=os.environ.get("OOH_ANTHROPIC_BASE_URL", API_BASE_URL))
 
 SYSTEM = (
     "You write short audience notes for out-of-home media planners in Dubai. "
@@ -84,9 +97,7 @@ def claude_narrative(facts: dict, brand: str) -> str | None:
     if path.exists():
         return json.loads(path.read_text())["text"]
     try:
-        import anthropic
-
-        client = anthropic.Anthropic()
+        client = claude_client()
         response = client.beta.messages.create(
             model=MODEL,
             max_tokens=1024,
