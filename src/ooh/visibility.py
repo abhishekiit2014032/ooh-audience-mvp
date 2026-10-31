@@ -130,7 +130,7 @@ def score_segments(roads: pd.DataFrame, placement: Placement, snapped: SnappedPl
     speeds = [segment_speed_kmh(m, h, params) for m, h in zip(df["maxspeed_osm"], df["highway"])]
     df["speed_kmh"] = [s for s, _ in speeds]
     df["speed_source"] = [s for _, s in speeds]
-    tt = tomtom_flow_speed(placement.lat, placement.lon)
+    tt = tomtom_flow_speed(snapped.lat, snapped.lon)
     if tt:
         main = df["highway"].isin(["motorway", "trunk"])
         df.loc[main, "speed_kmh"] = tt
