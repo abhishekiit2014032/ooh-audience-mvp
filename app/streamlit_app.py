@@ -187,8 +187,9 @@ def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
             road_rows = ()
 
     has_claude = env_key("ANTHROPIC_API_KEY") is not None
-    use_llm = st.sidebar.toggle("Claude narratives", value=has_claude, disabled=not has_claude,
-                                help="Needs ANTHROPIC_API_KEY. Without it a template writes the narrative.")
+    use_llm = st.sidebar.toggle("Claude narratives", value=False, disabled=not has_claude,
+                                help="Needs ANTHROPIC_API_KEY. Off by default: each new set of numbers is one "
+                                     "API call (cached on disk). Without it a template writes the narrative.")
     keys = {k: env_key(k) is not None for k in ["TOMTOM_API_KEY", "DUBAI_PULSE_KEY", "MAPILLARY_TOKEN",
                                                "ANTHROPIC_API_KEY"]}
     st.sidebar.caption("API keys: " + ", ".join(f"{k.split('_')[0].title()} {'set' if v else 'not set'}"
@@ -201,6 +202,8 @@ def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
 
 def page_map(res: Results, params: Params) -> None:
     st.header("Placements, exposure cones and visible road segments")
+    view_mode = st.radio("View", ["All placements", "Selected placement (sidebar)"], horizontal=True,
+                         key="map_view", label_visibility="collapsed")
     st.caption("Segments are coloured by visibility score V (blue = low, yellow = high). Hover for the "
                "factor breakdown and volume source.")
     radius, half = params.base("cone_radius_m"), params.base("half_angle_deg")
@@ -245,12 +248,17 @@ def page_map(res: Results, params: Params) -> None:
         pdk.Layer("TextLayer", pin_rows, get_position="position", get_text="label", get_size=15,
                   get_color=[255, 255, 255], get_pixel_offset=[0, -18]),
     ]
-    focus = res.placements[st.session_state.get("pid", "H1")].prep.snapped
-    view = pdk.ViewState(latitude=focus.lat, longitude=focus.lon, zoom=14.2, pitch=0)
+    if view_mode == "All placements":
+        lats = [r.prep.snapped.lat for r in res.placements.values()]
+        lons = [r.prep.snapped.lon for r in res.placements.values()]
+        view = pdk.ViewState(latitude=float(np.mean(lats)), longitude=float(np.mean(lons)), zoom=11.0, pitch=0)
+    else:
+        focus = res.placements[st.session_state.get("pid", "H1")].prep.snapped
+        view = pdk.ViewState(latitude=focus.lat, longitude=focus.lon, zoom=14.6, pitch=0)
     st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=view, map_provider="carto", map_style="dark",
                              tooltip={"html": "{tooltip}", "style": {"fontSize": "12px"}}), height=560)
-    st.caption("Basemap © CARTO, data © OpenStreetMap contributors. Pick a placement in the sidebar to centre "
-               "the map on it; zoom out to see all four.")
+    st.caption("Basemap © CARTO, data © OpenStreetMap contributors. Switch to 'Selected placement' to zoom "
+               "into the face picked in the sidebar.")
     rows = []
     for r in res.placements.values():
         s, p = r.prep.snapped, r.prep.placement
@@ -394,17 +402,24 @@ def page_compare(res: Results) -> None:
     rows = []
     for r in res.placements.values():
         p, m, prof = r.prep.placement, r.metrics, r.profile
-        rel_imp_adv = m["advertiser_impressions_month"].value * prof.interest_share.value
-        cpm = p.cost_per_month_aed / (rel_imp_adv / 1000) if rel_imp_adv else np.nan
+        adv, share = m["advertiser_impressions_month"], prof.interest_share.value
+
+        def cpm_of(imp: float) -> float:
+            return p.cost_per_month_aed / (imp * share / 1000) if imp * share else np.nan
+
+        cpm, cpm_lo, cpm_hi = cpm_of(adv.value), cpm_of(adv.high), cpm_of(adv.low)  # more impressions -> lower cost
         rows.append({
             "Placement": f"{p.id} {p.area}", "Type": p.type,
             "Daily impressions (placement)": m["impressions_day"].value,
+            "Daily impressions range": f"{fmt_num(m['impressions_day'].low)}–{fmt_num(m['impressions_day'].high)}",
             "Daily impressions (advertiser)": m["advertiser_impressions_day"].value,
             "Unique / month": m["unique_month"].value,
             "Unique range": f"{fmt_num(m['unique_month'].low)}–{fmt_num(m['unique_month'].high)}",
             "Car-relevant / month": prof.relevant_reach.value,
+            "Car-relevant range": f"{fmt_num(prof.relevant_reach.low)}–{fmt_num(prof.relevant_reach.high)}",
             "Cost / month AED": p.cost_per_month_aed,
             "AED per 1,000 relevant impressions": cpm,
+            "AED per 1,000 range": f"{cpm_lo:,.1f}–{cpm_hi:,.1f}",
             "Mean visibility": r.reach.mean_visibility,
             "Label": m["unique_month"].label,
         })
