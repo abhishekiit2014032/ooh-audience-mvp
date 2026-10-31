@@ -1,0 +1,15 @@
+station,daily_riders,is_sample,source
+financial centre,22000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+emirates towers,18000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+burj khalifa,30000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+business bay,20000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+mall of the emirates,28000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+equiti,12000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+onpassive,12000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+noor bank,12000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+al safa,10000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+dmcc,22000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+jumeirah lakes towers,22000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+sobha realty,24000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+dubai marina,24000,true,SAMPLE placeholder; replace with Dubai Pulse rta_metro_ridership-open
+_default,15000,true,SAMPLE default when the station is not listed

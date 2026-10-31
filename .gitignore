@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+data/cache/osmnx_http/
+data/cache/api/
+data/outputs/
+.DS_Store

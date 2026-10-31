@@ -1,0 +1,79 @@
+# OOH placements for the demo. Coordinates are APPROXIMATE (from the solution design doc).
+# The pipeline snaps each placement to the nearest matching carriageway on OpenStreetMap,
+# picks a facing bearing that faces oncoming traffic, and logs the result to
+# data/outputs/snap_log.json. Face size, height, cost and facing are ASSUMPTIONS until
+# real site data is supplied by the media owner.
+
+placements:
+  - id: H1
+    name: Sheikh Zayed Road near Financial Centre Metro
+    area: DIFC / Downtown
+    lat: 25.2115            # approximate, verify on OSM
+    lon: 55.2770
+    corridor: Sheikh Zayed Road
+    road_match: ["Sheikh Zayed", "E 11", "E11", "الشيخ زايد"]
+    facing_bearing_deg: 225 # ASSUMPTION: faces traffic heading north-east (towards Deira)
+    type: digital
+    width_m: 12
+    height_m: 8
+    loop_seconds: 60
+    slot_seconds: 10
+    cone_radius_m: 400
+    cost_per_month_aed: 150000   # ASSUMPTION, for the plan builder only
+
+  - id: H2
+    name: Sheikh Zayed Road near Umm Al Sheif exit
+    area: Umm Al Sheif / Al Barsha
+    lat: 25.1407            # doc gave 25.1440, 55.2120 (750 m off, on Al Wasl Road); moved to the SZR carriageway on OSM
+    lon: 55.2184
+    corridor: Sheikh Zayed Road
+    road_match: ["Sheikh Zayed", "E 11", "E11", "الشيخ زايد"]
+    facing_bearing_deg: 225
+    type: static
+    width_m: 14
+    height_m: 5
+    loop_seconds: 1
+    slot_seconds: 1
+    cone_radius_m: 400
+    cost_per_month_aed: 90000    # ASSUMPTION
+
+  - id: H3
+    name: Sheikh Zayed Road near Dubai Marina
+    area: Dubai Marina / JLT
+    lat: 25.0805
+    lon: 55.1455
+    corridor: Sheikh Zayed Road
+    road_match: ["Sheikh Zayed", "E 11", "E11", "الشيخ زايد"]
+    facing_bearing_deg: 45  # ASSUMPTION: faces traffic heading south-west (towards Abu Dhabi)
+    type: digital
+    width_m: 12
+    height_m: 8
+    loop_seconds: 60
+    slot_seconds: 10
+    cone_radius_m: 400
+    cost_per_month_aed: 120000   # ASSUMPTION
+
+  - id: H4
+    name: Al Khail Road, Al Quoz area
+    area: Al Quoz
+    lat: 25.1694            # doc gave 25.1700, 55.2520 (1.7 km west of Al Khail Road); moved to the E44 carriageway on OSM
+    lon: 55.2690
+    corridor: Al Khail Road
+    road_match: ["Al Khail Road", "E 44", "E44"]
+    facing_bearing_deg: 225
+    type: static
+    width_m: 12
+    height_m: 4
+    loop_seconds: 1
+    slot_seconds: 1
+    cone_radius_m: 400
+    cost_per_month_aed: 70000    # ASSUMPTION
+
+campaign:
+  brand: Example SUV launch
+  brand_category: automotive_suv
+  plan_start: 2026-11-01
+  plan_end: 2026-11-30
+  budget_aed: 400000
+  baseline_start: 2025-11-01   # same weeks of a prior period, used for the plan
+  baseline_end: 2025-11-30

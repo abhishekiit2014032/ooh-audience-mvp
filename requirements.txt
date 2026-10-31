@@ -1,0 +1,14 @@
+osmnx>=2.0,<3
+geopandas>=1.0
+shapely>=2.0
+pyproj>=3.6
+pandas>=2.2
+numpy>=1.26
+requests>=2.31
+pydantic>=2.6
+pyyaml>=6.0
+streamlit>=1.38
+pydeck>=0.9
+plotly>=5.20
+anthropic>=0.40
+pytest>=8.0

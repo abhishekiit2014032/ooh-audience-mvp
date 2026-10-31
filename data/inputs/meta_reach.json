@@ -1,0 +1,23 @@
+{
+  "is_sample": true,
+  "note": "SAMPLE placeholders. Replace with values copied from Meta Ads Manager: location = pin on the face, radius 1 km, United Arab Emirates, people living in or recently in this location, ages 18-65+. Set is_sample to false once all placements are filled.",
+  "copied_on": null,
+  "placements": {
+    "H1": {"radius_km": 1, "audience_size_low": 180000, "audience_size_high": 212000,
+           "age": {"18-24": 0.12, "25-34": 0.38, "35-44": 0.29, "45-54": 0.13, "55+": 0.08},
+           "gender": {"male": 0.66, "female": 0.34},
+           "interest_share": {"automobiles": 0.33, "suv": 0.12, "luxury_vehicles": 0.10}},
+    "H2": {"radius_km": 1, "audience_size_low": 95000, "audience_size_high": 112000,
+           "age": {"18-24": 0.13, "25-34": 0.35, "35-44": 0.30, "45-54": 0.14, "55+": 0.08},
+           "gender": {"male": 0.64, "female": 0.36},
+           "interest_share": {"automobiles": 0.30, "suv": 0.11, "luxury_vehicles": 0.07}},
+    "H3": {"radius_km": 1, "audience_size_low": 160000, "audience_size_high": 188000,
+           "age": {"18-24": 0.15, "25-34": 0.39, "35-44": 0.27, "45-54": 0.12, "55+": 0.07},
+           "gender": {"male": 0.61, "female": 0.39},
+           "interest_share": {"automobiles": 0.29, "suv": 0.10, "luxury_vehicles": 0.09}},
+    "H4": {"radius_km": 1, "audience_size_low": 70000, "audience_size_high": 82000,
+           "age": {"18-24": 0.14, "25-34": 0.37, "35-44": 0.30, "45-54": 0.13, "55+": 0.06},
+           "gender": {"male": 0.74, "female": 0.26},
+           "interest_share": {"automobiles": 0.35, "suv": 0.13, "luxury_vehicles": 0.05}}
+  }
+}

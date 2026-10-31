@@ -1,0 +1,9 @@
+{
+  "is_sample": true,
+  "note": "SAMPLE placeholders shaped like Dubai Statistics Center population tables. Replace with the latest DSC publication (population by area, age and gender) and set is_sample to false.",
+  "source": "Dubai Statistics Center (to be filled)",
+  "source_url": "https://www.dsc.gov.ae",
+  "emirate_total": 3800000,
+  "gender": {"male": 0.69, "female": 0.31},
+  "age": {"0-14": 0.15, "15-24": 0.11, "25-34": 0.30, "35-44": 0.25, "45-54": 0.12, "55+": 0.07}
+}

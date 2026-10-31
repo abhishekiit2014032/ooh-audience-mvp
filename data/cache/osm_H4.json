@@ -1,0 +1,15 @@
+{
+  "placement": "H4",
+  "lat": 25.1694,
+  "lon": 55.269,
+  "radius_m": 1500,
+  "endpoint": "https://overpass-api.de/api",
+  "fetched_at": "2026-10-31T07:34:42+00:00",
+  "counts": {
+    "edges": 1310,
+    "buildings": 5082,
+    "pois": 100,
+    "rail": 0,
+    "stations": 1
+  }
+}
