@@ -1,0 +1,1587 @@
+{
+ "updated_at": "2026-11-01T15:06:09+00:00",
+ "searches": {
+  "H1": "2026-11-01",
+  "H2": "2026-11-01",
+  "H3": "2026-11-01",
+  "H4": "2026-11-01",
+  "cars": "2026-11-01"
+ },
+ "facts": {
+  "19b05eb1e5ad": {
+   "kind": "event_attendance",
+   "what": "Dubai Ride",
+   "place": "Sheikh Zayed Road",
+   "value": 41836.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": "2026-11-01",
+   "event_end": "2026-11-01",
+   "figure_year": 2026,
+   "tags": [
+    "sports",
+    "families"
+   ],
+   "quote": "This morning, an astounding 41,836 cyclists gathered at sunrise to pedal through the heart of the city for Dubai Ride 2026, turning Dubai’s most famous highway into a giant celebration of fitness, togetherness, and community spirit.",
+   "source_url": "https://lovin.co/dubai/en/community/41000-cyclists-took-over-sheikh-zayed-road-this-morning-for-an-unforgettable-dubai-ride-2026/",
+   "source_title": "41,000+ Cyclists Took Over Sheikh Zayed Road This Morning For An Unforgettable Dubai Ride 2026",
+   "confidence": 0.85,
+   "note": "Route not checked on the page; Sheikh Zayed Road closed to cars that morning",
+   "measure": "count",
+   "near": [
+    "DIFC",
+    "Downtown Dubai",
+    "Dubai World Trade Centre",
+    "Dubai Mall",
+    "Burj Khalifa"
+   ],
+   "id": "19b05eb1e5ad",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "06a504fbcf5c": {
+   "kind": "venue_footfall",
+   "what": "Dubai Mall",
+   "place": "Dubai Mall",
+   "value": 111000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2024,
+   "tags": [
+    "general",
+    "luxury",
+    "families"
+   ],
+   "quote": "More than 111 million visitors arrived through the mall’s doors in 2024 which easily sees it surpass its previous record of 105 million visitors from the previous year.",
+   "source_url": "https://www.timeoutdubai.com/news/dubai-mall-2025",
+   "source_title": "Dubai Mall opens The District",
+   "confidence": 0.85,
+   "note": "2024 figure; this search found no confirmed 2025 figure",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Downtown Dubai",
+    "Burj Khalifa"
+   ],
+   "id": "06a504fbcf5c",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "ef8c4207c327": {
+   "kind": "venue_footfall",
+   "what": "Dubai World Trade Centre",
+   "place": "Dubai World Trade Centre",
+   "value": 2970000.0,
+   "unit": "people",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "business"
+   ],
+   "quote": "Dubai World Trade Centre (DWTC) welcomed 2.97 million participants across 401 events in 2025, as rising international attendance and a growing exhibition calendar reinforced Dubai’s position as a global business and events hub.",
+   "source_url": "https://www.arabianbusiness.com/business/tourism-hospitality/dubais-dwtc-draws-nearly-3-million-participants-in-2025-as-international-attendance-climbs",
+   "source_title": "Dubai's DWTC draws nearly 3 million participants in 2025 as international attendance climbs",
+   "confidence": 0.85,
+   "note": "Total across 401 events in 2025",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "ef8c4207c327",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "d8e06f89b588": {
+   "kind": "new_homes_or_offices",
+   "what": "DIFC workforce",
+   "place": "DIFC",
+   "value": 50200.0,
+   "unit": "employees",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "business"
+   ],
+   "quote": "DIFC’s greatest strength remains its talented workforce, which grew to 50,200 financial services related professionals.",
+   "source_url": "https://www.difc.com/whats-on/news/dubai-international-financial-centre-announces-landmark-annual-results-for-2025",
+   "source_title": "Dubai International Financial Centre announces landmark annual results for 2025",
+   "confidence": 0.9,
+   "note": "Financial services professionals only, end of 2025; daily commuters to DIFC",
+   "measure": "count",
+   "near": [
+    "DIFC"
+   ],
+   "id": "d8e06f89b588",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "93774f6a6681": {
+   "kind": "transit_ridership",
+   "what": "Burj Khalifa/Dubai Mall Metro Station",
+   "place": "Burj Khalifa/Dubai Mall Metro Station",
+   "value": 56000.0,
+   "unit": "riders",
+   "period": "day",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2023,
+   "tags": [
+    "general"
+   ],
+   "quote": "Ridership then grew to 8.827 million passengers in 2022, and exceeded 10.202 million passengers in 2023, with a daily average of 56,000 passengers.",
+   "source_url": "https://economymiddleeast.com/news/rta-to-expand-burj-khalifa-dubai-mall-metro-station-increasing-capacity-by-65-percent/",
+   "source_title": "RTA to expand Burj Khalifa, Dubai Mall Metro Station, increasing capacity by 65 percent",
+   "confidence": 0.85,
+   "note": "2023 daily average; neighbouring station, not Financial Centre",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Burj Khalifa",
+    "Downtown Dubai"
+   ],
+   "id": "93774f6a6681",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "f688b81c5e76": {
+   "kind": "transit_ridership",
+   "what": "Burj Khalifa/Dubai Mall Metro Station on New Year's Eve",
+   "place": "Burj Khalifa/Dubai Mall Metro Station",
+   "value": 110000.0,
+   "unit": "riders",
+   "period": "day",
+   "event_start": "2026-12-31",
+   "event_end": "2026-12-31",
+   "figure_year": null,
+   "tags": [
+    "general",
+    "culture"
+   ],
+   "quote": "Passenger numbers during New Year’s Eve exceed 110,000, and the station has recorded an average annual ridership growth of 7.5% over the past five years,” he stated.",
+   "source_url": "https://www.rta.ae/wps/portal/rta/ae/home/news-and-media/all-news/NewsDetails/expansion-of-burj-khalifa-dubai-mall-metro-station-to-boost-capacity-by-65percent",
+   "source_title": "News Details - Roads & Transport Authority",
+   "confidence": 0.6,
+   "note": "Edition year not given; 2026 NYE date is the usual Dec 31",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Burj Khalifa",
+    "Downtown Dubai"
+   ],
+   "id": "f688b81c5e76",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "cb3e0a09ccb1": {
+   "kind": "traffic_count",
+   "what": "Sheikh Zayed Road",
+   "place": "Sheikh Zayed Road",
+   "value": 400000.0,
+   "unit": "vehicles",
+   "period": "day",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general",
+    "cars"
+   ],
+   "quote": "It is one of the busiest and most heavily used roads in the region, carrying over 400,000 vehicles daily and up to 14,000 vehicles per hour on specific expanded stretches.",
+   "source_url": "https://www.arabianbusiness.com/business/transport/dubai-sheikh-zayed-road-traffic-carriageway",
+   "source_title": "Dubai’s Sheikh Zayed Road traffic to be cut by half with 15-km carriageway serving 2.6 million people",
+   "confidence": 0.75,
+   "note": "Figure is for the whole road, not just the Marina stretch; 'over' 400,000.",
+   "measure": "count",
+   "near": [
+    "Dubai Marina",
+    "JLT"
+   ],
+   "id": "cb3e0a09ccb1",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "5c649fedd6b8": {
+   "kind": "traffic_count",
+   "what": "Sheikh Zayed Road near Umm Al Sheif exit",
+   "place": "Umm Al Sheif",
+   "value": 14000.0,
+   "unit": "vehicles",
+   "period": "hour",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "cars",
+    "general"
+   ],
+   "quote": "The upgrade expanded the lanes from six to seven, increasing capacity by 16% to accommodate up to 14,000 vehicles per hour.",
+   "source_url": "https://www.mediaoffice.ae/en/news/2025/september/09-09/rta-completes-700-metre-expansion-on-sheikh-zayed-road-near-umm-al-sheif-exit",
+   "source_title": "RTA completes 700-metre expansion on Sheikh Zayed Road Near Umm Al Sheif Exit",
+   "confidence": 0.9,
+   "note": "Road capacity of the widened 700m stretch, not a counted flow",
+   "measure": "capacity",
+   "near": [
+    "Umm Al Sheif",
+    "Al Barsha",
+    "Mall of the Emirates",
+    "Umm Suqeim"
+   ],
+   "id": "5c649fedd6b8",
+   "placements": [
+    "H2"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H2",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "2e7ca208b5af": {
+   "kind": "traffic_count",
+   "what": "Sheikh Zayed Road",
+   "place": "Sheikh Zayed Road",
+   "value": 35000.0,
+   "unit": "vehicles",
+   "period": "hour",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general",
+    "cars"
+   ],
+   "quote": "While being one of the most scenic drives in Dubai, Sheikh Zayed Road is also one of the most congested streets, with more than 400,000 vehicles per day and peak of 35,000 vehicles per hour in both directions.",
+   "source_url": "https://transformtransport.org/research/article/sheikh-zayed-road/",
+   "source_title": "Sheikh Zayed Road - Transform Transport",
+   "confidence": 0.65,
+   "note": "Peak hour, both directions, whole road; source is about 3 years old.",
+   "measure": "count",
+   "near": [
+    "Dubai Marina",
+    "JLT"
+   ],
+   "id": "2e7ca208b5af",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "d1aa800e8d18": {
+   "kind": "venue_footfall",
+   "what": "Mall of the Emirates",
+   "place": "Mall of the Emirates",
+   "value": 40000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2024,
+   "tags": [
+    "luxury",
+    "families",
+    "general"
+   ],
+   "quote": "Mall of the Emirates welcomed more than 40 million visitors in 2024, latest company data shows.",
+   "source_url": "https://www.thenationalnews.com/business/property/2025/04/16/dubais-mall-of-the-emirates-to-undergo-136bn-makeover-to-mark-20th-anniversary/",
+   "source_title": "Dubai's Mall of the Emirates to undergo $1.36bn makeover to mark 20th anniversary",
+   "confidence": 0.9,
+   "note": "2024 figure; 'more than' 40 million",
+   "measure": "count",
+   "near": [
+    "Mall of the Emirates",
+    "Al Barsha",
+    "Ski Dubai",
+    "Umm Al Sheif"
+   ],
+   "id": "d1aa800e8d18",
+   "placements": [
+    "H2"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H2",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "d591aecdac37": {
+   "kind": "event_attendance",
+   "what": "Dubai Run",
+   "place": "Sheikh Zayed Road",
+   "value": 307000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "sports",
+    "general"
+   ],
+   "quote": "A record 307,000 participants took over Sheikh Zayed Road for Dubai Run 2025.",
+   "source_url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/08/14/dubai-run-2026-date-dubai-ride-fitness-challenge/",
+   "source_title": "Dubai Run and Dubai Ride 2026 dates revealed for Fitness Challenge",
+   "confidence": 0.8,
+   "note": "2025 edition; 2026 date not in text I found; not car event",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre",
+    "DIFC",
+    "Downtown Dubai"
+   ],
+   "id": "d591aecdac37",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "e41e69191eb1": {
+   "kind": "venue_footfall",
+   "what": "The Walk and JBR Beach",
+   "place": "JBR",
+   "value": 12000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2024,
+   "tags": [
+    "families",
+    "general"
+   ],
+   "quote": "Annual visitor count to The Walk and JBR beach: approximately 12 million.",
+   "source_url": "https://www.constantestate.com/blog/best-properties-in-jumeirah-beach-residence",
+   "source_title": "Best Properties to Buy in Jumeirah Beach Residence (JBR) 2026",
+   "confidence": 0.45,
+   "note": "Property blog citing DTCM 2024 statistics; not verified at source",
+   "measure": "count",
+   "near": [
+    "JBR",
+    "Dubai Marina"
+   ],
+   "id": "e41e69191eb1",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "b3d2ddf2c781": {
+   "kind": "new_homes_or_offices",
+   "what": "JLT",
+   "place": "JLT",
+   "value": 100000.0,
+   "unit": "people",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general",
+    "business"
+   ],
+   "quote": "JLT is home to 100,000 people spread across the 2 million square meter community and its 87 residential and commercial towers.",
+   "source_url": "https://www.timeoutdubai.com/news/jlt-rebranding-after-16-years",
+   "source_title": "JLT: After 16 years, JLT is rebranding",
+   "confidence": 0.6,
+   "note": "Article is about 4 years old; another page says 100,000 live, work and visit.",
+   "measure": "count",
+   "near": [
+    "JLT",
+    "Dubai Marina"
+   ],
+   "id": "b3d2ddf2c781",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "dd4f9f07c377": {
+   "kind": "new_homes_or_offices",
+   "what": "JLT",
+   "place": "JLT",
+   "value": 35000.0,
+   "unit": "residents",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general"
+   ],
+   "quote": "With a growing population of over 35,000 residents JLT suits singles and young couples who have come to Dubai to work.",
+   "source_url": "https://propsearch.ae/dubai/jumeirah-lakes-towers",
+   "source_title": "Propsearch.ae - Dubai Real Estate Research Platform",
+   "confidence": 0.5,
+   "note": "Residents only; this conflicts with the 100,000 figure; date unclear.",
+   "measure": "count",
+   "near": [
+    "JLT"
+   ],
+   "id": "dd4f9f07c377",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "c5dba2f88b6b": {
+   "kind": "new_homes_or_offices",
+   "what": "Hilton Residences JLT",
+   "place": "JLT",
+   "value": 396.0,
+   "unit": "homes",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "luxury"
+   ],
+   "quote": "With 396 units across studios, one-, two-, three-bedroom apartments, and exclusive four-bedroom sky villas, the tower is tailored to diverse lifestyles while maintaining Hilton’s hallmark of hospitality excellence.",
+   "source_url": "https://uaenews247.com/2025/11/03/hilton-residences-jlt-unveiled-a-new-icon-of-luxury-living-in-dubai/",
+   "source_title": "Hilton Residences JLT Unveiled: A New Icon of Luxury Living in Dubai",
+   "confidence": 0.6,
+   "note": "Planned units; no handover date given.",
+   "measure": "expected",
+   "near": [
+    "JLT"
+   ],
+   "id": "c5dba2f88b6b",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "ff9534dd93c4": {
+   "kind": "new_homes_or_offices",
+   "what": "Jumeirah Beach Residence",
+   "place": "JBR",
+   "value": 15000.0,
+   "unit": "residents",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general"
+   ],
+   "quote": "JBR can accommodate about 15,000 people, living in its apartments and hotel rooms.",
+   "source_url": "https://en.wikipedia.org/wiki/Jumeirah_Beach_Residence",
+   "source_title": "Jumeirah Beach Residence",
+   "confidence": 0.55,
+   "note": "How many JBR can house, not a count of residents.",
+   "measure": "capacity",
+   "near": [
+    "JBR"
+   ],
+   "id": "ff9534dd93c4",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "c2084686e9c6": {
+   "kind": "venue_footfall",
+   "what": "Alserkal Avenue",
+   "place": "Alserkal Avenue",
+   "value": 2000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "culture",
+    "general"
+   ],
+   "quote": "Founded in 2007 by Emirati businessman and patron Abdelmonem Bin Eisa Alserkal, the organisation began with the transformation of a former industrial site into Alserkal Avenue, now one of the region’s most vibrant cultural districts, home to more than 100 creative organisations and welcoming over two million visitors each year.",
+   "source_url": "https://alserkal.online/about/",
+   "source_title": "Be Inspired At Alserkal Avenue",
+   "confidence": 0.75,
+   "note": "Operator's own claim, 'over two million'; year not given",
+   "measure": "count",
+   "near": [
+    "Alserkal Avenue",
+    "Al Quoz"
+   ],
+   "id": "c2084686e9c6",
+   "placements": [
+    "H4"
+   ],
+   "status": "filtered",
+   "reason": "the quote does not state this number",
+   "search": "H4",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "a6dfeaec9a26": {
+   "kind": "event_attendance",
+   "what": "Dubai Racing Carnival 2026-27",
+   "place": "Meydan",
+   "value": 60000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": "2026-11-06",
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "sports",
+    "luxury"
+   ],
+   "quote": "The architectural masterpiece is the permanent home for the Dubai World Cup and is the world’s largest integrated racing facility, with a Grandstand seating capacity for more than 60,000.",
+   "source_url": "https://dubairacingclub.com/press-releases/carnival-tickets-on-sale/",
+   "source_title": "Tickets Now On Sale For 2026-27 Dubai Racing Carnival",
+   "confidence": 0.7,
+   "note": "Grandstand capacity, not raceday attendance; season starts 6 Nov",
+   "measure": "capacity",
+   "near": [
+    "Meydan",
+    "Al Khail Road"
+   ],
+   "id": "a6dfeaec9a26",
+   "placements": [
+    "H4"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H4",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "383d4c43e51e": {
+   "kind": "event_attendance",
+   "what": "Meydan Racecourse",
+   "place": "Meydan",
+   "value": 80000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "sports",
+    "luxury"
+   ],
+   "quote": "Stretching 1.6 kilometres and accommodating up to 80,000 spectators, Meydan Racecourse hosts the Dubai Racing Carnival, an internationally recognised racing season staged from November to March.",
+   "source_url": "https://emiratesracing.com/racecourses/meydan",
+   "source_title": "Meydan",
+   "confidence": 0.65,
+   "note": "Maximum capacity, not attendance; other sources say 60,000",
+   "measure": "capacity",
+   "near": [
+    "Meydan",
+    "Al Khail Road"
+   ],
+   "id": "383d4c43e51e",
+   "placements": [
+    "H4"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H4",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "f5ddf0c329d1": {
+   "kind": "event_attendance",
+   "what": "Quoz Arts Fest",
+   "place": "Alserkal Avenue",
+   "value": 38000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "culture",
+    "families"
+   ],
+   "quote": "“We had 38,000 people visit over the weekend, much higher than our target of 25,000 so we are thrilled!”",
+   "source_url": "https://huglondon.com/work/alserkal-avenue",
+   "source_title": "Alserkal Avenue — exceeding targets for Quoz Arts Fest I (hug)",
+   "confidence": 0.5,
+   "note": "Agency case study; edition not stated, probably 2020; held in January",
+   "measure": "count",
+   "near": [
+    "Alserkal Avenue",
+    "Al Quoz"
+   ],
+   "id": "f5ddf0c329d1",
+   "placements": [
+    "H4"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H4",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "84f2d06e2672": {
+   "kind": "traffic_count",
+   "what": "Al Khail Road Improvement Project",
+   "place": "Al Khail Road",
+   "value": 19600.0,
+   "unit": "vehicles",
+   "period": "hour",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general"
+   ],
+   "quote": "The existing intersections and bridges along the route are now able to accommodate around 19,600 vehicles per hour.",
+   "source_url": "https://www.timeoutdubai.com/news/al-khail-road-improvement-project-dubai",
+   "source_title": "The Dhs700 million Al Khail Road Improvement project is complete",
+   "confidence": 0.6,
+   "note": "Added capacity across whole road, not a vehicle count",
+   "measure": "capacity",
+   "near": [
+    "Al Khail Road",
+    "Al Quoz",
+    "Meydan"
+   ],
+   "id": "84f2d06e2672",
+   "placements": [
+    "H4"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H4",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "574b294fec4f": {
+   "kind": "event_attendance",
+   "what": "Dubai Ride",
+   "place": "Sheikh Zayed Road",
+   "value": 41836.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": "2026-11-01",
+   "event_end": "2026-11-01",
+   "figure_year": 2026,
+   "tags": [
+    "sports",
+    "families",
+    "general"
+   ],
+   "quote": "Dubai: Dubai Ride presented by DP World marked the first flagship event of the landmark 10th edition of Dubai Fitness Challenge (DFC) this morning, with 41,836 cyclists taking to Sheikh Zayed Road for the region’s largest community cycling event.",
+   "source_url": "https://www.emirates247.com/uae/dubai-ride-draws-41836-cyclists-to-sheikh-zayed-road-for-10th-dubai-fitness-challenge/7337",
+   "source_title": "Dubai Ride draws 41,836 cyclists to Sheikh Zayed Road for 10th Dubai Fitness Challenge - Emirates 24|7",
+   "confidence": 0.85,
+   "note": "Cycling event, not cars; source does not list route landmarks",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre",
+    "DIFC",
+    "Downtown Dubai"
+   ],
+   "id": "574b294fec4f",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "88a6e71045ad": {
+   "kind": "event_attendance",
+   "what": "Icons of Porsche",
+   "place": "Dubai Design District",
+   "value": 28000.0,
+   "unit": "visitors",
+   "period": "event",
+   "event_start": "2026-11-22",
+   "event_end": "2026-11-23",
+   "figure_year": 2025,
+   "tags": [
+    "cars",
+    "luxury",
+    "culture"
+   ],
+   "quote": "The 2025 edition drew 28,000–30,000 visitors and featured 300+ vehicles; continued growth is anticipated.",
+   "source_url": "https://www.dubicars.com/news/upcoming-car-events-dubai-2025-26.html",
+   "source_title": "Upcoming Car Events In Dubai 2026",
+   "confidence": 0.6,
+   "note": "Source gives 28,000–30,000 range; 2026 dates only 'expected', venue unconfirmed",
+   "measure": "count",
+   "near": [],
+   "id": "88a6e71045ad",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "fb5aa046033c": {
+   "kind": "event_attendance",
+   "what": "Custom Show Emirates",
+   "place": "Dubai World Trade Centre",
+   "value": 40000.0,
+   "unit": "visitors",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "cars"
+   ],
+   "quote": "Historically, this event attracts over 40,000 visitors and showcases hundreds of custom cars, trucks, and bikes.",
+   "source_url": "https://www.yallamotor.com/news/upcoming-car-events-in-dubai-2026-55068",
+   "source_title": "Upcoming Car Events in Dubai 2026",
+   "confidence": 0.45,
+   "note": "Historical, edition not given; 2026 dates and venue unconfirmed",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "fb5aa046033c",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "a54c42eccf4b": {
+   "kind": "event_attendance",
+   "what": "Dubai International Motor Show",
+   "place": "Dubai World Trade Centre",
+   "value": 108357.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "cars"
+   ],
+   "quote": "That was incredible we had 108,357 attendees across the 5 days!",
+   "source_url": "https://www.linkedin.com/showcase/dubai-international-motorshow",
+   "source_title": "Dubai International Motor Show",
+   "confidence": 0.5,
+   "note": "Edition year not stated; no 2026 edition dates found",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "a54c42eccf4b",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "7e2ac95ceb4e": {
+   "kind": "event_attendance",
+   "what": "Dubai International Motor Show",
+   "place": "Dubai World Trade Centre",
+   "value": 100000.0,
+   "unit": "visitors",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2017,
+   "tags": [
+    "cars"
+   ],
+   "quote": "The show will span 85,000 square metres of exhibition space at the World Trade Centre, and during its five-day run, expected to welcome more than 100,000 visitors.",
+   "source_url": "https://blog.japanesecartrade.com/1043-dubai-international-motor-show/",
+   "source_title": "Dubai International Motor Show - Auto Shows & Events",
+   "confidence": 0.5,
+   "note": "2017 edition forecast; old figure",
+   "measure": "expected",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "7e2ac95ceb4e",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "737f91ee81a7": {
+   "kind": "event_attendance",
+   "what": "Gulf Car Festival",
+   "place": "Dubai",
+   "value": 5000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2018,
+   "tags": [
+    "cars"
+   ],
+   "quote": "15 – 17th November, 2018: Around 5,000 people attended this year's Gulf Car Festival, one of the biggest ever to be held in Dubai.",
+   "source_url": "https://www.cud.ac.ae/news/cud-motor-club-goes-full-throttle-gulf-car-festival",
+   "source_title": "CUD Motor Club Goes Full-Throttle at the Gulf Car Festival",
+   "confidence": 0.4,
+   "note": "Old 2018 figure, 'around'; recent editions not found",
+   "measure": "count",
+   "near": [],
+   "id": "737f91ee81a7",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "9eba8ee748f9": {
+   "kind": "venue_footfall",
+   "what": "Dubai World Trade Centre",
+   "place": "Dubai World Trade Centre",
+   "value": 3000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "business",
+    "general"
+   ],
+   "quote": "Exhibitions, shows, concerts, and other events here draw well over 3 million visitors each year.",
+   "source_url": "https://www.dubai-online.com/sights/dubai-world-trade-centre/",
+   "source_title": "Dubai World Trade Centre (DWTC) - Events Calendar, Location",
+   "confidence": 0.5,
+   "note": "Page about four years old; all events, not cars only",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "9eba8ee748f9",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "61079aded3d6": {
+   "kind": "venue_footfall",
+   "what": "Dubai World Trade Centre mega events",
+   "place": "Dubai World Trade Centre",
+   "value": 30000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "business",
+    "general"
+   ],
+   "quote": "Around 25 events are classified as ‘mega events’, each attracting more than 30,000 people.",
+   "source_url": "https://www.dubai-online.com/sights/dubai-world-trade-centre/",
+   "source_title": "Dubai World Trade Centre (DWTC) - Events Calendar, Location",
+   "confidence": 0.45,
+   "note": "Lower bound per event; page about four years old",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "61079aded3d6",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "6ef4f8204fc3": {
+   "kind": "venue_footfall",
+   "what": "Dubai Mall",
+   "place": "Dubai Mall",
+   "value": 111000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2024,
+   "tags": [
+    "general",
+    "luxury",
+    "families"
+   ],
+   "quote": "More than 111 million visitors arrived through the mall’s doors in 2024 which easily sees it surpass its previous record of 105 million visitors from the previous year.",
+   "source_url": "https://www.timeoutdubai.com/news/dubai-mall-record-visitors",
+   "source_title": "111 million visitors at Dubai Mall in 2024; record-breaking numbers",
+   "confidence": 0.9,
+   "note": "2024 figure; 2025 full-year figure not found",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Downtown Dubai",
+    "Burj Khalifa"
+   ],
+   "id": "6ef4f8204fc3",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "1cb05ee10afd": {
+   "kind": "transit_ridership",
+   "what": "Burj Khalifa/Dubai Mall Metro Station",
+   "place": "Downtown Dubai",
+   "value": 10900000.0,
+   "unit": "riders",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "general"
+   ],
+   "quote": "On the Red Line, Union Metro Station recorded the highest ridership with 13.6 million riders, followed by Mall of the Emirates Metro Station with 11.2 million riders, and Burj Khalifa Dubai Mall Metro Station with 10.9 million riders.",
+   "source_url": "https://www.mediaoffice.ae/en/news/2026/february/15-02/rta-records-802-riders-in-dubai-2025",
+   "source_title": "802 Million Riders Used Public Transport, Shared Mobility and Taxis in 2025",
+   "confidence": 0.9,
+   "note": "Next station along from Financial Centre; Financial Centre's own figure not found",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Burj Khalifa",
+    "Downtown Dubai",
+    "DIFC"
+   ],
+   "id": "1cb05ee10afd",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "b890b7f2cd37": {
+   "kind": "transit_ridership",
+   "what": "Burj Khalifa-Dubai Mall Metro Station on New Year's Eve",
+   "place": "Downtown Dubai",
+   "value": 110000.0,
+   "unit": "riders",
+   "period": "event",
+   "event_start": "2026-12-31",
+   "event_end": "2027-01-01",
+   "figure_year": null,
+   "tags": [
+    "general",
+    "families"
+   ],
+   "quote": "During New Year celebrations alone, the station receives more than 110,000 passengers.",
+   "source_url": "https://www.khaleejtimes.com/uae/transport/rta-announces-expansion-of-burj-khalifa-dubai-mall-metro-station",
+   "source_title": "RTA announces expansion of Burj Khalifa-Dubai Mall Metro Station",
+   "confidence": 0.7,
+   "note": "Typical NYE figure, edition year not stated; 2026 dates assumed",
+   "measure": "count",
+   "near": [
+    "Burj Khalifa",
+    "Dubai Mall",
+    "Downtown Dubai"
+   ],
+   "id": "b890b7f2cd37",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "862847d295de": {
+   "kind": "event_attendance",
+   "what": "Dubai World Trade Centre events",
+   "place": "Dubai World Trade Centre",
+   "value": 2970000.0,
+   "unit": "people",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "business"
+   ],
+   "quote": "DWTC welcomed 2.97 million attendees in 2025 across its Dubai International Convention and Exhibition Centre (DICEC) and Dubai Exhibition Centre (DEC) venues, a 12% year-on-year increase.",
+   "source_url": "https://mediaoffice.ae/en/news/2026/april/07-04/dwtc-in-2025",
+   "source_title": "DWTC Welcomes Nearly 3 Million Participants in 2025, Reinforcing Dubai’s Position as a Leading Global Business Destination",
+   "confidence": 0.9,
+   "note": "Full-year total for all events, not just Nov-Jan",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "862847d295de",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "900ddb2ad6c2": {
+   "kind": "new_homes_or_offices",
+   "what": "DIFC workforce",
+   "place": "DIFC",
+   "value": 47901.0,
+   "unit": "employees",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "business"
+   ],
+   "quote": "The workforce within the Centre increased by 9% over the past year to 47,901 people.",
+   "source_url": "https://fintechnews.ae/27052/fintechdubai/difc-h1-2025-record-growth-new-firms/",
+   "source_title": "DIFC Sees Record Growth in H1 2025 with 32% Surge in New Firms - Fintechnews Middle East",
+   "confidence": 0.8,
+   "note": "H1 2025 figure; this is existing workers, not newly added",
+   "measure": "count",
+   "near": [
+    "DIFC"
+   ],
+   "id": "900ddb2ad6c2",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "0f0c3912d50f": {
+   "kind": "venue_footfall",
+   "what": "Burj Khalifa",
+   "place": "Burj Khalifa",
+   "value": 17000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2023,
+   "tags": [
+    "general",
+    "luxury"
+   ],
+   "quote": "A staggering 17 million visitors flock to the world's tallest tower every year, according to research conducted analytics website Switch On Business.",
+   "source_url": "https://www.khaleejtimes.com/travel/uae-attractions/dubais-burj-khalifa-named-worlds-most-popular-landmark-with-17-million-visitors-per-year",
+   "source_title": "Dubai's Burj Khalifa named world's most popular landmark with 17 million visitors per year",
+   "confidence": 0.5,
+   "note": "Third-party study estimate (2023 article), not an official count",
+   "measure": "expected",
+   "near": [
+    "Burj Khalifa",
+    "Downtown Dubai",
+    "Dubai Mall"
+   ],
+   "id": "0f0c3912d50f",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H1",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "f6049aa054ba": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai Marina",
+   "place": "Dubai Marina",
+   "value": 70550.0,
+   "unit": "residents",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2024,
+   "tags": [
+    "general"
+   ],
+   "quote": "In 2024 it had a population of 70,550.",
+   "source_url": "https://en.wikipedia.org/wiki/Dubai_Marina",
+   "source_title": "Dubai Marina",
+   "confidence": 0.7,
+   "note": "Existing residents, not new homes; Wikipedia figure for 2024",
+   "measure": "count",
+   "near": [
+    "Dubai Marina"
+   ],
+   "id": "f6049aa054ba",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "b593294b84a4": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai Marina",
+   "place": "Dubai Marina",
+   "value": 66000.0,
+   "unit": "residents",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general"
+   ],
+   "quote": "Among the newer freehold areas where foreigners can buy, Dubai Marina is the most populated, with about 66,000 residents.",
+   "source_url": "https://allnewlisting.com/en/dubai-population-in-2026/",
+   "source_title": "Dubai Population 2026: 4.8 Million and Rising",
+   "confidence": 0.55,
+   "note": "Existing residents; listing site says 'about'; year not stated in sentence",
+   "measure": "count",
+   "near": [
+    "Dubai Marina"
+   ],
+   "id": "b593294b84a4",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "9b911a8a5bed": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai Marina",
+   "place": "Dubai Marina",
+   "value": 130000.0,
+   "unit": "residents",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2021,
+   "tags": [
+    "general",
+    "luxury"
+   ],
+   "quote": "Dubai Marina is home to more than 130,000 residents and remains one of the city’s most iconic lifestyle destinations, thanks to its striking skyline, state-of-the-art amenities and buzzing waterfront atmosphere.",
+   "source_url": "https://www.thefirstgroup.com/en/news/2021/6/why-you-should-visit-dubai-marina/",
+   "source_title": "Dubai Marina Guide",
+   "confidence": 0.4,
+   "note": "2021 developer marketing page; conflicts with ~66-70k figures elsewhere",
+   "measure": "count",
+   "near": [
+    "Dubai Marina"
+   ],
+   "id": "9b911a8a5bed",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "9299a757d41f": {
+   "kind": "venue_footfall",
+   "what": "Bluewaters Island",
+   "place": "Bluewaters",
+   "value": 3000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "luxury",
+    "families",
+    "general"
+   ],
+   "quote": "Today, it attracts over **three million visitors** a year — and with good reason: luxury apartments, over 100 retail stores, Michelin-worthy dining and unique attractions make it a must-see.",
+   "source_url": "https://solidcars.ae/blog/bluewaters-island-dubai-guide-ain-dubai-shopping-dining-tips/",
+   "source_title": "Bluewaters Island Dubai Guide",
+   "confidence": 0.4,
+   "note": "Car-rental blog; no official source or year given",
+   "measure": "count",
+   "near": [
+    "Bluewaters",
+    "JBR"
+   ],
+   "id": "9299a757d41f",
+   "placements": [
+    "H3"
+   ],
+   "status": "filtered",
+   "reason": "the quote does not state this number",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "1804b3ab9bce": {
+   "kind": "venue_footfall",
+   "what": "Bluewaters Island",
+   "place": "Bluewaters",
+   "value": 3000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "general"
+   ],
+   "quote": "Bluewaters Island attraction is expected to attract more than 3 million visitors annually.",
+   "source_url": "https://www.memphistours.com/dubai/emirates-travel-guide/dubai-travel-guide/wiki/bluewaters-island-and-dubai-eye",
+   "source_title": "Blue Waters Dubai Eye",
+   "confidence": 0.35,
+   "note": "Forecast made before opening, not a measured count",
+   "measure": "expected",
+   "near": [
+    "Bluewaters",
+    "JBR"
+   ],
+   "id": "1804b3ab9bce",
+   "placements": [
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "H3",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "90a994433cbd": {
+   "kind": "event_attendance",
+   "what": "Dubai Ride",
+   "place": "Sheikh Zayed Road",
+   "value": 40327.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": "2026-11-01",
+   "event_end": "2026-11-01",
+   "figure_year": 2025,
+   "tags": [
+    "sports",
+    "general"
+   ],
+   "quote": "Dubai Ride kicked off the Dubai Fitness Challenge 2025 with an unforgettable morning that transformed Sheikh Zayed Road into the world's most iconic cycling track, welcoming a record 40,327 cyclists to the sixth edition of this flagship event in a spectacular display of community spirit.",
+   "source_url": "https://mediaoffice.ae/en/news/2025/november/02-11/dubai-ride-2025-kicks-off-dubai-fitness-challenge",
+   "source_title": "Dubai Ride 2025 kicks off Dubai Fitness Challenge with record 40,327 cyclists",
+   "confidence": 0.85,
+   "note": "2025 figure; 2026 date from The National; road closed to cars; route stretch not checked",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre",
+    "DIFC",
+    "Downtown Dubai"
+   ],
+   "id": "90a994433cbd",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "82008475a701": {
+   "kind": "event_attendance",
+   "what": "Custom Show Emirates",
+   "place": "Dubai World Trade Centre",
+   "value": 42581.0,
+   "unit": "visitors",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "cars"
+   ],
+   "quote": "The 2025 edition (17–19 October) was successful with 42,581 visitors and 325 custom vehicles.",
+   "source_url": "https://www.dubicars.com/news/upcoming-car-events-dubai-2025-26.html",
+   "source_title": "Upcoming Car Events In Dubai 2026",
+   "confidence": 0.6,
+   "note": "October 2025 edition; 2026 dates unconfirmed, may be outside campaign",
+   "measure": "count",
+   "near": [
+    "Dubai World Trade Centre"
+   ],
+   "id": "82008475a701",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "61b66795170e": {
+   "kind": "event_attendance",
+   "what": "24H Dubai",
+   "place": "Dubai Autodrome",
+   "value": 30000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "cars",
+    "sports"
+   ],
+   "quote": "Overall, there was exciting and competitive racing on the track with bigger grids and an array of top international and regional drivers in action, while off the track, there was a record number of spectators for the 24H Dubai with more than 30,000 attendees for this flagship event.",
+   "source_url": "https://www.gulftoday.ae/sport/2025/05/29/dubai-autodrome-set-to-host-a-packed-motorsport-season",
+   "source_title": "Dubai Autodrome set to host a packed motorsport season",
+   "confidence": 0.7,
+   "note": "2025 edition, 'more than'; 2027 dates not found; Autodrome not in list",
+   "measure": "count",
+   "near": [],
+   "id": "61b66795170e",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "ec6b185c6f0b": {
+   "kind": "event_attendance",
+   "what": "Grand Picnic",
+   "place": "Al Safa Park",
+   "value": 28000.0,
+   "unit": "visitors",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "cars",
+    "families"
+   ],
+   "quote": "The Grand Picnic 2025 was a roaring success, drawing over 28,000 visitors to the scenic Al Safa Park in Dubai.",
+   "source_url": "https://www.dubicars.com/news/grand-picnic-2025-event-highlights.html",
+   "source_title": "Grand Picnic 2025 Event Highlights",
+   "confidence": 0.6,
+   "note": "2025 edition; article dated Aug 2026; next dates unknown",
+   "measure": "count",
+   "near": [],
+   "id": "ec6b185c6f0b",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "30dabb32e7a0": {
+   "kind": "event_attendance",
+   "what": "Socialize & Drive",
+   "place": "Dubai Autodrome",
+   "value": 1600.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "cars",
+    "luxury"
+   ],
+   "quote": "Socialize & Drive 2025 brought over 1,600 guests and more than 400 supercars to the Dubai Autodrome.",
+   "source_url": "https://www.dubicars.com/news/socialize-and-drive-dubai-2025-event-review.html",
+   "source_title": "Socialize & Drive 2025 Dubai: Record Attendance and 400+ Supercars",
+   "confidence": 0.7,
+   "note": "November 2025 supercar meet; 2026 dates not found",
+   "measure": "count",
+   "near": [],
+   "id": "30dabb32e7a0",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "6ea99bea1182": {
+   "kind": "event_attendance",
+   "what": "Dubai Autodrome grandstand",
+   "place": "Dubai Autodrome",
+   "value": 7000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "cars",
+    "sports"
+   ],
+   "quote": "Dubai Autodrome will include retail stores, themed restaurants and refreshment outlets and will also provide private corporate hospitality suites with a public grandstand that can play host to 7,000 spectators.",
+   "source_url": "https://en.wikipedia.org/wiki/Dubai_Autodrome",
+   "source_title": "Dubai Autodrome",
+   "confidence": 0.5,
+   "note": "Grandstand capacity, not a count",
+   "measure": "capacity",
+   "near": [],
+   "id": "6ea99bea1182",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  }
+ }
+}

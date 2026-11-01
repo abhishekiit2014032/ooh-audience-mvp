@@ -59,3 +59,13 @@ def test_combined_relevant_matches_plan(results):
     assert ids
     got = duplication.combined_relevant(ids, results.plan_items, results.overlap)
     assert abs(got - results.plan[-1].combined_relevant) < 1e-6
+
+
+def test_no_crowds_leaves_the_plan_unchanged(results, params):
+    from ooh import footprint as fp
+    from ooh.config import load_placements
+
+    pcfg = load_placements()
+    pulse = fp.campaign_pulse([], pcfg, pcfg.campaign, params, {}, {})
+    plan, _ = fp.plan_with_crowds(results, pulse, pcfg.campaign.budget_aed)
+    assert [s.placement for s in plan] == [s.placement for s in results.plan]

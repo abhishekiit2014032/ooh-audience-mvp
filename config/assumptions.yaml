@@ -299,6 +299,32 @@ parameters:
     description: Events extracted with at least this confidence are switched on by default; others wait for review.
     source: Assumption (guard rail)
 
+  # ---------------------------------------------------------------- crowds from news (people facts)
+  news_event_pass_share:
+    value: 0.10
+    low: 0.05
+    high: 0.20
+    label: ASSUMPTION
+    group: News crowds
+    unit: share of event visitors
+    min: 0.0
+    max: 0.5
+    step: 0.01
+    description: Share of a nearby event's visitors who pass this billboard on the way in or out. Turns a sourced attendance figure into extra people passing the face.
+    source: Assumption; calibrate with traffic counts on event days in the pilot
+  news_audience_match_share:
+    value: 0.70
+    low: 0.50
+    high: 0.85
+    label: ASSUMPTION
+    group: News crowds
+    unit: share of event visitors
+    min: 0.0
+    max: 1.0
+    step: 0.05
+    description: Share of visitors to a themed event (e.g. a motor show) who belong to a campaign's audience when the theme matches (e.g. car fans at a car show). Other events use the normal interest share.
+    source: Assumption
+
 # Per road class: lanes per direction when OSM has no lanes tag, a utilisation multiplier
 # relative to the motorway utilisation above, and a fallback speed when OSM has no maxspeed.
 # All ASSUMPTIONS. Motorway 5 / trunk 4 / primary 3 lanes come from the solution design doc.

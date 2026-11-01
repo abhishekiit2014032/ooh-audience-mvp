@@ -31,6 +31,8 @@ class Placement(BaseModel):
 
     id: str
     name: str
+    short_name: str = ""     # what people call the spot, e.g. "Dubai Marina"; shown instead of the id
+    nearby_places: list[str] = Field(default_factory=list)  # venues / districts whose crowds pass this face
     area: str = ""
     lat: float
     lon: float
@@ -44,6 +46,11 @@ class Placement(BaseModel):
     slot_seconds: float = 1
     cone_radius_m: float = 400
     cost_per_month_aed: float
+
+    @property
+    def label(self) -> str:
+        """Plain-language name for non-technical pages."""
+        return self.short_name or self.area.split("/")[0].strip() or self.id
 
     @property
     def face_area_m2(self) -> float:
@@ -65,11 +72,34 @@ class Campaign(BaseModel):
     budget_aed: float
     baseline_start: date
     baseline_end: date
+    # Who the campaign is for. The target audience = unique audience x interest share.
+    id: str = "default"
+    name: str = ""
+    emoji: str = "🚙"
+    audience: str = "people interested in cars"      # plural noun phrase used in sentences
+    audience_short: str = "car fans"                 # short form for tiles and labels
+    interest_share: float | None = None              # ASSUMPTION until Meta values are entered; None = config default
+    meta_interest: str | None = "automobiles"        # Meta interest key; None = everyone who passes
+    creative_hint: str = ""
+    news_tags: list[str] = Field(default_factory=lambda: ["cars"])  # crowd-event tags that match this audience
+
+    @property
+    def title(self) -> str:
+        return self.name or self.brand
 
 
 class PlacementConfig(BaseModel):
     placements: list[Placement]
     campaign: Campaign
+    campaigns: list[Campaign] = Field(default_factory=list)   # selectable in the app; defaults to [campaign]
+
+    def campaign_options(self) -> list[Campaign]:
+        return self.campaigns or [self.campaign]
+
+    def with_campaign(self, campaign_id: str | None) -> "PlacementConfig":
+        """A copy with the chosen campaign as the active one (unknown id: keep the default)."""
+        chosen = next((c for c in self.campaign_options() if c.id == campaign_id), self.campaign_options()[0])
+        return self.model_copy(update={"campaign": chosen})
 
     @field_validator("placements")
     @classmethod

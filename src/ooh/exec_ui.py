@@ -65,6 +65,9 @@ body { padding:4px 4px 10px; }
               pointer-events:none; transition:opacity .15s, transform .15s; }
 .trust:hover .pop, .trust:focus .pop { opacity:1; transform:none; }
 .muted { color:var(--muted); }
+.dots { display:inline-flex; gap:3px; vertical-align:middle; margin:0 8px 0 3px; }
+.dots i { width:7px; height:7px; border-radius:50%; background:var(--line); }
+.dots i.on { background:var(--accent); }
 .fade { opacity:0; transform:translateY(10px); animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) forwards; }
 @keyframes fadeUp { to { opacity:1; transform:none; } }
 @keyframes pop { 0% { transform:scale(.6); opacity:0; } 70% { transform:scale(1.08); } 100% { transform:scale(1); opacity:1; } }
@@ -81,6 +84,8 @@ function fmtP(x) { x = Math.max(0, x); if (x >= 1e6) return (x / 1e6).toFixed(1)
   if (x >= 1e4) return Math.round(x / 1e3) + 'k'; if (x >= 1e3) return (x / 1e3).toFixed(1) + 'k';
   return Math.round(x).toLocaleString(); }
 function fmtA(x) { return 'AED ' + fmtP(x); }
+function dots(n, of) { of = of || 5; let h = '<span class="dots">';
+  for (let k = 0; k < of; k++) h += `<i class="${k < n ? 'on' : ''}"></i>`; return h + '</span>'; }
 function tween(el, to, fmt, ms) {
   ms = ms || 750; const from = el.dataset.v !== undefined ? +el.dataset.v : (reduce ? to : to * 0.55);
   el.dataset.v = to; if (reduce || from === to) { el.textContent = fmt(to); return; }
@@ -167,6 +172,7 @@ button.reset:hover { transform:translateY(-1px) rotate(-2deg); background:#e4e0f
 .face:hover { transform:translateY(-3px); box-shadow:var(--shadow-up); }
 .face:active { transform:scale(.97); }
 .face:not(.on) { opacity:.62; background:#fbfbfd; }
+.face.focus::before { content:"📍"; position:absolute; top:-10px; left:10px; font-size:14px; }
 .face.on { border-color:var(--c); box-shadow:0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent); }
 .ftop { display:flex; align-items:center; gap:7px; }
 .dot { width:11px; height:11px; border-radius:50%; background:var(--c); flex:none; }
@@ -198,12 +204,12 @@ _DECISION_BODY = r"""
     <div class="eyebrow"><span id="mode">🎯 Our recommendation</span>
       <span class="chip warn trust" tabindex="0" id="trust">◔ <span id="trustname"></span><span class="pop" id="trustpop"></span></span></div>
     <h2 id="headline"></h2>
-    <div class="bigrow"><div class="big" id="reach">0</div><div class="bigsub">car-interested people<br>reached every month</div></div>
+    <div class="bigrow"><div class="big" id="reach">0</div><div class="bigsub" id="bigsub"></div></div>
     <div class="range" id="range"></div>
     <div class="stats">
-      <div class="stat"><div class="k">Monthly spend</div><div class="v" id="spend">–</div><div class="s" id="spends"></div></div>
-      <div class="stat"><div class="k">Cost per person</div><div class="v" id="cpp">–</div><div class="s">per month</div></div>
-      <div class="stat"><div class="k">Double-counting removed</div><div class="v" id="dup">–</div><div class="s">people on 2+ boards</div></div>
+      <div class="stat"><div class="k">Everyone passing</div><div class="v" id="all">–</div><div class="s">people a month, all audiences</div></div>
+      <div class="stat"><div class="k">Billboards</div><div class="v" id="nb">–</div><div class="s" id="nbs"></div></div>
+      <div class="stat"><div class="k">Counted once</div><div class="v" id="dup">–</div><div class="s">repeat drivers not double-counted</div></div>
     </div>
     <div class="bud"><div class="budtrack"><div class="budfill" id="fill"></div></div>
       <div class="budlbl"><span id="budl"></span><span id="budr"></span></div></div>
@@ -213,8 +219,8 @@ _DECISION_BODY = r"""
     <div class="bhead"><div><b>Try your own mix</b><div class="hint">Tap a billboard to add or drop it</div></div>
       <button class="reset" id="reset">↺ Back to our pick</button></div>
     <div class="faces" id="faces"></div>
-    <div class="slider"><div class="srow"><span>Monthly budget</span><b id="bv"></b></div>
-      <input type="range" id="budget" aria-label="Monthly budget">
+    <div class="slider"><div class="srow"><span>Budget</span><b id="bv"></b></div>
+      <input type="range" id="budget" aria-label="Budget as a share of the planned budget">
       <div class="hint">Move the budget and we re-run our pick for that amount</div></div>
   </section>
 </div>
@@ -222,83 +228,91 @@ _DECISION_BODY = r"""
 
 _DECISION_JS = r"""
 const F = D.faces, byId = Object.fromEntries(F.map(f => [f.id, f]));
-let budget = D.budget, sel = new Set(D.picks[String(D.budget)] || []), custom = false;
+let pct = 100, sel = new Set(D.picks['100'] || []), custom = false;
 document.getElementById('trustname').textContent = D.trust[0];
 document.getElementById('trustpop').textContent = D.trust[1];
+document.getElementById('bigsub').innerHTML = `${D.aud_short}<br>reached every month`;
 const facesEl = document.getElementById('faces');
 F.forEach((f, i) => {
   const b = document.createElement('button');
   b.className = 'face fade'; b.style.setProperty('--c', f.color); b.style.animationDelay = (0.12 + i * 0.06) + 's';
-  b.dataset.id = f.id;
+  b.dataset.id = f.id; if (f.focus) b.classList.add('focus');
   b.innerHTML = `<span class="ribbon">⭐ Our pick</span>
-    <div class="ftop"><span class="dot"></span><b>${f.id}</b><span class="tick">✓</span></div>
-    <div class="fname" title="${f.name}">${f.area} · ${f.type}</div>
-    <div class="fnum">${fmtP(f.rel)} <small>people / month</small></div>
-    <div class="fsub">${fmtA(f.cost)} · AED ${f.cpp.toFixed(2)} per person</div>`;
+    <div class="ftop"><span class="dot"></span><b>${f.label}</b><span class="tick">✓</span></div>
+    <div class="fname" title="${f.name}">${f.road} · ${f.type}</div>
+    <div class="fnum">${fmtP(f.rel)} <small>${D.aud_short} / month</small></div>
+    <div class="fsub"><span title="Value for money: ${D.aud_short} reached per dirham, best billboard = 5 dots">Value ${dots(f.value_dots)}</span>
+      <span title="Price compared with the other billboards">Price ${dots(f.price_dots, 4)}</span></div>`;
   b.onclick = () => { sel.has(f.id) ? sel.delete(f.id) : sel.add(f.id); custom = true; render(); };
   facesEl.appendChild(b);
 });
 const slider = document.getElementById('budget');
-slider.min = 0; slider.max = D.budget_max; slider.step = D.step; slider.value = budget;
-slider.oninput = () => { budget = +slider.value; sel = new Set(D.picks[String(budget)] || []); custom = false; render(); };
-document.getElementById('reset').onclick = () => { sel = new Set(D.picks[String(budget)] || []); custom = false; render(); };
+slider.min = 0; slider.max = D.pct_max; slider.step = D.pct_step; slider.value = pct;
+slider.oninput = () => { pct = +slider.value; sel = new Set(D.picks[String(pct)] || []); custom = false; render(); };
+document.getElementById('reset').onclick = () => { sel = new Set(D.picks[String(pct)] || []); custom = false; render(); };
 
 function key(s) { return [...s].sort().join(','); }
-function list(ids) { return ids.length <= 1 ? ids.join('') : ids.slice(0, -1).join(', ') + ' and ' + ids[ids.length - 1]; }
+function list(xs) { return xs.length <= 1 ? xs.join('') : xs.slice(0, -1).join(', ') + ' and ' + xs[xs.length - 1]; }
+function names(ids) { return list(ids.map(i => byId[i].label)); }
+function share(cost) { return Math.round(cost / D.budget * 100); }
 function render() {
-  const pickIds = D.picks[String(budget)] || [], pickSet = new Set(pickIds);
+  const budget = D.budget * pct / 100;
+  const pickIds = D.picks[String(pct)] || [], pickSet = new Set(pickIds);
   const ids = F.map(f => f.id).filter(i => sel.has(i));
   const order = pickIds.filter(i => sel.has(i)).concat(ids.filter(i => !pickSet.has(i)));
   const cost = ids.reduce((a, i) => a + byId[i].cost, 0);
-  const rel = ids.length ? D.subsets[key(sel)].rel : 0;
+  const sub = ids.length ? D.subsets[key(sel)] : { rel: 0, all: 0 };
+  const rel = sub.rel;
   const naive = ids.reduce((a, i) => a + byId[i].rel, 0);
   const lo = ids.reduce((a, i) => a + byId[i].rel_lo, 0), hi = ids.reduce((a, i) => a + byId[i].rel_hi, 0);
   const isPick = key(sel) === key(pickSet);
-  const over = cost > budget;
+  const over = cost > budget + 1e-6;
 
   document.querySelectorAll('.face').forEach(b => {
     b.classList.toggle('on', sel.has(b.dataset.id)); b.classList.toggle('pick', pickSet.has(b.dataset.id));
     b.setAttribute('aria-pressed', sel.has(b.dataset.id)); });
   document.getElementById('mode').textContent = isPick ? '🎯 Our recommendation' : '✏️ Your plan';
   document.getElementById('headline').innerHTML = ids.length
-    ? `Book ${order.length === F.length ? 'all four: ' : ''}${list(order.map(i => `<span class="fc"><i style="background:${byId[i].color}"></i>${i}</span>`))}`
+    ? `${order.length === F.length ? 'Book all four: ' : 'Book '}${list(order.map(i => `<span class="fc"><i style="background:${byId[i].color}"></i>${byId[i].label}</span>`))}`
     : 'No billboards picked yet';
   tween(document.getElementById('reach'), rel, fmtP);
   document.getElementById('range').textContent = ids.length
     ? `Likely between ${fmtP(rel * lo / naive)} and ${fmtP(rel * hi / naive)}, depending on how often people repeat the trip`
     : 'Tap a billboard on the right to start';
-  tween(document.getElementById('spend'), cost, fmtA);
-  document.getElementById('spends').textContent = `of ${fmtA(budget)} budget`;
-  const cpp = document.getElementById('cpp');
-  if (rel > 0) tween(cpp, cost / rel, x => 'AED ' + x.toFixed(2)); else { cpp.textContent = '–'; delete cpp.dataset.v; }
+  tween(document.getElementById('all'), sub.all, fmtP);
+  document.getElementById('nb').textContent = `${ids.length} of ${F.length}`;
+  document.getElementById('nbs').textContent = ids.length ? `${ids.filter(i => byId[i].type === 'Digital').length} digital, ${ids.filter(i => byId[i].type !== 'Digital').length} static` : '';
   tween(document.getElementById('dup'), naive - rel, fmtP);
 
+  const used = budget ? cost / budget * 100 : (cost ? 100 : 0);
   const fill = document.getElementById('fill');
-  fill.style.width = Math.min(100, budget ? cost / budget * 100 : (cost ? 100 : 0)) + '%';
-  fill.classList.toggle('over', over);
-  document.getElementById('budl').textContent = over ? `${fmtA(cost - budget)} over budget` : `${fmtA(budget - cost)} left`;
-  document.getElementById('budr').textContent = `Budget ${fmtA(budget)}`;
-  document.getElementById('bv').textContent = fmtA(budget);
-  slider.style.setProperty('--p', (budget / D.budget_max * 100) + '%');
+  fill.style.width = Math.min(100, used) + '%'; fill.classList.toggle('over', over);
+  document.getElementById('budl').textContent = over ? `${Math.round(used - 100)}% over budget` : `${Math.round(used)}% of budget used`;
+  document.getElementById('budr').textContent = pct === 100 ? 'Planned budget' : `Budget at ${pct}% of plan`;
+  document.getElementById('bv').textContent = pct === 100 ? '100% · as planned' : `${pct}% of plan`;
+  slider.style.setProperty('--p', (pct / D.pct_max * 100) + '%');
 
   const msg = document.getElementById('msg'); msg.className = 'msg';
   const pickRel = pickIds.length ? D.subsets[key(pickSet)].rel : 0;
   const pickCost = pickIds.reduce((a, i) => a + byId[i].cost, 0);
-  if (!ids.length) { msg.textContent = 'Pick at least one billboard to see the reach.'; }
-  else if (over) { msg.className = 'msg bad'; msg.innerHTML = `⚠️ This mix is <b>${fmtA(cost - budget)} over budget</b>. Drop a billboard or raise the budget.`; }
+  const A = D.aud_short;
+  if (!ids.length) { msg.textContent = 'Pick at least one billboard to see who we reach.'; }
+  else if (over) { msg.className = 'msg bad'; msg.innerHTML = `⚠️ This mix goes <b>${Math.round(used - 100)}% over budget</b>. Drop a billboard or raise the budget.`; }
   else if (isPick) {
-    const left = budget - cost, rest = F.filter(f => !sel.has(f.id));
-    const cheapest = rest.sort((a, b) => a.cost - b.cost)[0];
+    const rest = F.filter(f => !sel.has(f.id)).sort((a, b) => a.cost - b.cost);
+    const leftPct = Math.round(100 - used);
     msg.className = 'msg good';
-    msg.innerHTML = rest.length === 0 ? `✅ Every billboard fits. ${fmtA(left)} of the budget is spare.`
-      : left < cheapest.cost ? `✅ Best reach per dirham for this budget. The ${fmtA(left)} left over can't buy another board: the cheapest one left (${cheapest.id}) costs ${fmtA(cheapest.cost)}.`
-      : `✅ Best reach per dirham for this budget. Adding more boards here would mostly reach people we already reach.`;
+    msg.innerHTML = rest.length === 0 ? `✅ Every billboard fits, with ${leftPct}% of the budget to spare.`
+      : (budget - cost) < rest[0].cost
+        ? `✅ The most ${A} for this budget. The ${leftPct}% left over isn't enough for another board: the cheapest one left, ${rest[0].label}, would need ${share(rest[0].cost)}% of the budget.`
+        : `✅ The most ${A} for this budget. Another board would mostly reach drivers we already reach.`;
   } else if (rel < pickRel - 1) {
-    msg.innerHTML = `💡 Our pick (${list(pickIds)}) reaches <b>${fmtP(pickRel - rel)} more people</b>` +
-      (pickCost <= cost ? ` and costs ${fmtA(cost - pickCost)} less.` : ` for ${fmtA(pickCost - cost)} more.`);
+    const d = Math.round((pickCost - cost) / D.budget * 100);
+    msg.innerHTML = `💡 Our pick (${names(pickIds)}) reaches <b>${fmtP(pickRel - rel)} more ${A}</b>` +
+      (d <= 0 ? ` and uses ${-d}% less of the budget.` : ` with ${d}% more of the budget.`);
   } else {
     msg.className = 'msg good';
-    msg.innerHTML = `🙌 This mix reaches ${fmtP(rel - pickRel)} more people than our pick, for ${fmtA(cost - pickCost)} more spend (AED ${((cost - pickCost) / Math.max(1, rel - pickRel)).toFixed(2)} per extra person).`;
+    msg.innerHTML = `🙌 This mix reaches ${fmtP(rel - pickRel)} more ${A} than our pick, using ${Math.round((cost - pickCost) / D.budget * 100)}% more of the budget.`;
   }
   fit();
 }
@@ -314,8 +328,9 @@ def decision_html(data: dict) -> str:
 
 
 _INSIGHTS_CSS = r"""
-.grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
-@media (max-width:820px) { .grid { grid-template-columns:1fr; } }
+.grid { display:grid; grid-template-columns:repeat(var(--n, 3), 1fr); gap:16px; }
+@media (max-width:1150px) { .grid { grid-template-columns:repeat(2, 1fr); } }
+@media (max-width:640px) { .grid { grid-template-columns:1fr; } }
 .tile { padding:16px 18px 16px; position:relative; }
 .tile .q { font-size:12.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:6px; }
 .tile .emo { font-size:18px; display:inline-block; }
@@ -338,7 +353,7 @@ _INSIGHTS_CSS = r"""
 _INSIGHTS_BODY = r"""<div class="grid" id="grid"></div><div id="why"></div>"""
 
 _INSIGHTS_JS = r"""
-const g = document.getElementById('grid');
+const g = document.getElementById('grid'); g.style.setProperty('--n', D.tiles.length);
 D.tiles.forEach((t, i) => {
   const d = document.createElement('div'); d.className = 'tile card lift fade'; d.style.animationDelay = (i * 0.08) + 's';
   d.innerHTML = `<div class="q"><span class="emo">${t.emoji}</span>${t.q}</div>
@@ -370,8 +385,10 @@ _LEAGUE_CSS = r"""
               border-radius:999px; cursor:pointer; transition:background .2s, color .2s, box-shadow .2s; }
 .seg button.on { background:#fff; color:var(--accent); box-shadow:0 2px 8px rgba(29,27,46,.10); }
 .list { position:relative; display:flex; flex-direction:column; gap:12px; }
-.row { display:grid; grid-template-columns:54px 1.35fr 1fr 1.6fr 1fr; gap:16px; align-items:center; padding:14px 18px; }
-@media (max-width:860px) { .row { grid-template-columns:44px 1fr 1fr; } .row .reachcol { grid-column:2 / span 2; } .row .cppcol { grid-column:2 / span 2; } }
+.row { display:grid; grid-template-columns:54px 1.5fr .85fr 1.5fr 1fr .8fr; gap:16px; align-items:center; padding:14px 18px; position:relative; }
+.row.focus { border-color:#bdb3f5; box-shadow:0 0 0 3px #efedfc, var(--shadow); }
+.row.focus::after { content:"📍 Your focus"; position:absolute; top:-9px; right:16px; font-size:10.5px; font-weight:800; color:var(--accent); background:#fff; border:1px solid #dcd7fb; border-radius:999px; padding:1px 8px; }
+@media (max-width:860px) { .row { grid-template-columns:44px 1fr 1fr; } .row .reachcol, .row .cppcol, .row .pricecol { grid-column:2 / span 2; } }
 .medal { font-size:30px; text-align:center; line-height:1; }
 .medal span { display:block; font-size:11px; color:var(--muted); font-weight:700; margin-top:3px; }
 .row:hover .medal { animation:wiggle .5s; }
@@ -389,14 +406,14 @@ _LEAGUE_CSS = r"""
 .rtxt { font-size:11.5px; color:var(--muted); margin-top:5px; }
 .cpp .v { color:var(--ink); }
 .cppbar { height:6px; border-radius:999px; background:var(--soft); margin-top:8px; overflow:hidden; }
-.cppbar i { display:block; height:100%; width:0; background:linear-gradient(90deg, #0ca30c, #fab219, #d03b3b); background-size:var(--bs,100%) 100%;
+.cppbar i { display:block; height:100%; width:0; background:linear-gradient(90deg, #8b7cf0, #6250d6);
             border-radius:999px; transition:width .9s cubic-bezier(.2,.8,.2,1); }
 .note { margin-top:14px; font-size:12.5px; color:var(--muted); line-height:1.5; }
 """
 
 _LEAGUE_BODY = r"""
 <div class="bar"><div class="seg" id="seg">
-  <button data-k="value" class="on">💎 Best value</button><button data-k="reach">📣 Biggest audience</button><button data-k="cost">💰 Lowest price</button>
+  <button data-k="value" class="on">💎 Best value</button><button data-k="reach" id="reachbtn">🎯 Biggest target audience</button><button data-k="cost">🏷️ Lowest price</button>
 </div><span class="chip trust" tabindex="0">◔ <span id="tn"></span><span class="pop" id="tp"></span></span></div>
 <div class="list" id="list"></div>
 <div class="note" id="note"></div>
@@ -405,27 +422,28 @@ _LEAGUE_BODY = r"""
 _LEAGUE_JS = r"""
 document.getElementById('tn').textContent = D.trust[0]; document.getElementById('tp').textContent = D.trust[1];
 document.getElementById('note').innerHTML = D.note;
+document.getElementById('reachbtn').textContent = `🎯 Most ${D.aud_short}`;
 const L = document.getElementById('list'), maxHi = Math.max(...D.rows.map(r => r.rel_hi));
-const cppMax = Math.max(...D.rows.map(r => r.cpp));
 const els = {};
 D.rows.forEach(r => {
   const d = document.createElement('div'); d.className = 'row card lift'; d.style.setProperty('--c', r.color);
+  d.dataset.id = r.id; if (r.focus) d.classList.add('focus');
   d.innerHTML = `<div class="medal"></div>
-    <div><div class="id"><span class="dot"></span><b>${r.id}</b></div><div class="nm">${r.name}</div>
+    <div><div class="id"><span class="dot"></span><b>${r.label}</b></div><div class="nm">${r.road} · ${r.type_note}</div>
       <div class="tags">${r.tags.map(t => `<span class="chip ${t[1] || ''}">${t[0]}</span>`).join('')}</div></div>
-    <div><div class="k">Monthly price</div><div class="v">${fmtA(r.cost)}</div><div class="rtxt">${r.type_note}</div></div>
-    <div class="reachcol"><div class="k">Car-interested people / month</div><div class="v">${fmtP(r.rel)}</div>
+    <div><div class="k">Everyone passing</div><div class="v">${fmtP(r.unique)}</div><div class="rtxt">people a month</div></div>
+    <div class="reachcol"><div class="k">${D.aud_cap} / month</div><div class="v">${fmtP(r.rel)}</div>
       <div class="track"><div class="rng" style="left:${r.rel_lo / maxHi * 100}%;width:${(r.rel_hi - r.rel_lo) / maxHi * 100}%"></div><div class="fillb" data-w="${r.rel / maxHi * 100}"></div></div>
       <div class="rtxt">likely ${fmtP(r.rel_lo)} – ${fmtP(r.rel_hi)}</div></div>
-    <div class="cpp cppcol"><div class="k">Cost per person</div><div class="v">AED ${r.cpp.toFixed(2)}</div>
-      <div class="cppbar"><i data-w="${r.cpp / cppMax * 100}" style="--bs:${cppMax / r.cpp * 100}%"></i></div><div class="rtxt">${r.cpp_note}</div></div>`;
+    <div class="cppcol"><div class="k">Value for money</div><div class="v">${r.value}<small> / 100</small></div>
+      <div class="cppbar"><i data-w="${r.value}"></i></div><div class="rtxt">${r.value_note}</div></div>
+    <div class="pricecol"><div class="k">Price level</div><div class="v" style="font-size:15px;margin-top:6px">${dots(r.price_dots, 4)}</div><div class="rtxt">${r.price_note}</div></div>`;
   L.appendChild(d); els[r.id] = d;
 });
 const medals = ['🥇', '🥈', '🥉', '🎗️'];
 function sortBy(k) {
-  const first = {}; Object.values(els).forEach(e => first[e.dataset.id || ''] = 0);
   const before = Object.fromEntries(Object.entries(els).map(([id, e]) => [id, e.getBoundingClientRect().top]));
-  const rows = [...D.rows].sort((a, b) => k === 'value' ? a.cpp - b.cpp : k === 'reach' ? b.rel - a.rel : a.cost - b.cost);
+  const rows = [...D.rows].sort((a, b) => k === 'value' ? b.value - a.value : k === 'reach' ? b.rel - a.rel : a.price_rank - b.price_rank);
   rows.forEach((r, i) => { const e = els[r.id]; L.appendChild(e);
     e.querySelector('.medal').innerHTML = `${medals[i]}<span>#${i + 1}</span>`; });
   if (!reduce) Object.entries(els).forEach(([id, e]) => {
@@ -483,6 +501,12 @@ svg { display:block; width:100%; height:auto; overflow:visible; }
 .gender { display:flex; height:14px; border-radius:999px; overflow:hidden; margin-top:12px; gap:2px; }
 .gender i { display:block; height:100%; transition:width .8s cubic-bezier(.2,.8,.2,1); width:50%; }
 .glbl { display:flex; justify-content:space-between; font-size:12px; color:var(--ink2); margin-top:5px; }
+.sec { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:20px 2px 2px; }
+.sec span { font-size:15px; font-weight:800; }
+.sec em { font-style:normal; font-size:12.5px; color:var(--muted); }
+.sec.target span { color:var(--accent); }
+.st.tgt { background:linear-gradient(160deg, #f6f4ff, #fff); border-color:#e4e0fb; }
+.st.tgt .n { color:var(--accent); }
 .sowhat { margin-top:12px; padding:14px 18px; border-left:4px solid var(--accent); font-size:13.5px; line-height:1.55; color:var(--ink2); }
 .sowhat b { color:var(--ink); }
 .tip { position:absolute; pointer-events:none; background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 9px;
@@ -496,10 +520,10 @@ _AUD_BODY = r"""
 """
 
 _AUD_JS = r"""
-let cur = D.faces[0].id;
+let cur = D.focus || D.faces[0].id;
 const tabs = document.getElementById('tabs');
 D.faces.forEach(f => { const b = document.createElement('button'); b.className = 'tab'; b.style.setProperty('--c', f.color);
-  b.innerHTML = `<span class="dot"></span>${f.id} · ${f.area}${f.in_plan ? ' ⭐' : ''}`; b.dataset.id = f.id;
+  b.innerHTML = `<span class="dot"></span>${f.label}${f.in_plan ? ' ⭐' : ''}`; b.dataset.id = f.id;
   b.onclick = () => { cur = f.id; draw(); }; tabs.appendChild(b); });
 
 function hourly(f) {
@@ -525,7 +549,8 @@ function draw() {
   const hot = Object.entries(f.age).sort((a, b) => b[1] - a[1]).slice(0, 2).map(a => a[0]);
   v.innerHTML = `
   <div class="persona card fade"><div class="avatar">${f.avatar}</div><div><h3>${f.headline}</h3><p>${f.blurb}</p></div></div>
-  <div class="stats">${f.stats.map((s, i) => `<div class="st card lift fade" style="animation-delay:${.05 + i * .06}s"><div class="e">${s[0]}</div><div class="n">${s[1]}</div><div class="l">${s[2]}</div></div>`).join('')}</div>
+  <div class="sec"><span>👥 Everyone who passes</span><em>general audience, useful for any brand</em></div>
+  <div class="stats">${f.general.map((s, i) => `<div class="st card lift fade" style="animation-delay:${.05 + i * .06}s"><div class="e">${s[0]}</div><div class="n">${s[1]}</div><div class="l">${s[2]}</div></div>`).join('')}</div>
   <div class="two">
     <div class="panel card fade" style="animation-delay:.2s"><h4>When they drive past</h4><div class="sub">Views per hour on a typical weekday. Hover the curve.</div>${hourly(f)}</div>
     <div class="panel card fade" style="animation-delay:.26s"><h4>Who they are</h4><div class="sub">Age and gender of people around the board</div>
@@ -533,7 +558,9 @@ function draw() {
       <div class="gender"><i data-w="${f.male * 100}" style="background:#2a78d6"></i><i data-w="${(1 - f.male) * 100}" style="background:#e87ba4"></i></div>
       <div class="glbl"><span>👨 ${Math.round(f.male * 100)}% men</span><span>${Math.round((1 - f.male) * 100)}% women 👩</span></div></div>
   </div>
-  <div class="sowhat card fade" style="animation-delay:.32s">${f.sowhat}</div>`;
+  <div class="sec target"><span>${D.emoji} Our campaign audience: ${D.audience}</span><em>${D.campaign}</em></div>
+  <div class="stats">${f.target.map((s, i) => `<div class="st card lift fade tgt" style="animation-delay:${.3 + i * .06}s"><div class="e">${s[0]}</div><div class="n">${s[1]}</div><div class="l">${s[2]}</div></div>`).join('')}</div>
+  <div class="sowhat card fade" style="animation-delay:.4s">${f.sowhat}</div>`;
   requestAnimationFrame(() => setTimeout(() => v.querySelectorAll('[data-w]').forEach(x => x.style.width = x.dataset.w + '%'), reduce ? 0 : 120));
   const svg = v.querySelector('#hsvg'), hit = v.querySelector('#hhit'), tip = v.querySelector('#htip');
   const W = 560, mx = Math.max(...f.hourly);
@@ -622,7 +649,7 @@ D.faces.forEach((f, i) => {
   const lo = Math.min(.8, ...f.weeks), hi = Math.max(1.1, ...f.weeks), y = v => H - 4 - (v - lo) / (hi - lo) * (H - 8), x = k => 4 + k / Math.max(1, n - 1) * (W - 8);
   const d = f.weeks.map((v, k) => `${k ? 'L' : 'M'}${x(k).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   const r = document.createElement('div'); r.className = 'fr fade'; r.style.setProperty('--c', f.color); r.style.animationDelay = (.12 + i * .06) + 's';
-  r.innerHTML = `<span class="dot"></span><div><b>${f.id}</b>${f.in_plan ? ' ⭐' : ''} <span class="nm">${f.area}${f.in_plan ? '' : ' · not in our pick'}</span><div><span class="chip ${st[1]}" style="margin-top:4px">${st[0]}</span></div></div>
+  r.innerHTML = `<span class="dot"></span><div><b>${f.label}</b>${f.in_plan ? ' ⭐' : ''} <span class="nm">${f.in_plan ? f.road : 'not in our pick'}</span><div><span class="chip ${st[1]}" style="margin-top:4px">${st[0]}</span></div></div>
     <div class="nums"><strong>${Math.round(f.index * 100)}%</strong> delivered<br>${fmtP(f.actual)} of ${fmtP(f.planned)}</div>
     <div class="nums">${f.news ? `News effect <strong>${f.news > 0 ? '+' : ''}${(f.news * 100).toFixed(1)}%</strong><br>${fmtP(Math.abs(f.news_views))} views ${f.news < 0 ? 'lost' : 'gained'}` : 'No road events<br>in the window'}</div>
     <div class="spark" title="Weekly delivery vs plan (dotted line = 100%)"><svg viewBox="0 0 ${W} ${H}"><line x1="0" x2="${W}" y1="${y(1)}" y2="${y(1)}" stroke="#c3c2b7" stroke-dasharray="3 3"/>
@@ -645,3 +672,406 @@ fit();
 
 def health_html(data: dict) -> str:
     return _doc(_HEALTH_CSS, _HEALTH_BODY, _HEALTH_JS, data)
+
+
+# --------------------------------------------------------------------------- what's on nearby (people facts)
+
+
+_PULSE_CSS = _AUD_CSS + r"""
+.phero { padding:20px 22px; background:radial-gradient(120% 160% at 0% 0%, #f1eeff 0%, #ffffff 60%), #fff; }
+.phero .eb { font-size:12.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent);
+             display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; align-items:center; }
+.phero .eb .chip { text-transform:none; letter-spacing:0; }
+.phero h2 { margin:8px 0 4px; font-size:23px; line-height:1.25; letter-spacing:-.01em; }
+.phero p { margin:0; color:var(--ink2); font-size:13.5px; line-height:1.5; }
+.kpis { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:14px; }
+@media (max-width:820px) { .kpis { grid-template-columns:1fr; } }
+.kpi { padding:12px 14px; background:#fff; }
+.kpi .n { font-size:26px; font-weight:800; letter-spacing:-.02em; }
+.kpi .l { font-size:12.5px; color:var(--ink2); margin-top:2px; line-height:1.35; }
+.kpi.tgt .n { color:var(--accent); }
+.verdict { margin-top:14px; padding:12px 16px; border-radius:14px; font-size:13.5px; line-height:1.5; color:var(--ink2);
+           background:#f3fbf3; border:1px solid #cdeccd; }
+.verdict.change { background:var(--accent-soft); border-color:#dcd7fb; }
+.verdict b { color:var(--ink); }
+.cal { padding:16px 18px; margin-top:14px; position:relative; }
+.cal h4 { margin:0; font-size:14.5px; } .cal .sub { font-size:12px; color:var(--muted); margin:2px 0 10px; }
+.crow { display:grid; grid-template-columns:118px 1fr; align-items:center; gap:8px; height:34px; }
+.crow .nm { font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
+.crow .nm i { width:9px; height:9px; border-radius:50%; flex:none; }
+.track { position:relative; height:100%; border-bottom:1px dashed var(--line); }
+.track .wk { position:absolute; top:4px; bottom:4px; width:1px; background:var(--line); }
+.bub { position:absolute; top:50%; border-radius:50%; transform:translate(-50%, -50%) scale(0); cursor:pointer;
+       border:2px solid #fff; box-shadow:0 1px 3px rgba(29,27,46,.25); animation:popb .5s cubic-bezier(.2,.8,.2,1) forwards; }
+.bub.car { outline:2.5px solid var(--accent); outline-offset:1px; }
+.bub span { position:absolute; inset:0; display:grid; place-items:center; font-size:11px; }
+@keyframes popb { to { transform:translate(-50%, -50%) scale(1); } }
+.axis { display:grid; grid-template-columns:118px 1fr; gap:8px; margin-top:4px; }
+.axis .ticks { position:relative; height:16px; font-size:11px; color:var(--muted); }
+.axis .ticks span { position:absolute; transform:translateX(-50%); white-space:nowrap; }
+.legend { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--ink2); margin-top:8px; }
+.legend i { display:inline-block; width:11px; height:11px; border-radius:50%; background:#c9c6dc; vertical-align:-1px; margin-right:5px; }
+.legend i.car { outline:2.5px solid var(--accent); outline-offset:1px; background:#fff; }
+.ptip { position:absolute; z-index:30; pointer-events:none; background:#fff; border:1px solid var(--line); border-radius:12px;
+        padding:9px 12px; font-size:12px; box-shadow:var(--shadow-up); opacity:0; transition:opacity .12s; max-width:300px; line-height:1.45; }
+.ptip b { color:var(--ink); } .ptip q { display:block; color:var(--ink2); font-style:italic; margin-top:4px; }
+.evs { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+.ev { padding:12px 14px; display:grid; grid-template-columns:62px 1fr auto; gap:12px; align-items:center; }
+@media (max-width:700px) { .ev { grid-template-columns:52px 1fr; } .ev .big { grid-column:2; text-align:left; } }
+.date { text-align:center; border-radius:12px; background:var(--soft); border:1px solid var(--line); padding:6px 4px; }
+.date b { display:block; font-size:19px; line-height:1; } .date span { font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; }
+.ev h5 { margin:0; font-size:14.5px; } .ev .meta { margin-top:5px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.ev .big { text-align:right; } .ev .big .n { font-size:21px; font-weight:800; letter-spacing:-.02em; }
+.ev .big .l { font-size:11.5px; color:var(--ink2); }
+.ev.car { border-color:#dcd7fb; background:linear-gradient(160deg, #f8f6ff, #fff); }
+.ev.car .big .n { color:var(--accent); }
+.empty { padding:14px 16px; font-size:13px; color:var(--muted); border:1.5px dashed var(--line); border-radius:14px; margin-top:10px; }
+.facts { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:10px; }
+@media (max-width:820px) { .facts { grid-template-columns:1fr 1fr; } }
+.fact { padding:13px 15px; display:flex; flex-direction:column; gap:3px; }
+.fact .top { display:flex; justify-content:space-between; align-items:flex-start; gap:6px; }
+.fact .e { font-size:19px; } .fact .n { font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.fact .u { font-size:12.5px; color:var(--ink2); } .fact .w { font-size:13px; font-weight:700; margin-top:2px; }
+.fact .meta { display:flex; gap:5px; flex-wrap:wrap; margin-top:6px; }
+a.src { color:var(--accent); font-size:12px; font-weight:600; text-decoration:none; }
+a.src:hover { text-decoration:underline; }
+.srcs { display:inline-flex; gap:8px; flex-wrap:wrap; }
+.away { margin-top:20px; padding:14px 18px; }
+.away h4 { margin:0; font-size:14.5px; } .away .sub { font-size:12px; color:var(--muted); margin:2px 0 8px; }
+.away .row { display:flex; gap:8px; flex-wrap:wrap; }
+"""
+
+_PULSE_BODY = r"""
+<div id="hero"></div>
+<div class="cal card fade" id="cal" style="animation-delay:.08s"></div>
+<div class="tabs" id="tabs" style="margin-top:18px"></div>
+<div id="view"></div>
+<div id="away"></div>
+<div class="ptip" id="ptip"></div>
+"""
+
+_PULSE_JS = r"""
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => /^https?:\/\//i.test(u || '') ? esc(u) : '#';
+const PER = { year:' a year', month:' a month', week:' a week', day:' a day', hour:' an hour', event:'', total:'' };
+const MEAS = { count:['counted', 'good'], expected:['expected', ''], capacity:['capacity, not a count', 'warn'] };
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dt = s => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const dayIdx = s => Math.round((dt(s) - dt(D.start)) / 864e5);
+const dlabel = (a, b) => { const x = dt(a), y = dt(b || a); const f = d => d.getUTCDate() + ' ' + MON[d.getUTCMonth()];
+  return +x === +y ? f(x) : (x.getUTCMonth() === y.getUTCMonth() ? x.getUTCDate() + '–' + f(y) : f(x) + ' – ' + f(y)); };
+function chips(f) { let h = '';
+  if (f.measure && MEAS[f.measure]) h += `<span class="chip ${MEAS[f.measure][1]}">${MEAS[f.measure][0]}</span>`;
+  if (f.year) h += `<span class="chip ${f.old ? 'warn' : ''}">${f.year} figure${f.old ? ' · old' : ''}</span>`;
+  if (f.match) h += `<span class="chip accent">${D.emoji} ${esc(D.audience_short)}</span>`;
+  if (f.sources_n > 1) h += `<span class="chip good">${f.sources_n} sources agree${f.range ? ' (' + f.range + ')' : ''}</span>`;
+  return h; }
+function srcs(list) { return '<span class="srcs">' + list.slice(0, 3).map(s =>
+  `<a class="src trust" href="${safeUrl(s.url)}" target="_blank" rel="noopener">${esc((s.title || 'source').slice(0, 38))} ↗<span class="pop">“${esc(s.quote)}”</span></a>`).join('') + '</span>'; }
+
+// ---- hero
+(function hero() {
+  const S = D.summary, el = document.getElementById('hero');
+  const head = S.n_events === 0
+    ? `No dated crowd events found next to our billboards in ${esc(D.window)}`
+    : `${S.n_events} crowd event${S.n_events > 1 ? 's' : ''} next to our billboards in ${esc(D.window)}` +
+      (S.n_car ? `, <span style="color:var(--accent)">${S.n_car} for ${esc(D.audience_short)}</span>` : '');
+  const verdict = S.changed
+    ? `<div class="verdict change">🔀 <b>Counting these crowds changes our pick:</b> ${esc(S.before)} → <b>${esc(S.after)}</b>. Worth a look on the Decision page.</div>`
+    : `<div class="verdict">✅ <b>Doesn't change our pick.</b> ${S.extra > 0 ? `Everyday traffic past our billboards is about <b>${S.ratio}× bigger</b> than these crowds over the month.` : 'Our pick rests on everyday traffic.'} ${S.best ? `Use the news for <b>timing</b>: ${esc(S.best)}.` : ''}</div>`;
+  el.innerHTML = `<div class="phero card fade"><div class="eb"><span>📣 What the news says · ${esc(D.window)}</span>
+      <span class="chip accent trust" tabindex="0">Sourced numbers<span class="pop">Every number below is quoted from a news or official page (hover a source link to read it). Turning a crowd into people passing our board uses our assumption that ${D.pass_share}% of visitors pass a nearby billboard.</span></span></div>
+    <h2>${head}</h2>
+    <p>Big events bring extra people past a billboard for a day or two. Visitor and resident numbers show why a spot is busy every day.</p>
+    <div class="kpis">
+      <div class="kpi card"><div class="n" data-t="${S.extra}">0</div><div class="l">extra people passing our billboards on event days</div></div>
+      <div class="kpi card tgt"><div class="n" data-t="${S.target}">0</div><div class="l">of them ${esc(D.audience_short)}</div></div>
+      <div class="kpi card"><div class="n">${S.n_facts}</div><div class="l">sourced numbers about our locations</div></div>
+    </div>${verdict}</div>`;
+  el.querySelectorAll('[data-t]').forEach(n => tween(n, +n.dataset.t, x => (x > 0 ? '+' : '') + fmtP(x), 900));
+})();
+
+// ---- calendar strip
+(function cal() {
+  const el = document.getElementById('cal'), N = D.days;
+  const all = D.faces.flatMap(f => f.events.map(e => e.extra));
+  const mx = Math.max(1, ...all);
+  const pos = i => ((i + .5) / N * 100).toFixed(2) + '%';
+  let rows = D.faces.map(f => {
+    const wk = [7, 14, 21, 28].filter(d => d < N).map(d => `<span class="wk" style="left:${(d / N * 100).toFixed(2)}%"></span>`).join('');
+    const bubs = f.events.map((e, k) => { const a = Math.max(0, dayIdx(e.start)), b = Math.min(N - 1, dayIdx(e.end || e.start));
+      const sz = 12 + 22 * Math.sqrt(e.extra / mx);
+      return `<span class="bub ${e.match ? 'car' : ''}" data-f="${f.id}" data-k="${k}" style="left:${pos((a + b) / 2)};width:${sz}px;height:${sz}px;background:${f.color};animation-delay:${.2 + k * .08}s"></span>`; }).join('');
+    return `<div class="crow"><div class="nm"><i style="background:${f.color}"></i>${esc(f.label)}${f.in_plan ? ' ⭐' : ''}</div><div class="track">${wk}${bubs}</div></div>`; }).join('');
+  const ticks = [0, 7, 14, 21, 28].filter(d => d < N).map(d => { const x = new Date(+dt(D.start) + d * 864e5);
+    return `<span style="left:${pos(d)}">${x.getUTCDate()} ${MON[x.getUTCMonth()]}</span>`; }).join('');
+  el.innerHTML = `<h4>When the crowds come</h4><div class="sub">Each bubble is an event with a sourced attendance figure. Size = extra people passing our board. Hover for the source.</div>
+    ${rows}<div class="axis"><span></span><div class="ticks">${ticks}</div></div>
+    <div class="legend"><span><i></i>general crowd</span><span><i class="car"></i>${esc(D.audience_short)} crowd</span><span>⭐ in our current pick</span></div>`;
+  const tip = document.getElementById('ptip');
+  el.querySelectorAll('.bub').forEach(b => {
+    b.onmouseenter = () => { const f = D.faces.find(x => x.id === b.dataset.f), e = f.events[+b.dataset.k];
+      tip.innerHTML = `<b>${esc(e.what)}</b> · ${dlabel(e.start, e.end)}<br>${fmtP(e.visitors)} visitors (${MEAS[e.measure] ? MEAS[e.measure][0] : ''}) → <b>~${fmtP(e.extra)}</b> pass our ${esc(f.label)} board${e.match ? `, ~${fmtP(e.target)} ${esc(D.audience_short)}` : ''}<q>“${esc(e.sources[0].quote)}”</q><span class="muted">${esc(e.sources[0].title)}</span>`;
+      const r = b.getBoundingClientRect(); tip.style.opacity = 1;
+      tip.style.left = Math.max(4, Math.min(document.body.clientWidth - 310, r.left + window.scrollX - 140)) + 'px';
+      tip.style.top = (r.bottom + window.scrollY + 8) + 'px'; };
+    b.onmouseleave = () => tip.style.opacity = 0;
+    b.onclick = () => { cur = b.dataset.f; draw(); document.getElementById('tabs').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
+  });
+})();
+
+// ---- per location
+let cur = D.focus || D.faces[0].id;
+const tabs = document.getElementById('tabs');
+D.faces.forEach(f => { const b = document.createElement('button'); b.className = 'tab'; b.style.setProperty('--c', f.color);
+  b.innerHTML = `<span class="dot"></span>${esc(f.label)}${f.in_plan ? ' ⭐' : ''} <span class="muted" style="font-weight:600">${f.n_facts}</span>`; b.dataset.id = f.id;
+  b.onclick = () => { cur = f.id; draw(); }; tabs.appendChild(b); });
+
+function evRow(e, i, f) {
+  const d = dt(e.start);
+  return `<div class="ev card lift fade ${e.match ? 'car' : ''}" style="animation-delay:${.05 + i * .06}s">
+    <div class="date"><span>${MON[d.getUTCMonth()]}</span><b>${d.getUTCDate()}</b>${e.end && e.end !== e.start ? `<span>to ${dt(e.end).getUTCDate()}</span>` : ''}</div>
+    <div><h5>${e.icon} ${esc(e.what)}</h5><div class="muted" style="font-size:12.5px;margin-top:2px">${fmtP(e.visitors)} visitors during the campaign${e.note ? ' · ' + esc(e.note) : ''}</div>
+      <div class="meta">${chips(e)} ${srcs(e.sources)}</div></div>
+    <div class="big"><div class="n">+${fmtP(e.match ? e.target : e.extra)}</div><div class="l">${e.match ? esc(D.audience_short) + ' passing' : 'people passing'}<br>our board${e.capped ? ' (capped)' : ''}</div></div></div>`; }
+function factCard(x, i) {
+  return `<div class="fact card lift fade" style="animation-delay:${.05 + i * .05}s"><div class="top"><span class="e">${x.icon}</span></div>
+    <div><span class="n">${fmtP(x.value)}</span> <span class="u">${esc(x.unit)}${PER[x.period] || ''}</span></div>
+    <div class="w">${esc(x.what)}</div>${x.note ? `<div class="muted" style="font-size:12px">${esc(x.note)}</div>` : ''}
+    <div class="meta">${chips(x)}</div><div style="margin-top:4px">${srcs(x.sources)}</div></div>`; }
+function draw() {
+  const f = D.faces.find(x => x.id === cur);
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.id === cur));
+  const v = document.getElementById('view'); v.style.setProperty('--c', f.color);
+  const car = f.events.filter(e => e.match), gen = f.events.filter(e => !e.match);
+  const laterCar = f.later.filter(x => x.match), laterGen = f.later.filter(x => !x.match);
+  v.innerHTML = `
+  <div class="sec target"><span>${D.emoji} Crowds of ${esc(D.audience_short)} near ${esc(f.label)}</span><em>${esc(D.window)}</em></div>
+  ${car.length ? `<div class="evs">${car.map((e, i) => evRow(e, i, f)).join('')}</div>` : `<div class="empty">No ${esc(D.audience_short)} event with a published crowd figure near ${esc(f.label)} during ${esc(D.window)}.</div>`}
+  ${laterCar.length ? `<div class="sec"><span>📅 ${esc(D.audience_short)} events here on other dates</span><em>not in this campaign's window, or this year's dates not announced yet</em></div><div class="facts">${laterCar.map(factCard).join('')}</div>` : ''}
+  <div class="sec"><span>👥 General crowds near ${esc(f.label)}</span><em>${esc(D.window)}</em></div>
+  ${gen.length ? `<div class="evs">${gen.map((e, i) => evRow(e, i, f)).join('')}</div>` : `<div class="empty">No other dated crowd event with a published figure during ${esc(D.window)}.</div>`}
+  ${laterGen.length ? `<div class="sec"><span>📅 Other big crowds here</span><em>other dates</em></div><div class="facts">${laterGen.map(factCard).join('')}</div>` : ''}
+  <div class="sec"><span>📌 Why ${esc(f.label)} is busy every day</span><em>visitors, residents, workers, metro riders and traffic, as published</em></div>
+  ${f.context.length ? `<div class="facts">${f.context.map(factCard).join('')}</div>` : `<div class="empty">No published visitor, resident or ridership numbers found yet.</div>`}`;
+  fit();
+}
+draw();
+
+// ---- elsewhere
+(function away() {
+  if (!D.away.length) return;
+  document.getElementById('away').innerHTML = `<div class="away card fade"><h4>${D.emoji} ${esc(D.audience_short)} crowds elsewhere in Dubai</h4>
+    <div class="sub">None of our billboards is nearby. Useful for activation or for choosing future sites.</div>
+    <div class="row">${D.away.map(x => `<span class="chip ${x.in_window ? 'accent' : ''} trust" tabindex="0">${x.icon} ${esc(x.what)} · ${fmtP(x.value)}${x.when ? ' · ' + esc(x.when) : ''}<span class="pop">“${esc(x.quote)}” (${esc(x.title)})</span></span>`).join('')}</div></div>`;
+})();
+"""
+
+
+def pulse_html(data: dict) -> str:
+    return _doc(_PULSE_CSS, _PULSE_BODY, _PULSE_JS, data)
+
+
+# --------------------------------------------------------------------------- explore a location (knowledge layer)
+
+_ESC_JS = r"""
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => /^https?:\/\//i.test(u || '') ? esc(u) : '';
+const TRUSTW = { VERIFIED:['Solid','good'], ESTIMATE:['Good estimate',''], ASSUMPTION:['Our assumption','warn'],
+                 SAMPLE:['Placeholder','warn'], CONCEPT:['Idea stage',''] };
+"""
+
+_EXPLORE_CSS = r"""
+.idc { padding:20px 22px; display:grid; grid-template-columns:auto 1fr auto; gap:18px; align-items:center;
+       background:radial-gradient(120% 160% at 0% 0%, color-mix(in srgb, var(--c) 14%, white), #fff 60%); }
+@media (max-width:760px) { .idc { grid-template-columns:auto 1fr; } .idc .rank { grid-column:1 / -1; } }
+.pinb { width:62px; height:62px; border-radius:20px; background:var(--c); display:grid; place-items:center; font-size:30px;
+        box-shadow:0 8px 22px color-mix(in srgb, var(--c) 40%, transparent); animation:pop .5s cubic-bezier(.2,.8,.2,1) both; }
+.idc h2 { margin:0; font-size:24px; letter-spacing:-.01em; } .idc p { margin:4px 0 0; color:var(--ink2); font-size:13.5px; }
+.idc .chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.rank { text-align:center; padding:10px 16px; border-radius:16px; background:#fff; border:1px solid var(--line); }
+.rank b { display:block; font-size:30px; letter-spacing:-.02em; color:var(--accent); } .rank span { font-size:12px; color:var(--ink2); }
+.eng { display:grid; grid-template-columns:repeat(6, 1fr); gap:10px; margin-top:14px; }
+@media (max-width:980px) { .eng { grid-template-columns:repeat(3, 1fr); } }
+@media (max-width:560px) { .eng { grid-template-columns:repeat(2, 1fr); } }
+.eg { padding:12px 14px; } .eg .e { font-size:18px; } .eg .n { font-size:21px; font-weight:800; letter-spacing:-.02em; margin-top:2px; }
+.eg .l { font-size:12px; color:var(--ink2); line-height:1.3; } .eg.tgt .n { color:var(--accent); }
+.kl { margin-top:16px; padding:16px 18px; }
+.kl .head { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; }
+.kl h3 { margin:0; font-size:16.5px; } .kl .sub { font-size:12.5px; color:var(--ink2); margin-top:3px; }
+.funnel { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--ink2); }
+.funnel b { font-size:22px; color:var(--ink); letter-spacing:-.02em; } .funnel b.u { color:var(--accent); }
+.funnel .arr { color:var(--muted); font-size:18px; }
+.fchips { display:flex; gap:6px; flex-wrap:wrap; margin:14px 0 4px; }
+.fchip { font:inherit; font-size:12.5px; font-weight:700; border:1.5px solid var(--line); background:#fff; color:var(--ink2);
+         border-radius:999px; padding:5px 11px; cursor:pointer; transition:all .15s; }
+.fchip.on { border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
+.fchip i { font-style:normal; opacity:.6; margin-left:4px; }
+.kgrid { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:10px; }
+@media (max-width:980px) { .kgrid { grid-template-columns:repeat(2, 1fr); } }
+@media (max-width:560px) { .kgrid { grid-template-columns:1fr; } }
+.kf { padding:12px 14px; display:flex; flex-direction:column; gap:4px; position:relative; }
+.kf .tp { font-size:11.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+.kf .v { font-size:18px; font-weight:800; letter-spacing:-.01em; line-height:1.25; }
+.kf .t { font-size:13px; color:var(--ink2); }
+.kf .why { font-size:12px; color:var(--accent); font-weight:600; }
+.kf .meta { display:flex; gap:5px; flex-wrap:wrap; margin-top:4px; align-items:center; }
+.kf .rel { position:absolute; top:12px; right:12px; width:34px; height:5px; border-radius:999px; background:var(--line); overflow:hidden; }
+.kf .rel i { display:block; height:100%; background:var(--accent); }
+.kf.off { opacity:.62; } .kf.off .why { color:var(--muted); }
+.more { margin-top:12px; font:inherit; font-size:13px; font-weight:700; color:var(--accent); background:none; border:none; cursor:pointer; padding:4px 0; }
+a.src { color:var(--accent); font-size:12px; font-weight:600; text-decoration:none; } a.src:hover { text-decoration:underline; }
+"""
+
+_EXPLORE_BODY = r"""<div id="id"></div><div class="eng" id="eng"></div><div class="kl card fade" id="kl" style="animation-delay:.15s"></div>"""
+
+_EXPLORE_JS = _ESC_JS + r"""
+const L = D.loc, C = D.campaign;
+document.body.style.setProperty('--c', L.color);
+document.getElementById('id').innerHTML = `<div class="idc card fade"><div class="pinb">📍</div>
+  <div><h2>${esc(L.label)} <span class="muted" style="font-size:15px;font-weight:600">· ${esc(L.road)}</span></h2>
+  <p>${esc(L.format)} · ${esc(L.size)} · ${esc(L.price_word)}</p>
+  <div class="chips">${L.in_plan ? '<span class="chip accent">⭐ In our plan</span>' : '<span class="chip">Not in our plan</span>'}
+  ${(L.tags || []).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div></div>
+  <div class="rank"><b>#${L.rank}</b><span>of ${L.n} for the<br>${esc(C.emoji)} ${esc(C.title)}</span></div></div>`;
+document.getElementById('eng').innerHTML = D.engage.map((e, i) =>
+  `<div class="eg card lift fade ${e[3] ? 'tgt' : ''}" style="animation-delay:${.05 + i * .05}s"><div class="e">${e[0]}</div><div class="n">${esc(e[1])}</div><div class="l">${esc(e[2])}</div></div>`).join('');
+
+let topic = 'all', showAll = false;
+function card(f, i) {
+  const tw = TRUSTW[f.trust] || [f.trust, ''];
+  const link = safeUrl(f.url) ? `<a class="src trust" href="${safeUrl(f.url)}" target="_blank" rel="noopener">source ↗${f.quote ? `<span class="pop">“${esc(f.quote)}”</span>` : ''}</a>` : '';
+  return `<div class="kf card lift fade ${f.used ? '' : 'off'}" style="animation-delay:${Math.min(.4, .03 * i)}s">
+    <div class="rel" title="relevance ${Math.round(f.score * 100)}%"><i style="width:${Math.round(f.score * 100)}%"></i></div>
+    <div class="tp">${D.topics[f.topic].icon} ${esc(D.topics[f.topic].label)}</div>
+    <div class="v">${esc(f.display)}</div><div class="t">${esc(f.title)}</div>
+    <div class="why">${f.used ? '✓ ' : '· '}${esc(f.reason)}</div>
+    <div class="meta"><span class="chip ${tw[1]} trust" tabindex="0">${tw[0]}<span class="pop">${esc(f.detail || '')}${f.detail ? '<br>' : ''}From: ${esc(f.sources.join(', '))}</span></span>${link}</div></div>`; }
+function draw() {
+  const inTopic = f => topic === 'all' || f.topic === topic;
+  const used = D.facts.filter(f => f.used && inTopic(f)), rest = D.facts.filter(f => !f.used && inTopic(f));
+  const counts = {}; D.facts.forEach(f => { counts[f.topic] = counts[f.topic] || [0, 0]; counts[f.topic][0]++; if (f.used) counts[f.topic][1]++; });
+  const chips = ['all', ...Object.keys(D.topics).filter(t => counts[t])].map(t => `<button class="fchip ${t === topic ? 'on' : ''}" data-t="${t}">${t === 'all' ? 'All topics' : D.topics[t].icon + ' ' + esc(D.topics[t].label)}<i>${t === 'all' ? D.counts.used : counts[t][1]}</i></button>`).join('');
+  document.getElementById('kl').innerHTML = `<div class="head"><div><h3>🧠 What the knowledge layer says about ${esc(L.label)}</h3>
+      <div class="sub">Every fact comes from a data source and carries its trust level. Only what matters for the ${esc(C.emoji)} ${esc(C.title)} is shown first; the bar on each card is its relevance.</div></div>
+      <div class="funnel"><span><b>${D.counts.total}</b> facts known</span><span class="arr">→</span><span><b class="u">${D.counts.used}</b> matter for ${esc(C.audience_short)}</span><span class="muted">from ${D.counts.sources} sources</span></div></div>
+    <div class="fchips">${chips}</div>
+    <div class="kgrid">${used.map(card).join('') || '<div class="muted" style="font-size:13px;padding:8px 2px">Nothing in this topic matters for this campaign.</div>'}</div>
+    ${rest.length ? `<button class="more" id="more">${showAll ? '▾ Hide' : '▸ Show'} the other ${rest.length} fact${rest.length > 1 ? 's' : ''} we know (not used for this campaign)</button>` : ''}
+    ${showAll ? `<div class="kgrid">${rest.map(card).join('')}</div>` : ''}`;
+  document.querySelectorAll('.fchip').forEach(b => b.onclick = () => { topic = b.dataset.t; draw(); });
+  const m = document.getElementById('more'); if (m) m.onclick = () => { showAll = !showAll; draw(); };
+  fit();
+}
+draw();
+"""
+
+
+def explore_html(data: dict) -> str:
+    return _doc(_EXPLORE_CSS, _EXPLORE_BODY, _EXPLORE_JS, data)
+
+
+# --------------------------------------------------------------------------- score & compare
+
+
+_SCORE_CSS = r"""
+.sgrid { display:grid; grid-template-columns:300px 1fr; gap:16px; align-items:start; }
+@media (max-width:900px) { .sgrid { grid-template-columns:1fr; } }
+.wts { padding:16px 18px; position:sticky; top:4px; }
+.wts h4 { margin:0; font-size:14.5px; } .wts .sub { font-size:12px; color:var(--muted); margin:2px 0 10px; }
+.w { margin:10px 0; } .w .top { display:flex; justify-content:space-between; font-size:13px; font-weight:700; }
+.w .top span:last-child { color:var(--accent); } .w .help { font-size:11.5px; color:var(--muted); margin-top:2px; }
+.w input { width:100%; accent-color:var(--cc); margin:6px 0 0; }
+.w .flat { font-size:11px; color:var(--warn-text); font-weight:600; }
+.reset { font:inherit; font-size:12.5px; font-weight:700; border:1px solid var(--line); background:#fff; border-radius:999px; padding:5px 12px; cursor:pointer; color:var(--ink2); }
+.rows { position:relative; }
+.row { padding:14px 16px; margin-bottom:10px; transition:transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .2s; cursor:pointer; }
+.row .top { display:grid; grid-template-columns:40px 1fr auto; gap:12px; align-items:center; }
+.medal { font-size:24px; text-align:center; }
+.row h5 { margin:0; font-size:16px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.row h5 i { width:10px; height:10px; border-radius:50%; display:inline-block; }
+.row .rd { font-size:12.5px; color:var(--ink2); margin-top:2px; }
+.tot { text-align:right; } .tot b { font-size:28px; letter-spacing:-.02em; } .tot span { font-size:11.5px; color:var(--muted); display:block; }
+.stack { display:flex; height:12px; border-radius:999px; overflow:hidden; background:var(--soft); margin-top:10px; gap:2px; }
+.stack i { display:block; height:100%; transition:width .5s cubic-bezier(.2,.8,.2,1); }
+.det { display:none; margin-top:12px; gap:8px; flex-direction:column; }
+.row.open .det { display:flex; }
+.cr { display:grid; grid-template-columns:150px 1fr 40px; gap:10px; align-items:center; font-size:12.5px; }
+.cr .bar { height:8px; border-radius:999px; background:var(--soft); overflow:hidden; } .cr .bar i { display:block; height:100%; border-radius:999px; }
+.cr b { text-align:right; } .cr .why { grid-column:2 / 4; font-size:12px; color:var(--ink2); margin-top:-4px; }
+.focusr { box-shadow:0 0 0 2px var(--accent), var(--shadow); }
+.leg { display:flex; gap:12px; flex-wrap:wrap; font-size:12px; color:var(--ink2); margin:0 2px 10px; }
+.leg i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+.recon { padding:14px 18px; margin-top:6px; border-left:4px solid var(--accent); font-size:13.5px; line-height:1.55; color:var(--ink2); }
+.recon b { color:var(--ink); }
+.row .out { grid-column:1/-1; margin-top:8px; padding:8px 10px; border-radius:10px; background:#fff7e6; color:#7a4b00; font-size:12.5px; line-height:1.45; }
+.across { padding:16px 18px; margin-top:16px; }
+.across h4 { margin:0; font-size:14.5px; } .across .sub { font-size:12px; color:var(--muted); margin:2px 0 10px; }
+.mx { width:100%; border-collapse:separate; border-spacing:4px; font-size:13px; }
+.mx th { font-size:12px; color:var(--ink2); font-weight:700; text-align:center; padding:4px; }
+.mx th:first-child { text-align:left; }
+.mx td { text-align:center; border-radius:10px; padding:10px 6px; font-weight:800; transition:transform .15s; }
+.mx td:first-child { text-align:left; font-weight:700; background:none; }
+.mx td.cell:hover { transform:scale(1.04); }
+.mx tr.cur td:first-child { color:var(--accent); }
+"""
+
+_SCORE_BODY = r"""<div class="sgrid"><div class="wts card fade" id="wts"></div><div><div class="leg" id="leg"></div><div class="rows" id="rows"></div><div class="recon card fade" id="recon"></div></div></div><div class="across card fade" id="across"></div>"""
+
+_SCORE_JS = _ESC_JS + r"""
+const CC = ['#6250d6', '#2a78d6', '#1baf7a', '#eb6834', '#8a889c'];
+const W = Object.assign({}, D.weights);
+const crit = D.criteria;
+document.getElementById('leg').innerHTML = crit.map((c, i) => `<span><i style="background:${CC[i]}"></i>${c.icon} ${esc(c.label)}</span>`).join('');
+function drawWts() {
+  document.getElementById('wts').innerHTML = `<h4>⚖️ What matters most?</h4><div class="sub">Move the weights; the ranking updates instantly. Defaults are set for the ${esc(D.campaign.emoji)} ${esc(D.campaign.title)}.</div>
+    ${crit.map((c, i) => `<div class="w" style="--cc:${CC[i]}"><div class="top"><span>${c.icon} ${esc(c.label)}</span><span id="wv-${c.id}">${Math.round(100 * W[c.id] / Object.values(W).reduce((a, b) => a + b, 0) || 0)}%</span></div>
+      <input type="range" min="0" max="50" step="5" value="${W[c.id]}" data-k="${c.id}"><div class="help">${esc(c.help)}</div>${c.flat ? '<div class="flat">Barely differs between locations</div>' : ''}</div>`).join('')}
+    <button class="reset" id="reset">Reset to campaign defaults</button>`;
+  document.querySelectorAll('.w input').forEach(s => s.oninput = () => { W[s.dataset.k] = +s.value; rank(); });
+  document.getElementById('reset').onclick = () => { Object.assign(W, D.weights); drawWts(); rank(); };
+}
+const open = new Set([D.focus]);
+function total(l) { const sw = Object.values(W).reduce((a, b) => a + b, 0) || 1;
+  return crit.reduce((s, c) => s + W[c.id] * l.scores[c.id].score, 0) / sw; }
+const rowsEl = document.getElementById('rows');
+D.locs.forEach(l => { const d = document.createElement('div'); d.className = 'row card lift' + (l.focus ? ' focusr' : ''); d.id = 'r-' + l.id;
+  d.onclick = () => { open.has(l.id) ? open.delete(l.id) : open.add(l.id); d.classList.toggle('open'); fit(); };
+  if (open.has(l.id)) d.classList.add('open'); rowsEl.appendChild(d); });
+function rank() {
+  const sw = Object.values(W).reduce((a, b) => a + b, 0) || 1;
+  crit.forEach(c => { const el = document.getElementById('wv-' + c.id); if (el) el.textContent = Math.round(100 * W[c.id] / sw) + '%'; });
+  const order = D.locs.map(l => ({ l, t: total(l) })).sort((a, b) => b.t - a.t);
+  const first = {}; order.forEach(o => first[o.l.id] = document.getElementById('r-' + o.l.id).getBoundingClientRect().top);
+  order.forEach((o, i) => { const l = o.l, d = document.getElementById('r-' + l.id);
+    d.innerHTML = `<div class="top"><div class="medal">${['🥇','🥈','🥉'][i] || '#' + (i + 1)}</div>
+      <div><h5><i style="background:${l.color}"></i>${esc(l.label)} ${l.in_plan ? '<span class="chip accent">⭐ in our plan</span>' : ''}</h5><div class="rd">${esc(l.road)} · ${esc(l.format)}</div></div>
+      <div class="tot"><b data-v="${o.t}">${Math.round(o.t)}</b><span>score / 100</span></div></div>
+      <div class="stack">${crit.map((c, k) => `<i style="width:${(W[c.id] * l.scores[c.id].score / sw).toFixed(2)}%;background:${CC[k]}" title="${esc(c.label)}: ${Math.round(l.scores[c.id].score)}"></i>`).join('')}</div>
+      <div class="det">${crit.map((c, k) => `<div class="cr"><span>${c.icon} ${esc(c.label)}</span><div class="bar"><i style="width:${l.scores[c.id].score}%;background:${CC[k]}"></i></div><b>${Math.round(l.scores[c.id].score)}</b><div class="why">${esc(l.scores[c.id].why)}</div></div>`).join('')}${l.why_out ? `<div class="out">🧾 <b>Why it is not in our plan:</b> ${esc(l.why_out)}</div>` : ''}</div>`;
+    rowsEl.appendChild(d); });
+  if (!reduce) order.forEach(o => { const d = document.getElementById('r-' + o.l.id), dy = first[o.l.id] - d.getBoundingClientRect().top;
+    if (dy) { d.style.transition = 'none'; d.style.transform = `translateY(${dy}px)`; requestAnimationFrame(() => { d.style.transition = ''; d.style.transform = ''; }); } });
+  const top = order[0].l;
+  const planNames = D.plan.join(', ');
+  document.getElementById('recon').innerHTML = top.in_plan
+    ? `🎯 <b>${esc(top.label)} scores highest and is in our plan</b> (${esc(planNames)}). The plan also counts drivers who pass several boards only once, so it can include boards that score lower here.`
+    : `🤔 <b>${esc(top.label)} scores highest on its own, but our plan (${esc(planNames)}) leaves it out</b>: ${esc(top.why_out)} The score rates each board alone; the plan buys the best <i>set</i> for the budget.`;
+  fit();
+}
+drawWts(); rank();
+// ---- across campaigns
+(function () {
+  const A = D.across; if (!A) return;
+  const col = v => `color-mix(in srgb, #6250d6 ${Math.round(8 + v * .55)}%, white)`;
+  document.getElementById('across').innerHTML = `<h4>🗂️ Every campaign at a glance</h4><div class="sub">Score of each location for each campaign (default weights). ⭐ = in that campaign's plan.</div>
+    <table class="mx"><tr><th></th>${A.locs.map(l => `<th>${esc(l.label)}</th>`).join('')}</tr>
+    ${A.campaigns.map(c => `<tr class="${c.id === D.campaign.id ? 'cur' : ''}"><td>${esc(c.emoji)} ${esc(c.title)}</td>${A.locs.map(l => { const v = c.totals[l.id];
+      return `<td class="cell" style="background:${col(v)};color:${v > 70 ? '#fff' : 'var(--ink)'}" title="${esc(c.title)} · ${esc(l.label)}">${Math.round(v)}${c.plan.includes(l.id) ? ' ⭐' : ''}</td>`; }).join('')}</tr>`).join('')}</table>`;
+  fit();
+})();
+"""
+
+
+def score_html(data: dict) -> str:
+    return _doc(_SCORE_CSS, _SCORE_BODY, _SCORE_JS, data)

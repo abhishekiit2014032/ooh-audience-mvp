@@ -100,7 +100,7 @@ def prepare(pcfg: PlacementConfig, params: Params, allow_download: bool = True) 
 # --------------------------------------------------------------------------- stage 2
 
 
-def compute_placement(prep: GeoPrep, params: Params, brand: str) -> PlacementResult:
+def compute_placement(prep: GeoPrep, params: Params, brand: str, campaign=None) -> PlacementResult:
     p, s = prep.placement, prep.snapped
     scored = score_segments(prep.roads, p, s, params, sov=1.0)
     metro_scored = score_metro(prep.metro, p, s, params, sov=1.0)
@@ -108,7 +108,9 @@ def compute_placement(prep: GeoPrep, params: Params, brand: str) -> PlacementRes
     base = r.scenarios["base"]
     road_share = base.road_impressions_day / base.impressions_day if base.impressions_day else 1.0
     prof = profile_mod.build_profile(p, prep.pois, r.metrics["unique_month"], r.metrics["impressions_month"],
-                                     params, road_share)
+                                     params, road_share,
+                                     interest_key=campaign.meta_interest if campaign else "automobiles",
+                                     audience=campaign.audience if campaign else "car-interest")
     facts = narrative.facts_for(p, r.metrics, prof)
     return PlacementResult(prep, scored, metro_scored, r, prof, facts)
 
@@ -140,7 +142,7 @@ def campaign_forecasts(results: dict[str, PlacementResult], pcfg: PlacementConfi
 def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params,
             events: list[dict] | None = None, event_overrides: dict[str, bool] | None = None) -> Results:
     brand = pcfg.campaign.brand
-    results = {pid: compute_placement(prep, params, brand) for pid, prep in preps.items()}
+    results = {pid: compute_placement(prep, params, brand, pcfg.campaign) for pid, prep in preps.items()}
 
     # Duplication and plan
     items = []

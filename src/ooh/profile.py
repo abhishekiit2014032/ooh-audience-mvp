@@ -92,7 +92,8 @@ def _age_share(age: dict[str, float], bands: tuple[str, ...]) -> float:
 
 
 def build_profile(placement: Placement, pois: gpd.GeoDataFrame, unique: Metric,
-                  impressions_month: Metric, params: Params, road_share: float) -> Profile:
+                  impressions_month: Metric, params: Params, road_share: float,
+                  interest_key: str | None = "automobiles", audience: str = "car-interest") -> Profile:
     meta_all = load_json_input("meta_reach.json")
     meta = meta_all["placements"].get(placement.id, {})
     meta_is_sample = bool(meta_all.get("is_sample", True)) or not meta
@@ -103,14 +104,16 @@ def build_profile(placement: Placement, pois: gpd.GeoDataFrame, unique: Metric,
     commuter_share = float(shares[list(COMMUTER_HOURS)].sum())
 
     # Interest share: Meta when real values exist, else the assumption.
-    if not meta_is_sample and "interest_share" in meta:
-        s = float(meta["interest_share"].get("automobiles", params.base("interest_share")))
+    if interest_key is None:
+        interest = Metric(1.0, 1.0, 1.0, "ESTIMATE", "Campaign targets everyone who passes", "share")
+    elif not meta_is_sample and "interest_share" in meta and interest_key in meta["interest_share"]:
+        s = float(meta["interest_share"][interest_key])
         interest = Metric(s, s * 0.8, s * 1.2, "ESTIMATE",
-                          "Meta Ads Manager reach estimate, interest 'Automobiles'", "share")
+                          f"Meta Ads Manager reach estimate, interest '{interest_key}'", "share")
     else:
         interest = Metric(params.base("interest_share"), params.get("interest_share", "low"),
                           params.get("interest_share", "high"), "ASSUMPTION",
-                          "Assumed car-interest share until Meta values are entered", "share")
+                          f"Assumed share of {audience} until Meta values are entered", "share")
 
     rr_label = weakest(unique.label, interest.label)
     relevant = Metric(unique.value * interest.value, unique.low * interest.value, unique.high * interest.value,

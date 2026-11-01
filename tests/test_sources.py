@@ -22,7 +22,7 @@ def test_scores_in_range_and_ordered():
 def test_every_edge_points_to_a_known_output():
     for s in sources.registry():
         assert s.engine in sources.ENGINE
-        assert s.feeds, s.id
+        assert s.feeds or s.context_only, s.id
         for o in s.feeds:
             assert o in sources.OUTPUTS, (s.id, o)
             assert o in sources.ENGINE_OUTPUTS[s.engine] or o in sources.ENGINE_HANDOFF.get(s.engine, []), \

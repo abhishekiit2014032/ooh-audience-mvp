@@ -1,0 +1,22 @@
+# People facts a planner can enter by hand (no API key needed). They join the facts found online on
+# the "What's on nearby" page. Same rule as online facts: the quote must state the number.
+#
+# kind: event_attendance | venue_footfall | new_homes_or_offices | transit_ridership | traffic_count
+# place: one of a placement's nearby_places in config/placements.yaml (e.g. "Dubai Marina")
+# period: event | day | week | month | year
+# tags: cars | luxury | business | families | sports | culture | general
+facts: []
+#  - kind: event_attendance
+#    what: Example car festival
+#    place: Dubai World Trade Centre
+#    value: 25000
+#    unit: visitors
+#    period: event
+#    event_start: 2026-11-20
+#    event_end: 2026-11-22
+#    figure_year: 2025
+#    tags: [cars]
+#    quote: "The 2025 edition welcomed 25,000 visitors."
+#    source_title: Organiser press release
+#    source_url: https://example.com
+#    enabled: true

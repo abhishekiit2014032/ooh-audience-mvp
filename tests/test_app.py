@@ -6,8 +6,8 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 APP = str(Path(__file__).resolve().parents[1] / "app" / "streamlit_app.py")
-PAGES = ["Decision", "Billboard league", "Audience", "Campaign health",
-         "Map", "Data sources", "Placement detail", "Compare locations", "Duplication and plan", "Planned vs actual",
+PAGES = ["Overview", "Explore a location", "Score & compare", "Decision", "Campaign health",
+         "Knowledge layer", "Data sources", "Map", "Placement detail", "Compare locations", "Duplication and plan", "Planned vs actual",
          "Sensitivity", "Activation", "Area signals", "Assumptions and sources"]
 
 
@@ -37,3 +37,13 @@ def test_slider_change_recomputes():
     at.sidebar.radio(key="page").set_value("Compare locations").run()
     at.sidebar.slider(key="param_monthly_frequency").set_value(4.0).run()
     assert not at.exception
+
+
+def test_every_campaign_renders_the_executive_pages():
+    at = AppTest.from_file(APP, default_timeout=300)
+    at.run()
+    for cid in ["suv_launch", "luxury_launch", "service_promo"]:
+        at.selectbox(key="campaign_id").set_value(cid).run()
+        for page in PAGES[:5]:
+            at.sidebar.radio(key="page").set_value(page).run()
+            assert not at.exception, (cid, page, at.exception)

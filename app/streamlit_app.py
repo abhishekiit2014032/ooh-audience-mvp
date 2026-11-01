@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import io
 import sys
+import html
 from datetime import date
 from itertools import combinations
 from pathlib import Path
@@ -24,10 +25,13 @@ from pyproj import Transformer  # noqa: E402
 
 from ooh import duplication  # noqa: E402
 from ooh import exec_ui  # noqa: E402
+from ooh import footprint as footprint_mod  # noqa: E402
+from ooh import flow_viz  # noqa: E402
+from ooh import knowledge as knowledge_mod  # noqa: E402
 from ooh import narrative as narrative_mod  # noqa: E402
 from ooh import signals as signals_mod  # noqa: E402
 from ooh import sources as sources_mod  # noqa: E402
-from ooh.brain_viz import brain_html, diagram_data  # noqa: E402
+from ooh.brain_viz import diagram_data  # noqa: E402
 from ooh.activation import PLATFORM_MIN_RADIUS_KM  # noqa: E402
 from ooh.config import (AssumptionConfig, Params, RoadClass, env_key, load_assumptions,  # noqa: E402
                         load_placements)
@@ -38,8 +42,10 @@ from ooh.pipeline import Results, compute, prepare, sensitivity  # noqa: E402
 st.set_page_config(page_title="OOH Decision Room", page_icon="📍", layout="wide")
 
 # Executive pages answer one decision each; the analyst toolkit keeps the full technical detail.
-EXEC_PAGES = ["Decision", "Billboard league", "Audience", "Campaign health"]
+EXEC_PAGES = ["Overview", "Explore a location", "Score & compare", "Decision", "Campaign health"]
 ANALYST_PAGES = [
+    "Knowledge layer",
+    "Data sources",
     "Map",
     "Placement detail",
     "Compare locations",
@@ -48,15 +54,15 @@ ANALYST_PAGES = [
     "Sensitivity",
     "Area signals",
     "Activation",
-    "Data sources",
     "Assumptions and sources",
 ]
 PAGES = EXEC_PAGES + ANALYST_PAGES
-PAGE_ICONS = {"Decision": "🎯", "Billboard league": "🏆", "Audience": "👥", "Campaign health": "📈", "Map": "🗺️",
+PAGE_ICONS = {"Overview": "🗺️", "Explore a location": "📍", "Score & compare": "🏆", "Knowledge layer": "🧠",
+              "Decision": "🎯",
+              "Campaign health": "📈", "Map": "🛰️",
               "Placement detail": "🔎", "Compare locations": "📊", "Duplication and plan": "🔁",
               "Planned vs actual": "📦", "Sensitivity": "🎚️", "Area signals": "📰", "Activation": "📲",
               "Data sources": "🧠", "Assumptions and sources": "📚"}
-PID_PAGES = {"Map", "Placement detail", "Planned vs actual", "Sensitivity"}
 MAIN_SLIDERS = ["utilisation", "occupancy", "monthly_frequency", "cone_radius_m", "half_angle_deg",
                 "interest_share", "obstruction_factor"]
 BADGE_COLORS = {
@@ -102,8 +108,9 @@ def ledger_stamp() -> str:
 
 
 @st.cache_resource(max_entries=24, show_spinner="Recomputing...")
-def get_results(overrides: tuple, road_rows: tuple, event_overrides: tuple = (), stamp: str = "") -> Results:
-    pcfg = load_placements()
+def get_results(overrides: tuple, road_rows: tuple, event_overrides: tuple = (), stamp: str = "",
+                campaign_id: str | None = None) -> Results:
+    pcfg = load_placements().with_campaign(campaign_id)
     params = Params(build_cfg(road_rows), dict(overrides))
     return compute(get_preps(), pcfg, params, event_overrides=dict(event_overrides))
 
@@ -129,7 +136,7 @@ def event_hours(ev: dict, params: Params) -> str:
 
 def event_faces(ev: dict, pcfg) -> str:
     types = load_assumptions().event_types
-    return ", ".join(p.id for p in pcfg.placements if signals_mod.affects(ev, p, types)) or "none"
+    return ", ".join(p.label for p in pcfg.placements if signals_mod.affects(ev, p, types)) or "none"
 
 
 MOTION_CSS = """
@@ -154,6 +161,10 @@ MOTION_CSS = """
 .ooh-sub { color: #55536a; font-size: 1.02rem; margin: 0; max-width: 780px; }
 .ooh-analyst { display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
                color:#55536a; background:#f6f5fc; border:1px solid #ecebf3; border-radius:999px; padding:3px 10px; margin-bottom:4px; }
+/* campaign + location context bar */
+.ooh-ctx { background: linear-gradient(135deg, #f4f2ff, #ffffff); border: 1px solid #e4e0fb; border-radius: 14px;
+           padding: 8px 14px; font-size: .9rem; color: var(--ooh-ink); line-height: 1.45; }
+.ooh-ctx span { color: #55536a; font-size: .85rem; }
 /* sidebar navigation */
 [data-testid="stSidebar"] { border-right: 1px solid var(--ooh-line); }
 .ooh-brand { display:flex; align-items:center; gap:10px; margin: 0 0 14px; }
@@ -172,11 +183,20 @@ MOTION_CSS = """
 [data-testid="stSidebar"] [role="radiogroup"] > div[data-selected="true"] [data-testid="stRadioOption"] {
     background: #efedfc; box-shadow: inset 3px 0 0 #6250d6; }
 [data-testid="stSidebar"] [role="radiogroup"] > div[data-selected="true"] p { font-weight: 700; color: #6250d6; }
-[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(5) { margin-top: 30px; }
-[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(5)::before { content: "ANALYST TOOLKIT"; position:absolute;
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(6) { margin-top: 30px; }
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(6)::before { content: "ANALYST TOOLKIT"; position:absolute;
     top:-20px; left:10px; font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--ooh-muted); }
-[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(n+5) p { font-size: .9rem; }
-[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(-n+4) p { font-size: 1rem; font-weight: 600; }
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(n+6) p { font-size: .9rem; }
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(-n+5) p { font-size: 1rem; font-weight: 600; }
+/* overview: section titles and location cards */
+.ooh-sec { font-size: 1.25rem; font-weight: 800; color: var(--ooh-ink); letter-spacing: -.01em; margin: 26px 0 2px; }
+.ooh-mini { font-size: .85rem; color: #55536a; margin: 0 0 6px; }
+.ooh-loc { font-size: .95rem; color: var(--ooh-ink); line-height: 1.4; }
+.ooh-loc .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align: middle; }
+.ooh-star { font-size: .72rem; font-weight: 700; color: #6250d6; background: #efedfc; border-radius: 999px; padding: 1px 8px;
+            margin-left: 4px; }
+.ooh-locsub { font-size: .8rem; color: var(--ooh-muted); margin: 2px 0 4px; }
+.ooh-locnum { font-size: .85rem; color: #55536a; }
 /* tidy containers */
 [data-testid="stPlotlyChart"], [data-testid="stDeckGlJsonChart"] { border-radius: 14px; overflow: hidden; }
 [data-testid="stPlotlyChart"] { border: 1px solid var(--ooh-line); padding: 6px 8px; background:#fff; }
@@ -273,21 +293,19 @@ def lonlat_path(geom) -> list[list[float]]:
 # --------------------------------------------------------------------------- sidebar
 
 
-def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
+def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, dict, tuple, bool]:
     st.sidebar.markdown(
         f"<div class='ooh-brand'><div class='logo'>📍</div><div><b>OOH Decision Room</b>"
-        f"<span>{pcfg.campaign.brand} · Dubai</span></div></div>", unsafe_allow_html=True)
+        f"<span>Outdoor billboards · Dubai</span></div></div>", unsafe_allow_html=True)
     page = st.sidebar.radio("Page", PAGES, key="page", label_visibility="collapsed",
                             format_func=lambda x: f"{PAGE_ICONS.get(x, '')}\u2002{x}")
-    ids = [p.id for p in pcfg.placements]
-    keep = st.session_state.get("pid_keep", ids[0])
-    if page in PID_PAGES:
-        pid = st.sidebar.selectbox("Billboard", ids, index=ids.index(keep) if keep in ids else 0,
-                                   format_func=lambda i: f"{i} · {next(p.name for p in pcfg.placements if p.id == i)}",
-                                   key="pid")
-        st.session_state["pid_keep"] = pid
-    else:
-        pid = keep if keep in ids else ids[0]
+    # The interest-share slider starts from the active campaign's target share, and follows a campaign switch.
+    camp = pcfg.campaign
+    camp_share = float(camp.interest_share if camp.interest_share is not None else
+                       acfg.parameters["interest_share"].value)
+    if st.session_state.get("_slider_campaign") != camp.id:
+        st.session_state["param_interest_share"] = camp_share
+        st.session_state["_slider_campaign"] = camp.id
 
     st.sidebar.divider()
     st.sidebar.caption("🎛️ ANALYST CONTROLS · every number in the app follows these")
@@ -303,7 +321,7 @@ def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
             return
         value = container.slider(f"{key.replace('_', ' ').capitalize()} ({p.unit})", float(p.min),
                                  float(p.max), step=float(p.step), key=skey, help=p.description)
-        if abs(value - p.value) > 1e-12:
+        if key == "interest_share" or abs(value - p.value) > 1e-12:
             overrides[key] = float(value)
 
     with st.sidebar.expander("Key assumptions"):
@@ -344,9 +362,10 @@ def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
                                                    "ANTHROPIC_API_KEY"]}
         st.caption("API keys: " + ", ".join(f"{k.split('_')[0].title()} {'set' if v else 'not set'}"
                                             for k, v in keys.items()))
-    if overrides or road_rows:
-        st.sidebar.warning(f"{len(overrides) + (1 if road_rows else 0)} assumption(s) changed from the defaults.")
-    return page, pid, overrides, road_rows, use_llm
+    changed = [k for k in overrides if k != "interest_share" or abs(overrides[k] - camp_share) > 1e-12]
+    if changed or road_rows:
+        st.sidebar.warning(f"{len(changed) + (1 if road_rows else 0)} assumption(s) changed from the defaults.")
+    return page, overrides, road_rows, use_llm
 
 
 # --------------------------------------------------------------------------- pages
@@ -370,39 +389,68 @@ def analyst_tag() -> None:
 
 
 def trust_of(*labels: str) -> list[str]:
-    worst = max(labels, key=lambda l: ["VERIFIED", "ESTIMATE", "ASSUMPTION", "SAMPLE", "CONCEPT"].index(l)
-                if l in exec_ui.TRUST else 1)
+    order = ["VERIFIED", "ESTIMATE", "ASSUMPTION", "SAMPLE", "CONCEPT"]
+    worst = max(labels, key=lambda l: order.index(l) if l in order else 1)
     return list(exec_ui.TRUST.get(worst, ("Estimate", "")))
 
 
-def face_rows(res: Results) -> list[dict]:
-    """One row per billboard, in config order, with the numbers the executive pages use."""
+def cap(text: str) -> str:
+    """Capitalise the first letter only (keeps "SUV")."""
+    return text[:1].upper() + text[1:]
+
+
+def road_short(corridor: str) -> str:
+    return corridor.replace(" Road", " Rd")
+
+
+def name_of(res: Results, pid: str) -> str:
+    return res.placements[pid].prep.placement.label
+
+
+def face_rows(res: Results, focus: str | None = None) -> list[dict]:
+    """One row per billboard, in config order, with the numbers the executive pages use.
+
+    Prices stay inside the data (they drive the plan and the value score) but are never shown in AED:
+    executives see value for money and a price level relative to the other billboards.
+    """
     plan_ids = {s.placement for s in res.plan}
     rows = []
     for i, (pid, r) in enumerate(res.placements.items()):
         p, rr = r.prep.placement, r.profile.relevant_reach
-        rows.append({"id": pid, "name": p.name, "area": p.area.split(" / ")[0], "area_full": p.area,
-                     "type": p.type.title(), "cost": float(p.cost_per_month_aed), "rel": float(rr.value),
-                     "rel_lo": float(rr.low), "rel_hi": float(rr.high),
-                     "cpp": float(p.cost_per_month_aed / rr.value) if rr.value else 0.0,
+        rows.append({"id": pid, "label": p.label, "name": p.name, "road": road_short(p.corridor),
+                     "area_full": p.area, "type": p.type.title(), "cost": float(p.cost_per_month_aed),
+                     "rel": float(rr.value), "rel_lo": float(rr.low), "rel_hi": float(rr.high),
+                     "unique": float(r.metrics["unique_month"].value),
                      "color": exec_ui.FACE_COLORS[i % len(exec_ui.FACE_COLORS)], "in_plan": pid in plan_ids,
-                     "label": rr.label, "sov": float(p.share_of_voice), "unique": float(r.metrics["unique_month"].value)})
+                     "label_trust": rr.label, "sov": float(p.share_of_voice), "focus": pid == focus})
+    per_aed = {f["id"]: f["rel"] / f["cost"] if f["cost"] else 0.0 for f in rows}
+    best = max(per_aed.values()) or 1.0
+    by_cost = sorted(rows, key=lambda f: f["cost"])
+    for f in rows:
+        f["value"] = round(per_aed[f["id"]] / best * 100)
+        f["value_dots"] = max(1, round(f["value"] / 20))
+        f["price_rank"] = by_cost.index(f) + 1                                # 1 = cheapest
+        f["price_dots"] = f["price_rank"] if len(rows) <= 4 else max(1, round(f["price_rank"] / len(rows) * 4))
     return rows
 
 
-def plan_options(res: Results, budget: float, step: int = 10_000) -> dict:
-    """De-duplicated relevant reach for every mix of billboards, and the plan builder's pick at each budget."""
+def plan_options(res: Results, budget: float, pct_step: int = 5, pct_max: int = 150) -> dict:
+    """De-duplicated reach for every mix of billboards, and the plan builder's pick at each budget level.
+
+    Budget levels are shares of the campaign budget (100 = as planned), so no AED is sent to the page.
+    """
     items, mat = res.plan_items, res.overlap
+    uniques = duplication.uniques_dict(items)
     ids = [it.id for it in items]
     subsets = {}
     for k in range(1, len(ids) + 1):
         for combo in combinations(ids, k):
-            subsets[",".join(sorted(combo))] = {"rel": float(duplication.combined_relevant(list(combo), items, mat))}
-    total = sum(it.cost_aed for it in items)
-    top = int(np.ceil(max(budget * 1.5, total + step * 5) / step) * step)
-    picks = {str(b): [s.placement for s in duplication.greedy_plan(items, mat, b)] for b in range(0, top + 1, step)}
-    return {"subsets": subsets, "picks": picks, "budget_max": top, "step": step,
-            "budget": int(round(budget / step) * step)}
+            subsets[",".join(sorted(combo))] = {
+                "rel": float(duplication.combined_relevant(list(combo), items, mat)),
+                "all": float(duplication.combined_unique(list(combo), uniques, mat))}
+    picks = {str(pc): [s.placement for s in duplication.greedy_plan(items, mat, budget * pc / 100)]
+             for pc in range(0, pct_max + 1, pct_step)}
+    return {"subsets": subsets, "picks": picks, "pct_max": pct_max, "pct_step": pct_step, "budget": budget}
 
 
 def news_events(res: Results, params: Params) -> list[dict]:
@@ -428,8 +476,7 @@ def news_events(res: Results, params: Params) -> list[dict]:
                     "note": e.get("note") or e.get("corridor") or "",
                     "where": e.get("stretch") or e.get("corridor") or ", ".join(e.get("areas", [])),
                     "hours": event_hours(e, params) if "type" in e else "", "confidence": e.get("confidence"),
-                    "faces": hit["faces"],
-                    "source": e.get("source", "")})
+                    "faces": hit["faces"], "source": e.get("source", "")})
     return sorted(out, key=lambda x: x["date"])
 
 
@@ -441,20 +488,37 @@ def delivery_summary(res: Results) -> pd.DataFrame:
     return g
 
 
-def page_decision(res: Results, pcfg, params: Params) -> None:
-    budget = float(pcfg.campaign.budget_aed)
-    faces = face_rows(res)
+def context_bar(pcfg) -> tuple:
+    """Campaign and location pickers at the top of every page: everything below follows them."""
+    camps = pcfg.campaign_options()
+    by_id = {c.id: c for c in camps}
+    ids = [p.id for p in pcfg.placements]
+    labels = {p.id: f"{p.label} · {road_short(p.corridor)}" for p in pcfg.placements}
+    c1, c2, c3 = st.columns([1.25, 1.25, 2.2], vertical_alignment="bottom")
+    cid = c1.selectbox("Campaign", [c.id for c in camps], key="campaign_id",
+                       format_func=lambda i: f"{by_id[i].emoji} {by_id[i].title}")
+    pid = c2.selectbox("Location in focus", ids, key="pid", format_func=lambda i: labels[i])
+    c = by_id[cid]
+    c3.markdown(
+        f"<div class='ooh-ctx'><b>{c.emoji} {c.title}</b> · {c.plan_start:%d %b} – {c.plan_end:%d %b %Y}"
+        f"<br><span>Target audience: <b>{c.audience}</b></span></div>", unsafe_allow_html=True)
+    return c, pid
+
+
+def page_decision(res: Results, pcfg, params: Params, focus: str) -> None:
+    c = pcfg.campaign
+    budget = float(c.budget_aed)
+    faces = face_rows(res, focus)
     by_id = {f["id"]: f for f in faces}
     opts = plan_options(res, budget)
-    trust = trust_of(*[f["label"] for f in faces])
-    start = pcfg.campaign.plan_start
-    page_header(f"🎯 The decision · {pcfg.campaign.brand} · {start:%B %Y}",
-                f"Where should our {exec_ui.aed(budget)} a month go?",
-                f"We scored {len(faces)} billboards on how many car-interested people each one reaches per dirham, "
-                "without counting the same driver twice. Here is the mix we recommend. Tap the cards to try your own.")
-    html_block(exec_ui.decision_html({"faces": faces, "trust": trust, **opts}), height=560)
+    trust = trust_of(*[f["label_trust"] for f in faces])
+    page_header(f"{c.emoji} {c.title} · {c.plan_start:%B %Y}",
+                f"Which billboards should carry our {c.title}?",
+                f"We compared {len(faces)} billboards on how many <b>{c.audience}</b> each one reaches for the money, "
+                "counting every driver once. Here is the mix we recommend. Tap the cards to try your own.")
+    html_block(exec_ui.decision_html({"faces": faces, "trust": trust, "aud_short": c.audience_short, **opts}),
+               height=560)
 
-    # Three answers a board member asks next, plus the obvious "why not the flagship?"
     plan_ids = [s.placement for s in res.plan]
     deliv = delivery_summary(res)
     scope = [i for i in plan_ids if i in deliv.index] or list(deliv.index)
@@ -462,17 +526,17 @@ def page_decision(res: Results, pcfg, params: Params) -> None:
     expected = float(d["actual"].sum() / d["planned"].sum()) if d["planned"].sum() else 1.0
     status = ("Looks on track", "good") if expected >= 0.97 else ("Keep an eye on it", "warn") if expected >= 0.9 else \
         ("Likely behind plan", "crit")
-    light = [pid for pid, r in d.iterrows() if r["index"] < 0.97]
-    started = date.today() > pcfg.campaign.plan_start
+    light = [name_of(res, pid) for pid, r in d.iterrows() if r["index"] < 0.97]
+    started = date.today() > c.plan_start
     events = news_events(res, params)
     plan_rel = [f for f in faces if f["in_plan"]] or faces
     lo_x = sum(f["rel_lo"] for f in plan_rel) / sum(f["rel"] for f in plan_rel)
     hi_x = sum(f["rel_hi"] for f in plan_rel) / sum(f["rel"] for f in plan_rel)
     meter = {"VERIFIED": 5, "ESTIMATE": 3, "ASSUMPTION": 2, "SAMPLE": 2, "CONCEPT": 1}
-    worst = max((f["label"] for f in faces), key=lambda l: meter.get(l, 3) * -1)
+    worst = min((f["label_trust"] for f in faces), key=lambda l: meter.get(l, 3))
     tiles = [
         {"emoji": "📦", "q": "Will it deliver?", "a": f"{expected:.0%}", "unit": "of planned views expected",
-         "text": ((f"For our pick ({', '.join(scope)}), " if plan_ids else "Across all billboards, ")
+         "text": ((f"For our pick ({', '.join(name_of(res, i) for i in scope)}), " if plan_ids else "Across all billboards, ")
                   + ("based on a simulated month: no media-owner play logs or live traffic counts are connected yet. "
                      if not started else "simulated until play logs and live counts are connected. ")
                   + (f"{', '.join(light)} may run a little light." if light else "Every board is at or above plan.")),
@@ -481,45 +545,70 @@ def page_decision(res: Results, pcfg, params: Params) -> None:
     ]
     hits_plan = [(e, {k: v for k, v in e["faces"].items() if k in plan_ids}) for e in events]
     hits_plan = [(e, f) for e, f in hits_plan if f]
-    others = sorted({k for e in events for k in e["faces"] if k not in plan_ids})
+    others = sorted({name_of(res, k) for e in events for k in e["faces"] if k not in plan_ids})
     if hits_plan:
         e, fs = hits_plan[0]
-        worst_face = min(fs.items(), key=lambda kv: kv[1]["delta"])
-        small = abs(worst_face[1]["campaign"]) < 0.02
+        wid, wv = min(fs.items(), key=lambda kv: kv[1]["delta"])
+        small = abs(wv["campaign"]) < 0.02
         tiles.append({"emoji": "🚧", "q": "Anything in the way?",
                       "a": f"{len(hits_plan)} road event{'s' if len(hits_plan) > 1 else ''}", "unit": "for our pick",
-                      "text": (f"<b>{e['date']:%a %d %b}</b>: {e['note'] or e['type']}. "
-                               f"{worst_face[0]} loses about {exec_ui.people(abs(worst_face[1]['delta']))} views of our "
-                               f"ad that day ({worst_face[1]['campaign']:+.1%} over the month)."),
+                      "text": (f"<b>{e['date']:%a %d %b}</b>: {e['note'] or e['type']}. {name_of(res, wid)} loses about "
+                               f"{exec_ui.people(abs(wv['delta']))} views of our ad that day "
+                               f"({wv['campaign']:+.1%} over the month)."),
                       "chips": [("Small effect" if small else "Material effect", "good" if small else "warn"),
                                 ("From news headlines", "accent")]})
     else:
         tiles.append({"emoji": "🌤️", "q": "Anything in the way?", "a": "All clear", "unit": "for our pick",
-                      "text": ("No closures, roadworks or big events are expected near the boards we recommend this month."
+                      "text": ("No closures, roadworks or big events are expected near the boards we recommend "
+                               "during the campaign."
                                + (f" The only one found affects {', '.join(others)}, which is not in our pick."
                                   if others else "")),
                       "chips": [("From news headlines", "accent")]})
+    pulse, crowd_plan, _ = crowd_pulse(res, pcfg, params)
+    near_pick = [(pid, e) for pid in plan_ids for e in pulse[pid].events]
+    near_all = [(pid, e) for pid, lp in pulse.items() for e in lp.events]
+    same = [s.placement for s in crowd_plan] == plan_ids
+    if near_all:
+        pid, top = max(near_pick or near_all, key=lambda pe: pe[1].extra_people)
+        extra = sum(e.extra_people for _, e in near_pick)
+        what = html.escape(top.group.what)
+        tiles.append({"emoji": "📣", "q": "Crowds nearby?",
+                      "a": f"+{exec_ui.people(extra)}" if near_pick else f"{len(near_all)} event{'s' if len(near_all) > 1 else ''}",
+                      "unit": "people on event days" if near_pick else "near other boards",
+                      "text": (f"<b>{what}</b> ({top.group.event_start:%d %b}) "
+                               f"{'brought' if (top.group.event_end or top.group.event_start) <= date.today() else 'brings'} about "
+                               f"{exec_ui.people(top.extra_people)} extra people past {name_of(res, pid)}"
+                               + ("" if near_pick else ", which is not in our pick")
+                               + (". Small next to everyday traffic, so the pick stays the same."
+                                  if same else ". Counting it would change our pick: see What's on nearby.")),
+                      "chips": [("Same pick" if same else "Pick changes", "good" if same else "warn"),
+                                ("Sourced numbers", "accent")]})
+    else:
+        tiles.append({"emoji": "📣", "q": "Crowds nearby?", "a": "Quiet", "unit": "month",
+                      "text": "No event with a published crowd figure is found near our billboards during the campaign.",
+                      "chips": [("Sourced numbers", "accent")]})
     tiles.append({"emoji": "🔍", "q": "How sure are we?", "a": trust[0], "unit": "", "meter": meter.get(worst, 3),
-                  "text": (f"Good for ranking the billboards; treat the head counts as a range. Reach could land between "
-                           f"{lo_x:.1f}× and {hi_x:.1f}× our central figure, mostly depending on how often the same "
-                           "people repeat the trip. Traffic is estimated from road capacity, not live counters."),
-                  "chips": [("Ranking: reliable", "good"), ("Head counts: ± a lot", "warn")]})
+                  "text": (f"Good for ranking the billboards; treat head counts as a range. The audience could land "
+                           f"between {lo_x:.1f}× and {hi_x:.1f}× our central figure, mostly depending on how often the "
+                           "same people repeat the trip. Traffic is estimated from road capacity, not live counters."),
+                  "chips": [("Ranking: reliable", "good"), ("Head counts: wide range", "warn")]})
 
     why = None
     left_out = [f for f in faces if f["id"] not in plan_ids]
     if plan_ids and left_out:
         f = max(left_out, key=lambda x: x["rel"])
-        best = min(faces, key=lambda x: x["cpp"])
-        key_plan = ",".join(sorted(plan_ids))
-        key_with = ",".join(sorted(plan_ids + [f["id"]]))
+        best = max(faces, key=lambda x: x["value"])
+        key_plan, key_with = ",".join(sorted(plan_ids)), ",".join(sorted(plan_ids + [f["id"]]))
         inc = opts["subsets"][key_with]["rel"] - opts["subsets"][key_plan]["rel"]
+        base_rel = opts["subsets"][key_plan]["rel"]
         spent = sum(by_id[i]["cost"] for i in plan_ids)
         points = []
-        if f["cpp"] >= max(x["cpp"] for x in faces) - 1e-9:
-            points.append(f"<b>Priciest per person:</b> AED {f['cpp']:.2f} for each car-interested person, against "
-                          f"AED {best['cpp']:.2f} for {best['id']}, the best value.")
+        ratio = best["value"] / f["value"] if f["value"] else 0
+        if f["value"] <= min(x["value"] for x in faces):
+            points.append(f"<b>Lowest value for money:</b> {best['label']} reaches about {ratio:.1f}× more "
+                          f"{c.audience_short} for the same spend.")
         else:
-            points.append(f"<b>Cost per person:</b> AED {f['cpp']:.2f}, against AED {best['cpp']:.2f} for {best['id']}.")
+            points.append(f"<b>Value for money:</b> {f['value']}/100, against 100 for {best['label']}.")
         mat = res.overlap
         partner = max(plan_ids, key=lambda x: mat.loc[f["id"], x] / min(mat.loc[f["id"], f["id"]], mat.loc[x, x]))
         share = mat.loc[f["id"], partner] / min(mat.loc[f["id"], f["id"]], mat.loc[partner, partner])
@@ -527,54 +616,25 @@ def page_decision(res: Results, pcfg, params: Params) -> None:
         smaller = partner if mat.loc[partner, partner] <= mat.loc[f["id"], f["id"]] else f["id"]
         other = f["id"] if smaller == partner else partner
         if share >= 0.2:
-            points.append(f"<b>Same drivers:</b> about {share:.0%} of the people who pass {smaller} also pass {other}"
-                          f"{' (same road, same direction)' if 'same corridor' in rule else ''}, so much of its audience "
-                          "is already covered.")
-        need = spent + f["cost"] - budget
-        points.append(f"<b>Small gain:</b> adding it would bring only {exec_ui.people(inc)} extra people for "
-                      f"{exec_ui.aed(f['cost'])} a month (AED {f['cost'] / max(inc, 1):.2f} per extra person)"
-                      + (f", and the budget would need to grow by {exec_ui.aed(need)}." if need > 0 else "."))
-        why = {"title": f"Why isn't {f['id']} ({f['name']}) in the plan?", "points": points}
-    html_block(exec_ui.insights_html({"tiles": tiles, "why": why}), height=470)
-    st.caption("Head counts are people per month, counted once even if they pass several times. "
-               "\"Car-interested\" = share of the audience with an interest in cars or SUVs. "
-               "Billboard prices are planning assumptions until media-owner quotes arrive. "
+            points.append(f"<b>Same drivers:</b> about {share:.0%} of the people who pass {name_of(res, smaller)} also "
+                          f"pass {name_of(res, other)}"
+                          f"{' (same road, same direction)' if 'same corridor' in rule else ''}, so much of its "
+                          "audience is already covered.")
+        over = (spent + f["cost"]) / budget - 1
+        points.append(f"<b>Small gain:</b> adding it would bring only {exec_ui.people(inc)} more {c.audience_short} "
+                      f"(+{inc / base_rel:.0%}) while costing {f['cost'] / budget:.0%} of the budget on its own"
+                      + (f", which would take the plan {over:.0%} over budget." if over > 0 else "."))
+        why = {"title": f"Why isn't {f['label']} ({f['road']}) in the plan?", "points": points}
+    html_block(exec_ui.insights_html({"tiles": tiles, "why": why}), height=520)
+    st.caption(f"Head counts are people per month, counted once even if they pass several times. "
+               f"\"{cap(c.audience_short)}\" = {c.audience}. Value for money and price levels compare the "
+               "billboards with each other, based on planning prices until media-owner quotes arrive. "
                "Full method in the Analyst toolkit.")
 
 
-def page_league(res: Results) -> None:
-    faces = face_rows(res)
-    page_header("🏆 Billboard league", "Which billboard gives us the most for the money?",
-                "Each billboard on its own: price, audience and cost per car-interested person. "
-                "Re-sort to see who wins on value, size or price.")
-    best_cpp = min(f["cpp"] for f in faces)
-    max_rel = max(f["rel"] for f in faces)
-    max_cpp = max(f["cpp"] for f in faces)
-    rows = []
-    for f in faces:
-        tags = [("⭐ In our plan", "accent") if f["in_plan"] else ("Not in plan", "")]
-        if f["cpp"] == best_cpp:
-            tags.append(("💎 Best value", "good"))
-        if f["rel"] == max_rel:
-            tags.append(("📣 Biggest audience", ""))
-        if f["cpp"] == max_cpp and len(faces) > 1:
-            tags.append(("💸 Priciest per person", "warn"))
-        slots = round(1 / f["sov"]) if f["sov"] else 1
-        rows.append({**f, "name": f"{f['name']} · {f['area_full']}", "tags": tags,
-                     "type_note": (f"Digital screen · our ad is 1 of {slots} in rotation" if f["type"] == "Digital"
-                                   and slots > 1 else f"{f['type']} · our ad shows all day"),
-                     "cpp_note": "best value" if f["cpp"] == best_cpp else f"{f['cpp'] / best_cpp - 1:+.0%} vs best"})
-    note = ("Car-interested people = unique people passing each month × the share interested in cars. "
-            "The bar shows our central figure; the faint band is the likely range. Two billboards on the same road "
-            "share many drivers, which is why the Decision page does not simply add them up.")
-    html_block(exec_ui.league_html({"rows": rows, "trust": trust_of(*[f["label"] for f in faces]), "note": note}),
-               height=600)
-
-
-def page_audience(res: Results) -> None:
-    faces = face_rows(res)
-    page_header("👥 Audience", "Who will see our ad, and when?",
-                "Use this to brief the creative and, on digital screens, to schedule it. ⭐ marks billboards in our plan.")
+def audience_payload(res: Results, pcfg, focus: str, only: str | None = None) -> dict:
+    c = pcfg.campaign
+    faces = [f for f in face_rows(res, focus) if only is None or f["id"] == only]
     out = []
     for f in sorted(faces, key=lambda x: (not x["in_plan"], -x["rel"])):
         r = res.placements[f["id"]]
@@ -589,41 +649,471 @@ def page_audience(res: Results) -> None:
         rush = sum(hourly[7:10] + hourly[17:20]) / sum(hourly) if sum(hourly) else 0
         share = prof.interest_share.value
         tenths = round(core * 10)
+        slots = round(1 / f["sov"]) if f["sov"] else 1
         if f["type"] == "Digital":
-            sowhat = (f"<b>So what:</b> this is a digital screen, so we can choose when to run. Weight the SUV creative to "
-                      f"the 7–10 am and 5–8 pm rush, when {rush:.0%} of views happen. Our ad shares the screen with "
-                      f"{round(1 / f['sov']) - 1} others, so keep it to one image and one line.")
+            sowhat = (f"<b>So what:</b> this is a digital screen, so we can choose when to run. Weight the creative to the "
+                      f"7–10 am and 5–8 pm rush, when {rush:.0%} of views happen. Our ad shares the screen with "
+                      f"{slots - 1} others, so keep it simple.")
         else:
-            sowhat = (f"<b>So what:</b> a static board shows one message all day to drivers at motorway speed. "
-                      f"Design for a two-second glance: the car, the brand and one line.")
-        if cars >= 10:
-            sowhat += f" With {cars} car showrooms and services within 1 km, a 'test drive nearby' call to action fits."
+            sowhat = ("<b>So what:</b> a static board shows one message all day to drivers at motorway speed, "
+                      "so design for a two-second glance.")
+        if c.creative_hint:
+            sowhat += f" <b>For our {c.title}:</b> {c.creative_hint}"
+        if cars >= 10 and (c.meta_interest or c.brand_category.startswith("automotive")):
+            sowhat += f" With {cars} car showrooms and services within 1 km, a 'visit us nearby' call to action fits."
+        target = [["🎯", exec_ui.people(f["rel"]), f"{c.audience_short} a month"],
+                  ["🧩", f"{share:.0%}" if share < 1 else "Everyone", f"of passers-by match the campaign"],
+                  ["🏬", f"{cars}", "car showrooms and services within 1 km"],
+                  ["📺", f"1 in {slots}" if slots > 1 else "All day", "screen time is ours" if slots > 1
+                   else "our ad is always on show"]]
         out.append({
-            "id": f["id"], "area": f["area"], "color": f["color"], "in_plan": f["in_plan"], "type": f["type"],
+            "id": f["id"], "label": f["label"], "color": f["color"], "in_plan": f["in_plan"],
             "avatar": "💼" if premium else "🚙",
-            "headline": f"{'Premium-area' if premium else 'Everyday'} commuters through {f['area_full']}",
-            "blurb": (f"{tenths} in 10 are aged 25–54 and {male:.0%} are men. Nearly all of them are in cars "
-                      f"(the view count is road traffic){', plus a few metro riders' if r.reach.metro else ''}. "
+            "headline": f"{'Premium-area' if premium else 'Everyday'} commuters on {f['road']} at {f['label']}",
+            "blurb": (f"{tenths} in 10 are aged 25–54 and {male:.0%} are men. Nearly all of them are in cars"
+                      f"{', plus a few metro riders' if r.reach.metro else ''}. "
                       + (f"Around the board you mostly find {' and '.join(top_poi)}." if top_poi else "")),
-            "stats": [["🎯", f"{tenths} in 10", "aged 25–54"],
-                      ["🚗", f"{exec_ui.people(f['rel'])}", f"car-interested people a month ({share:.0%} of the audience)"],
-                      ["⏰", f"{rush:.0%}", "of views in the two rush hours"],
-                      ["🏬", f"{cars}", "car showrooms and services within 1 km"]],
-            "hourly": hourly, "age": {k.replace("-", "–"): float(v) for k, v in age.items()}, "male": male,
-            "sowhat": sowhat})
-    html_block(exec_ui.audience_html({"faces": out}), height=760)
+            "general": [["👥", exec_ui.people(f["unique"]), "different people pass every month"],
+                        ["🎂", f"{tenths} in 10", "aged 25–54"],
+                        ["👨", f"{male:.0%}", "men"],
+                        ["⏰", f"{rush:.0%}", "of views in the two rush hours"]],
+            "target": target, "hourly": hourly,
+            "age": {k.replace("-", "–"): float(v) for k, v in age.items()}, "male": male, "sowhat": sowhat})
+    return {"faces": out, "focus": focus, "audience": c.audience, "emoji": c.emoji, "campaign": c.title}
+
+
+def page_audience(res: Results, pcfg, focus: str, only: str | None = None) -> None:
+    if only is None:
+        page_header("👥 Audience", "Who will see our ad, and when?",
+                    "First everyone who drives past, then the slice our campaign is after. "
+                    "Use it to brief the creative and, on digital screens, to schedule it. ⭐ = in our plan.")
+    html_block(exec_ui.audience_html(audience_payload(res, pcfg, focus, only)), height=900)
+    faces = face_rows(res, focus)
     label = "SAMPLE" if any(res.placements[f["id"]].profile.meta_is_sample for f in faces) else "ESTIMATE"
-    st.caption(f"Age, gender and car interest come from Meta audience estimates ({exec_ui.TRUST[label][0].lower()}: "
-               f"{exec_ui.TRUST[label][1].lower()}). Hourly shape is a standard Dubai commuter curve (assumption). "
+    st.caption(f"Age, gender and interests come from Meta audience estimates ({exec_ui.TRUST[label][0].lower()}: "
+               f"{exec_ui.TRUST[label][1].lower()}). The hourly shape is a standard Dubai commuter curve (assumption). "
                "Nearby places are from OpenStreetMap.")
 
 
-def page_health(res: Results, pcfg, params: Params) -> None:
-    faces = face_rows(res)
+def crowd_pulse(res: Results, pcfg, params: Params) -> tuple[dict, list, list]:
+    """Crowd events per billboard for the selected campaign, the crowd-adjusted plan, and all fact groups."""
+    facts = footprint_mod.all_facts(pcfg)
+    pulse = footprint_mod.pulse_for_results(res, pcfg, pcfg.campaign, params, facts)
+    plan, _ = footprint_mod.plan_with_crowds(res, pulse, pcfg.campaign.budget_aed)
+    return pulse, plan, footprint_mod.group_facts(facts)
+
+
+def _fact_view(g, campaign, in_window: bool = False) -> dict:
+    """What the page needs to show one sourced number (escaped in the browser)."""
+    year = g.figure_year or (g.event_start.year if g.event_start and not in_window else None)
+    rng = f"{exec_ui.people(g.low)}–{exec_ui.people(g.high)}" if g.high > g.low * 1.02 else ""
+    return {"what": g.what, "icon": g.icon, "value": g.value, "unit": g.unit, "period": g.period,
+            "year": year, "old": bool(year and year < date.today().year - 2), "measure": g.measure,
+            "match": bool(set(g.tags) & set(campaign.news_tags)), "note": g.note,
+            "sources": g.sources, "sources_n": len(g.sources), "range": rng}
+
+
+def page_news(res: Results, pcfg, params: Params, focus: str, embedded: bool = False) -> None:
+    c = pcfg.campaign
+    faces = face_rows(res, focus)
+    pulse, crowd_plan, groups = crowd_pulse(res, pcfg, params)
+    if not embedded:
+        page_header(f"📣 What's on nearby · {c.plan_start:%B %Y}",
+                    "What does the news say about crowds at our locations?",
+                    f"Sourced numbers from news and official pages: big events during the {c.title}, and the "
+                    f"visitors, residents and metro riders that make each spot busy. <b>{cap(c.audience_short)}</b> "
+                    "crowds are shown first. ⭐ = in our plan.")
+    out = []
+    for f in faces:
+        lp = pulse[f["id"]]
+        evs = []
+        for e in lp.events:
+            g = e.group
+            evs.append({**_fact_view(g, c, in_window=True),
+                        "start": g.event_start.isoformat(), "end": (g.event_end or g.event_start).isoformat(),
+                        "visitors": e.visitors_in_window, "extra": e.extra_people, "target": e.extra_target,
+                        "match": e.matches_campaign, "capped": e.capped})
+        later = sorted((_fact_view(g, c) for g in lp.later), key=lambda x: (not x["match"], -x["value"]))
+        context = sorted((_fact_view(g, c) for g in lp.context),
+                         key=lambda x: (x["measure"] == "capacity", x["old"], -x["value"]))
+        out.append({"id": f["id"], "label": f["label"], "color": f["color"], "in_plan": f["in_plan"],
+                    "events": evs, "later": later, "context": context,
+                    "n_facts": len(lp.events) + len(lp.later) + len(lp.context)})
+    tracked = {pid for g in groups for pid in g.placements}
+    away = []
+    for g in groups:
+        if g.placements or not (set(g.tags) & set(c.news_tags)) or g.kind != "event_attendance":
+            continue
+        in_win = bool(g.event_start and g.event_start <= c.plan_end and (g.event_end or g.event_start) >= c.plan_start)
+        when = (f"{g.event_start:%d %b}" if g.event_start else (f"{g.figure_year} figure" if g.figure_year else ""))
+        away.append({"what": g.what, "icon": g.icon, "value": g.value, "when": when, "in_window": in_win,
+                     "quote": g.sources[0]["quote"], "title": g.sources[0]["title"]})
+    away.sort(key=lambda x: (not x["in_window"], -x["value"]))
+
+    all_events = [(f, e) for f in out for e in f["events"]]
+    extra = sum(lp.extra_people for lp in pulse.values())
+    target = sum(lp.extra_target for lp in pulse.values())
+    days = (c.plan_end - c.plan_start).days + 1
+    everyday = sum(float(r.metrics["people_day"].value) for r in res.placements.values()) * days
+    before, after = [s.placement for s in res.plan], [s.placement for s in crowd_plan]
+    types = params.cfg.event_types
+    closures = [ev for ev in res.events if ev.get("type") == "full_closure"
+                and st.session_state.get("event_overrides", {}).get(ev["id"], ev.get("enabled", False))]
+
+    def closed(pid: str, e: dict) -> bool:
+        p = res.placements[pid].prep.placement
+        return any(signals_mod.affects(ev, p, types) and ev["date"] <= e["end"] and ev["end_date"] >= e["start"]
+                   for ev in closures)
+
+    ahead = [(f, e) for f, e in all_events
+             if date.fromisoformat(e["end"]) > date.today() and not closed(f["id"], e)]
+    best = max(ahead, key=lambda fe: (fe[0]["in_plan"], fe[1]["extra"]), default=None)
+    best_txt = ""
+    if best:
+        f, e = best
+        d0 = date.fromisoformat(e["start"])
+        best_txt = f"the biggest crowd still ahead is {d0:%a %d %b} at {f['label']} ({e['what']})"
+        if f["in_plan"] and res.placements[f["id"]].prep.placement.type == "digital":
+            best_txt += ", a digital screen in our pick, so we can weight our slots to it"
+        elif not f["in_plan"]:
+            best_txt += ", a board outside our pick"
+    summary = {"n_events": len(all_events), "n_car": sum(1 for _, e in all_events if e["match"]),
+               "extra": extra, "target": target, "n_facts": sum(f["n_facts"] for f in out),
+               "ratio": f"{float(f'{everyday / extra:.2g}'):,.0f}" if extra else "", "changed": before != after,
+               "before": ", ".join(name_of(res, i) for i in before) or "none",
+               "after": ", ".join(name_of(res, i) for i in after) or "none", "best": best_txt}
+    data = {"faces": out, "focus": focus, "summary": summary, "away": away, "emoji": c.emoji,
+            "audience_short": c.audience_short, "window": f"{c.plan_start:%d %b} – {c.plan_end:%d %b %Y}",
+            "start": c.plan_start.isoformat(), "days": days,
+            "pass_share": round(params.base("news_event_pass_share") * 100)}
+    html_block(exec_ui.pulse_html(data), height=1100)
+    store = footprint_mod.PeopleStore.load()
+    st.caption(f"Numbers are quoted from the linked pages as found by AI web search: kept only when the quote states "
+               f"the number and the link was a real search result (open a link to check; source quality varies). A crowd becomes extra people passing our board "
+               f"with our assumptions: {params.base('news_event_pass_share'):.0%} of visitors pass a nearby board, "
+               f"capped at {params.base('event_max_daily_change'):.0%} of a normal day; "
+               f"{params.base('news_audience_match_share'):.0%} of a car event's visitors count as "
+               f"{c.audience_short}. Visitor, resident and ridership numbers are shown as evidence, not added to reach. "
+               f"Last search: {store.updated_at[:10] or 'never'} · {len(tracked)} of {len(faces)} locations have "
+               "sourced numbers. Analysts can review every number under Area signals.")
+
+
+# --------------------------------------------------------------------------- knowledge layer pages
+
+
+@st.cache_data(show_spinner=False)
+def source_names() -> dict:
+    return {x.id: x.name for x in sources_mod.registry()}
+
+
+def knowledge_facts(res: Results, pcfg, params: Params) -> list:
+    return knowledge_mod.build(res, pcfg, params)
+
+
+def goto(page: str | None = None, focus: str | None = None) -> None:
+    """Switch page / location from a button or a map click (applied before the widgets are built)."""
+    if page:
+        st.session_state["_goto"] = page
+    if focus:
+        st.session_state["_focus"] = focus
+    st.rerun()
+
+
+def apply_pending() -> None:
+    if "_goto" in st.session_state:
+        st.session_state["page"] = st.session_state.pop("_goto")
+    if "_focus" in st.session_state:
+        st.session_state["pid"] = st.session_state.pop("_focus")
+
+
+def flow_payload(res: Results, pcfg, params: Params) -> dict:
+    """Data-flow diagram for every campaign, so the campaign chips switch it instantly."""
+    reg = sources_mod.registry()
+    facts = knowledge_facts(res, pcfg, params)
+    graphs = []
+    for c in pcfg.campaign_options():
+        g = knowledge_mod.flow_graph(facts, c, reg)
+        graphs.append({"id": c.id, "title": c.title, "emoji": c.emoji, "audience_short": c.audience_short, "graph": g})
+    data = dict(next(g["graph"] for g in graphs if g["id"] == pcfg.campaign.id))
+    data["campaigns"] = graphs
+    data["focus_campaign"] = pcfg.campaign.id
+    return data
+
+
+def page_overview(res: Results, pcfg, params: Params, focus: str) -> None:
+    c = pcfg.campaign
+    plan_ids = [s.placement for s in res.plan]
+    page_header("📍 OOH Decision Room · Dubai",
+                f"{len(res.placements)} billboards, {len(pcfg.campaign_options())} car campaigns: where should each run?",
+                "Every source feeds one knowledge layer; each campaign reads only what it needs from it. "
+                "Click a billboard on the map (or a card) to explore it.")
+    facts = knowledge_facts(res, pcfg, params)
+    pulse = footprint_mod.pulse_for_results(res, pcfg, c, params)
+    scores = knowledge_mod.score_locations(res, pcfg, c, facts, pulse)
+    order = sorted(scores["total"], key=lambda k: -scores["total"][k])
+    faces = {f["id"]: f for f in face_rows(res, focus)}
+
+    col_map, col_cards = st.columns([2.15, 1], gap="medium")
+    with col_map:
+        close = st.segmented_control(
+            "Map view", ["🌍 All locations", f"🔍 Close-up: {res.placements[focus].prep.placement.label}"],
+            default="🌍 All locations", key="overview_zoom", label_visibility="collapsed") != "🌍 All locations"
+        radius, half = params.base("cone_radius_m"), params.base("half_angle_deg")
+        seg_rows, cone_rows, pin_rows = [], [], []
+        vmax = max((float(r.scored["V"].max()) for r in res.placements.values() if not r.scored.empty), default=1)
+        for pid, r in res.placements.items():
+            s, p, f = r.prep.snapped, r.prep.placement, faces[pid]
+            rgb = [int(f["color"][i:i + 2], 16) for i in (1, 3, 5)]
+            flows = r.reach.scenarios["base"].flows.set_index("flow") if len(r.reach.scenarios["base"].flows) else None
+            if not r.scored.empty:
+                for row in r.scored[r.scored["included"]].itertuples():
+                    vol = flows.loc[row.flow, "vehicles_day"] if flows is not None and row.flow in flows.index else 0
+                    seg_rows.append({"path": lonlat_path(row.geometry), "color": v_color(row.V, vmax),
+                                     "tooltip": (f"<b>{html.escape(p.label)}</b> · road in view: {html.escape(str(row.label))}"
+                                                 f"<br/>{exec_ui.people(vol)} vehicles a day on this road")})
+            alpha = 70 if pid == focus else 40
+            cone_rows.append({"polygon": cone_polygon_lonlat(s.lon, s.lat, s.facing_bearing_deg, radius, half),
+                              "fill": rgb + [alpha], "line": rgb + [200],
+                              "tooltip": f"<b>{html.escape(p.label)}</b>: where the board can be seen (up to {radius:.0f} m)"})
+            rank = order.index(pid) + 1
+            pin_rows.append({"position": [s.lon, s.lat], "label": f"#{rank} {p.label}",
+                             "pid": pid, "color": rgb + [255], "r": (18 if close else 90 if pid == focus else 55),
+                             "tooltip": (f"<b>{html.escape(p.label)}</b> · {road_short(p.corridor)}<br/>"
+                                         f"{p.type.title()} board · {exec_ui.people(r.metrics['unique_month'].value)} "
+                                         f"people a month<br/>{exec_ui.people(r.profile.relevant_reach.value)} "
+                                         f"{html.escape(c.audience_short)} · #{rank} for the {html.escape(c.title)}"
+                                         f"{'<br/>⭐ in our plan' if pid in plan_ids else ''}<br/><i>Click to explore</i>")})
+        layers = [
+            pdk.Layer("PolygonLayer", cone_rows, id="cones", get_polygon="polygon", get_fill_color="fill",
+                      get_line_color="line", line_width_min_pixels=1, pickable=True),
+            pdk.Layer("PathLayer", seg_rows, id="roads", get_path="path", get_color="color", width_min_pixels=3,
+                      pickable=True),
+            pdk.Layer("ScatterplotLayer", [x for x in pin_rows if x["pid"] == focus], id="focus_ring",
+                      get_position="position", get_radius=45 if close else 260, get_fill_color=[98, 80, 214, 30],
+                      get_line_color=[98, 80, 214, 200], line_width_min_pixels=2, stroked=True,
+                      radius_min_pixels=14 if close else 18),
+            pdk.Layer("ScatterplotLayer", pin_rows, id="pins", get_position="position", get_radius="r",
+                      get_fill_color="color", get_line_color=[255, 255, 255], line_width_min_pixels=3, stroked=True,
+                      radius_min_pixels=8, pickable=True),
+            pdk.Layer("TextLayer", pin_rows, id="labels", get_position="position", get_text="label", get_size=14,
+                      get_color=[29, 27, 46], get_pixel_offset=[0, -24], font_weight=700,
+                      outline_width=4, outline_color=[255, 255, 255, 255],
+                      font_settings={"sdf": True}),
+        ]
+        lats = [r.prep.snapped.lat for r in res.placements.values()]
+        lons = [r.prep.snapped.lon for r in res.placements.values()]
+        fs = res.placements[focus].prep.snapped
+        view = (pdk.ViewState(latitude=fs.lat, longitude=fs.lon, zoom=14.4, pitch=0) if close else
+                pdk.ViewState(latitude=float(np.mean(lats)), longitude=float(np.mean(lons)), zoom=10.75, pitch=0))
+        event = st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=view, map_provider="carto", map_style="light",
+                                         tooltip={"html": "{tooltip}", "style": {"fontSize": "12.5px"}}),
+                                height=520, on_select="rerun", selection_mode="single-object", key="overview_map")
+        picked = (getattr(event, "selection", None) or {}).get("objects", {}) if event else {}
+        # Act on a new click only: the map keeps its selection, so a later change of the location picker
+        # must not snap the focus back to the last clicked pin.
+        objs = picked.get("pins") or []
+        sel = objs[0].get("pid") if objs else None
+        if sel != st.session_state.get("_map_last"):
+            st.session_state["_map_last"] = sel
+            if sel and sel != focus:
+                goto(focus=sel)
+        st.caption("Coloured wedge = where a board can be seen; blue roads = the traffic that sees it (darker = "
+                   "better view). Use the close-up (or zoom in) to see them. Basemap © CARTO, data © OpenStreetMap "
+                   "contributors.")
+    with col_cards:
+        st.markdown(f"<div class='ooh-mini'>Ranked for the <b>{c.emoji} {c.title}</b></div>", unsafe_allow_html=True)
+        for i, pid in enumerate(order):
+            f = faces[pid]
+            with st.container(border=True):
+                st.markdown(
+                    f"<div class='ooh-loc'><span class='dot' style='background:{f['color']}'></span>"
+                    f"<b>{['🥇', '🥈', '🥉'][i] if i < 3 else '#' + str(i + 1)} {f['label']}</b>"
+                    f"{' <span class=ooh-star>⭐ in plan</span>' if f['in_plan'] else ''}"
+                    f"<div class='ooh-locsub'>{f['road']} · {f['type']} · score {knowledge_mod.score_int(scores['total'][pid])}</div>"
+                    f"<div class='ooh-locnum'><b>{exec_ui.people(f['unique'])}</b> people / month · "
+                    f"<b>{exec_ui.people(f['rel'])}</b> {c.audience_short}</div></div>", unsafe_allow_html=True)
+                if st.button(f"Explore {f['label']} →", key=f"ov_{pid}", width="stretch",
+                             type="primary" if pid == focus else "secondary"):
+                    goto("Explore a location", pid)
+
+    st.markdown("<div class='ooh-sec'>How we know: data sources → knowledge layer → outcomes</div>",
+                unsafe_allow_html=True)
+    st.caption("Each source files facts into the knowledge layer. Pick a campaign to see which facts it uses "
+               "(particles) and which outcomes they shape. Hover any box to trace it.")
+    html_block(flow_viz.flow_html(flow_payload(res, pcfg, params)), height=760)
+
+    st.markdown("<div class='ooh-sec'>Next</div>", unsafe_allow_html=True)
+    n1, n2, n3 = st.columns(3)
+    if n1.button("📍 Explore a location", width="stretch"):
+        goto("Explore a location")
+    if n2.button("🏆 Score & compare", width="stretch"):
+        goto("Score & compare")
+    if n3.button("🎯 Build the plan", width="stretch", type="primary"):
+        goto("Decision")
+
+
+def page_explore(res: Results, pcfg, params: Params, focus: str) -> None:
+    c = pcfg.campaign
+    r = res.placements[focus]
+    p = r.prep.placement
+    faces = {f["id"]: f for f in face_rows(res, focus)}
+    f = faces[focus]
+    facts = knowledge_facts(res, pcfg, params)
+    pulse = footprint_mod.pulse_for_results(res, pcfg, c, params)
+    scores = knowledge_mod.score_locations(res, pcfg, c, facts, pulse)
+    order = sorted(scores["total"], key=lambda k: -scores["total"][k])
+    picks = knowledge_mod.select(facts, c, focus)
+    by = {x.fact.id: x.fact for x in picks}
+    page_header(f"📍 Explore a location · {c.emoji} {c.title}",
+                f"What do we know about {p.label}, and what matters for the {c.title}?",
+                "Pick another location or campaign at the top: the facts re-filter to what that campaign needs.")
+    dwell = by.get(f"{focus}:dwell")
+    base = r.reach.scenarios["base"]
+    engage = [
+        ["👥", exec_ui.people(f["unique"]), "different people a month", False],
+        [c.emoji, exec_ui.people(f["rel"]), f"{c.audience_short} a month", True],
+        ["⏱️", f"{dwell.value:.0f} s" if dwell else "–", "in view per pass (main road)", False],
+        ["👁️", f"{r.metrics['mean_visibility'].value * 100:.0f}/100", "visibility score", False],
+        ["⏰", f"{r.profile.commuter_share:.0%}", "of traffic in the rush hours", False],
+        ["🚇", exec_ui.people(r.reach.metro.daily_riders) if r.reach.metro and base.metro_impressions_day else "–",
+         "metro riders a day nearby", False],
+    ]
+    tags = []
+    if f["value"] == 100:
+        tags.append("💎 best value for money")
+    poi = r.profile.poi_counts
+    if poi.get("Car showrooms and services", 0) >= 20:
+        tags.append(f"🚗 {poi['Car showrooms and services']} car showrooms nearby")
+    if by.get(f"{focus}:premium") and by[f"{focus}:premium"].value:
+        tags.append("✨ premium area")
+    n = len(order)
+    srcs = {s for x in picks for s in x.fact.sources}
+    data = {
+        "loc": {"id": focus, "label": p.label, "road": p.corridor, "color": f["color"],
+                "format": (f"Digital screen, our ad 1 in {round(1 / p.share_of_voice)}" if p.type == "digital"
+                           and p.share_of_voice < 1 else f"{p.type.title()} board"),
+                "size": f"{p.width_m:g} × {p.height_m:g} m",
+                "price_word": by[f"{focus}:price"].display if f"{focus}:price" in by else "",
+                "in_plan": f["in_plan"], "rank": order.index(focus) + 1, "n": n, "tags": tags},
+        "campaign": {"title": c.title, "emoji": c.emoji, "audience_short": c.audience_short},
+        "engage": engage,
+        "counts": {"total": len(picks), "used": sum(1 for x in picks if x.used), "sources": len(srcs)},
+        "topics": knowledge_mod.rules()["topics"],
+        "facts": [{"title": x.fact.title, "display": x.fact.display, "topic": x.fact.topic, "reason": x.reason,
+                   "score": round(x.score, 2), "used": x.used, "trust": x.fact.trust,
+                   "sources": [source_names().get(s, s) for s in x.fact.sources], "url": x.fact.url,
+                   "quote": x.fact.quote, "detail": x.fact.detail} for x in picks],
+    }
+    html_block(exec_ui.explore_html(data), height=900)
+    view = st.segmented_control("Look closer", ["👥 Who passes", "📣 Crowds & news"], default="👥 Who passes",
+                                key="explore_view")
+    if view == "📣 Crowds & news":
+        page_news(res, pcfg, params, focus, embedded=True)
+    else:
+        page_audience(res, pcfg, focus, only=focus)
+
+
+def score_payload(res: Results, pcfg, params: Params, focus: str, across: dict | None = None) -> dict:
+    c = pcfg.campaign
+    facts = knowledge_facts(res, pcfg, params)
+    pulse = footprint_mod.pulse_for_results(res, pcfg, c, params)
+    sc = knowledge_mod.score_locations(res, pcfg, c, facts, pulse)
+    R = knowledge_mod.rules()["criteria"]
+    plan_ids = [s.placement for s in res.plan]
+    faces = {f["id"]: f for f in face_rows(res, focus)}
+    mat, budget = res.overlap, float(c.budget_aed)
+    locs = []
+    for pid, f in faces.items():
+        why_out = ""
+        if pid not in plan_ids and plan_ids:
+            # overlap is in people; as a share of this board's own audience
+            partner = max(plan_ids, key=lambda x: mat.loc[pid, x])
+            share = mat.loc[pid, partner] / mat.loc[pid, pid] if mat.loc[pid, pid] else 0.0
+            spent = sum(faces[i]["cost"] for i in plan_ids)
+            parts = []
+            if share >= 0.2:
+                parts.append(f"about {share:.0%} of its drivers also pass {faces[partner]['label']}, already in the plan")
+            over = (spent + f["cost"]) / budget - 1
+            if over > 0:
+                parts.append(f"adding it would take the plan {over:.0%} over budget")
+            if f["value"] < 100:
+                parts.append(f"its value for money is {f['value']}/100")
+            why_out = ("; ".join(parts) or "the budget buys more people elsewhere") + "."
+        locs.append({"id": pid, "label": f["label"], "road": f["road"], "color": f["color"], "in_plan": f["in_plan"],
+                     "focus": pid == focus, "format": f["type"],
+                     "scores": {k: {"score": v[pid]["score"], "why": v[pid]["why"]}
+                                for k, v in sc["criteria"].items()}, "why_out": why_out})
+    return {"criteria": [{"id": k, **R[k], "flat": k in sc["flat"]} for k in R],
+            "weights": sc["weights"], "locs": locs, "focus": focus,
+            "plan": [faces[i]["label"] for i in plan_ids],
+            "campaign": {"id": c.id, "title": c.title, "emoji": c.emoji}, "across": across}
+
+
+def page_score(res: Results, pcfg, params: Params, focus: str, okey: tuple, road_rows: tuple, ekey: tuple) -> None:
+    c = pcfg.campaign
+    page_header(f"🏆 Score & compare · {c.emoji} {c.title}",
+                f"Which location fits the {c.title} best?",
+                "Each location is scored 0–100 on five criteria, relative to the others, from the facts that matter "
+                "for this campaign. Move the weights to test what you care about; click a row for the reasons.")
+    pall = load_placements()
+    across = {"locs": [{"id": p.id, "label": p.label} for p in pall.placements], "campaigns": []}
+    for camp in pall.campaign_options():
+        ov = dict(okey)
+        ov["interest_share"] = camp.interest_share if camp.interest_share is not None else ov.get("interest_share", 0.3)
+        r2 = res if camp.id == c.id else get_results(tuple(sorted(ov.items())), road_rows, ekey, ledger_stamp(), camp.id)
+        p2 = pall.with_campaign(camp.id)
+        f2 = knowledge_facts(r2, p2, params)
+        pulse2 = footprint_mod.pulse_for_results(r2, p2, camp, params)
+        s2 = knowledge_mod.score_locations(r2, p2, camp, f2, pulse2)
+        across["campaigns"].append({"id": camp.id, "title": camp.title, "emoji": camp.emoji,
+                                    "totals": {k: knowledge_mod.score_int(v) for k, v in s2["total"].items()},
+                                    "plan": [s.placement for s in r2.plan]})
+    html_block(exec_ui.score_html(score_payload(res, pcfg, params, focus, across)), height=880)
+    st.caption("Scores compare our billboards with each other (best = 100 for audience, value and fit). Crowd timing "
+               "earns 100 when sourced crowds add 5% to a board's month. Audience fit uses local signals from "
+               "OpenStreetMap and the premium-area rule; Meta interest shares are placeholders, so they do not "
+               "separate the boards yet. Weights and signals are in config/knowledge.yaml.")
+
+
+def page_knowledge(res: Results, pcfg, params: Params, focus: str) -> None:
+    c = pcfg.campaign
+    st.header("Knowledge layer: every fact and why it is used")
+    facts = knowledge_facts(res, pcfg, params)
+    picks = knowledge_mod.select(facts, c)
+    used = sum(1 for x in picks if x.used)
+    st.markdown(f"**{len(facts)}** facts from **{len({s for f in facts for s in f.sources})}** sources. For the "
+                f"**{c.emoji} {c.title}**, **{used}** pass the relevance threshold "
+                f"({knowledge_mod.rules()['relevance']['threshold']:.0%}). Rules: `config/knowledge.yaml`.")
+    only = st.segmented_control("Show", ["All", "Used", "Not used"], default="All", key="kl_filter")
+    where = st.selectbox("Location", ["All locations"] + [p.id for p in pcfg.placements] + ["all"],
+                         format_func=lambda i: {"All locations": "All locations", "all": "Dubai-wide"}.get(
+                             i, name_of(res, i) if i in res.placements else i), key="kl_where")
+    rows = []
+    for x in picks:
+        f = x.fact
+        if only == "Used" and not x.used or only == "Not used" and x.used:
+            continue
+        if where != "All locations" and f.location != where:
+            continue
+        rows.append({"Used": x.used, "Relevance": x.score, "Why": x.reason,
+                     "Location": name_of(res, f.location) if f.location in res.placements else "Dubai-wide",
+                     "Topic": knowledge_mod.rules()["topics"][f.topic]["label"], "Fact": f.title, "Value": f.display,
+                     "Trust": f.trust, "Sources": ", ".join(source_names().get(s, s) for s in f.sources),
+                     "Feeds": ", ".join(sources_mod.OUTPUTS.get(o, o) for o in f.feeds) or "context only",
+                     "Tags": ", ".join(f.tags), "Link": f.url or None})
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", height=620, column_config={
+        "Relevance": st.column_config.ProgressColumn(min_value=0, max_value=1, format="%.2f"),
+        "Link": st.column_config.LinkColumn(display_text="open ↗")})
+    st.caption("Relevance = topic base + tag match + campaign window − weak figure; core numbers are always used. "
+               "The data-flow diagram on the Overview is counted from this same table.")
+
+
+def page_health(res: Results, pcfg, params: Params, focus: str) -> None:
+    faces = face_rows(res, focus)
     c = pcfg.campaign
     page_header("📈 Campaign health", "Is the campaign delivering what we paid for?",
-                f"Campaign {c.plan_start:%d %b} – {c.plan_end:%d %b %Y}. Views delivered against the plan for each "
-                "billboard (⭐ = in our pick), and anything on the roads that changes the forecast.")
+                f"{c.emoji} {c.title}, {c.plan_start:%d %b} – {c.plan_end:%d %b %Y}. Views of our ad against the plan "
+                "for each billboard (⭐ = in our pick), and anything on the roads that changes the forecast.")
     g = delivery_summary(res)
     rows = []
     for f in faces:
@@ -631,12 +1121,13 @@ def page_health(res: Results, pcfg, params: Params) -> None:
             continue
         r = g.loc[f["id"]]
         weeks = res.delivery[res.delivery["placement"] == f["id"]]["delivery_index"].astype(float).tolist()
-        rows.append({"id": f["id"], "area": f["area"], "color": f["color"], "index": float(r["index"]), "in_plan": f["in_plan"],
+        rows.append({"id": f["id"], "label": f["label"], "road": f["road"], "color": f["color"],
+                     "index": float(r["index"]), "in_plan": f["in_plan"],
                      "planned": float(r["planned"]), "actual": float(r["actual"]), "news": float(r["news"]),
                      "news_views": float(r["forecast"] - r["planned"]), "weeks": weeks})
     events = []
     for e in news_events(res, params):
-        chips = [(f"{pid}: {v['day_change']:+.0%} that day · {exec_ui.people(abs(v['delta']))} views", "crit")
+        chips = [(f"{name_of(res, pid)}: {v['day_change']:+.0%} that day · {exec_ui.people(abs(v['delta']))} views", "crit")
                  for pid, v in e["faces"].items()]
         if e.get("confidence"):
             chips.append((f"{e['confidence']:.0%} confident", ""))
@@ -651,16 +1142,17 @@ def page_health(res: Results, pcfg, params: Params) -> None:
         "ok": 0.97, "watch": 0.90, "faces": rows, "events": events,
         "foot": ("📌 Delivered views are <b>simulated</b> until the media owner's play logs and live traffic counts are "
                  "connected. Road events come from news headlines, dated by AI and checked against sources; analysts "
-                 "can switch each one on or off under Area signals. Views = advertiser impressions (our slot only).")}),
+                 "can switch each one on or off under Area signals. Views = views of our ad (our slot only).")}),
         height=640)
 
 
 # --------------------------------------------------------------------------- analyst pages
 
 
-def page_map(res: Results, params: Params, pid: str) -> None:
-    st.header("Placements, exposure cones and visible road segments")
-    view_mode = st.radio("View", ["All placements", "Selected placement (sidebar)"], horizontal=True,
+def page_map(res: Results, params: Params, pid: str, pcfg=None) -> None:
+    aud = pcfg.campaign.audience if pcfg else "in the target audience"
+    st.header("Where the billboards are, and which roads can see them")
+    view_mode = st.radio("View", ["All placements", "Location in focus"], horizontal=True,
                          key="map_view", label_visibility="collapsed")
     st.caption("Segments are coloured by visibility score V (light blue = low, deep navy = high). Hover for the "
                "factor breakdown and volume source.")
@@ -675,7 +1167,7 @@ def page_map(res: Results, params: Params, pid: str) -> None:
                 vol = flows.loc[row.flow, "vehicles_day"] if flows is not None and row.flow in flows.index else 0
                 seg_rows.append({
                     "path": lonlat_path(row.geometry), "color": v_color(row.V, vmax),
-                    "tooltip": (f"<b>{p.id} · {row.label}</b> ({row.highway})<br/>V = {row.V:.3f} = "
+                    "tooltip": (f"<b>{p.label} · {row.label}</b> ({row.highway})<br/>V = {row.V:.3f} = "
                                 f"D {row.D:.2f} × A {row.A:.2f} × O {row.O:.2f} × S {row.S:.2f} × T {row.T:.2f}"
                                 f"<br/>{row.dist_m:.0f} m from face · {row.lanes} lanes ({row.lanes_source})"
                                 f"<br/>Flow volume {vol:,.0f} vehicles/day · capacity fallback (ESTIMATE)"
@@ -684,15 +1176,16 @@ def page_map(res: Results, params: Params, pid: str) -> None:
         if not r.metro_scored.empty:
             for row in r.metro_scored[r.metro_scored["included"]].itertuples():
                 metro_rows.append({"path": lonlat_path(row.geometry),
-                                   "tooltip": f"<b>{p.id} · metro track</b><br/>V = {row.V:.3f}"})
+                                   "tooltip": f"<b>{p.label} · metro track</b><br/>V = {row.V:.3f}"})
         cone_rows.append({"polygon": cone_polygon_lonlat(s.lon, s.lat, s.facing_bearing_deg, radius, half),
-                          "tooltip": f"<b>{p.id} exposure cone</b><br/>radius {radius:.0f} m · half-angle {half:.0f}°"})
+                          "tooltip": f"<b>{p.label}: where the board can be seen</b><br/>up to {radius:.0f} m away"})
         u = r.metrics["unique_month"]
-        pin_rows.append({"position": [s.lon, s.lat], "label": p.id,
-                         "tooltip": (f"<b>{p.id} · {p.name}</b><br/>{p.type}, {p.width_m:g} × {p.height_m:g} m, "
-                                     f"facing {s.facing_bearing_deg:.0f}°<br/>Unique / month {fmt_num(u.value)} "
-                                     f"({fmt_num(u.low)}–{fmt_num(u.high)}) {u.label}<br/>Snapped to {s.road_name} "
-                                     f"({s.snap_distance_m:.0f} m)")})
+        rr = r.profile.relevant_reach
+        pin_rows.append({"position": [s.lon, s.lat], "label": p.label,
+                         "tooltip": (f"<b>{p.label}</b> · {road_short(p.corridor)}<br/>{p.type.title()} board, "
+                                     f"{p.width_m:g} × {p.height_m:g} m<br/>{exec_ui.people(u.value)} people pass a "
+                                     f"month (likely {exec_ui.people(u.low)}–{exec_ui.people(u.high)})<br/>"
+                                     f"{exec_ui.people(rr.value)} of them are {aud}")})
     layers = [
         pdk.Layer("PolygonLayer", cone_rows, get_polygon="polygon", get_fill_color=[98, 80, 214, 26],
                   get_line_color=[98, 80, 214, 150], line_width_min_pixels=1, pickable=True),
@@ -715,22 +1208,27 @@ def page_map(res: Results, params: Params, pid: str) -> None:
         view = pdk.ViewState(latitude=focus.lat, longitude=focus.lon, zoom=14.6, pitch=0)
     st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=view, map_provider="carto", map_style="light",
                              tooltip={"html": "{tooltip}", "style": {"fontSize": "12px"}}), height=560)
-    st.caption("Basemap © CARTO, data © OpenStreetMap contributors. Switch to 'Selected placement' to zoom "
-               "into the face picked in the sidebar.")
+    st.caption("Basemap © CARTO, data © OpenStreetMap contributors. Switch to 'Location in focus' to zoom "
+               "into the location picked at the top.")
+    plan_ids = {x.placement for x in res.plan}
     rows = []
     for r in res.placements.values():
-        s, p = r.prep.snapped, r.prep.placement
-        rows.append({"id": p.id, "name": p.name, "lat": s.lat, "lon": s.lon, "facing °": s.facing_bearing_deg,
-                     "snapped to": s.road_name, "snap distance m": s.snap_distance_m,
-                     "visible segments": int(r.scored["included"].sum()) if not r.scored.empty else 0,
-                     "OSM data": r.prep.area_source})
+        p = r.prep.placement
+        rows.append({"Location": p.label, "Road": p.corridor, "Board": p.type.title(),
+                     "Size": f"{p.width_m:g} × {p.height_m:g} m",
+                     "People passing / month": exec_ui.people(r.metrics["unique_month"].value),
+                     f"{cap(pcfg.campaign.audience_short) if pcfg else 'Target'} / month":
+                         exec_ui.people(r.profile.relevant_reach.value),
+                     "In our pick": "⭐ Yes" if p.id in plan_ids else "No"})
     st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+    st.caption("Where each board sits on the road and which way it faces are in Assumptions and sources "
+               "(snapping log).")
 
 
 def page_detail(res: Results, pid: str, params: Params, use_llm: bool, brand: str) -> None:
     r = res.placements[pid]
     p, s, m, prof = r.prep.placement, r.prep.snapped, r.metrics, r.profile
-    st.header(f"{p.id} · {p.name}")
+    st.header(f"{p.label} · {p.corridor}")
     st.markdown(f"{p.type.title()} face, {p.width_m:g} × {p.height_m:g} m, facing {s.facing_bearing_deg:.0f}° "
                 f"towards traffic on {s.road_name}. Share of voice {p.share_of_voice:.2f}. "
                 f"Example brief: {brand}.")
@@ -902,7 +1400,7 @@ def page_compare(res: Results) -> None:
 
         cpm, cpm_lo, cpm_hi = cpm_of(adv.value), cpm_of(adv.high), cpm_of(adv.low)  # more impressions -> lower cost
         rows.append({
-            "Placement": f"{p.id} {p.area}", "Type": p.type,
+            "Placement": p.label, "Type": p.type,
             "Daily impressions (placement)": m["impressions_day"].value,
             "Daily impressions range": f"{fmt_num(m['impressions_day'].low)}–{fmt_num(m['impressions_day'].high)}",
             "Daily impressions (advertiser)": m["advertiser_impressions_day"].value,
@@ -928,7 +1426,7 @@ def page_compare(res: Results) -> None:
 
     vals = [r.profile.relevant_reach for r in res.placements.values()]
     order = np.argsort([-v.value for v in vals])
-    ids = [list(res.placements)[i] for i in order]
+    ids = [name_of(res, list(res.placements)[i]) for i in order]
     vals = [vals[i] for i in order]
     fig = go.Figure(go.Bar(
         x=ids, y=[v.value for v in vals], marker_color=SERIES[0],
@@ -951,7 +1449,8 @@ def page_duplication(res: Results, budget: float) -> None:
     text = [[(f"{fmt_num(mat.loc[a, b])}<br>{share.loc[a, b]:.0%}" if a != b else f"{fmt_num(mat.loc[a, a])}<br>own")
              for b in ids] for a in ids]
     off = share.where(~np.eye(len(ids), dtype=bool))
-    fig = go.Figure(go.Heatmap(z=off.values, x=ids, y=ids, text=text, texttemplate="%{text}",
+    names = [name_of(res, i) for i in ids]
+    fig = go.Figure(go.Heatmap(z=off.values, x=names, y=names, text=text, texttemplate="%{text}",
                                colorscale="Blues", zmin=0, zmax=max(0.6, float(np.nanmax(off.values)) if len(ids) > 1 else 1),
                                colorbar=dict(title="share of smaller", tickformat=".0%"),
                                hovertemplate="%{y} × %{x}<br>%{text}<extra></extra>"))
@@ -959,7 +1458,8 @@ def page_duplication(res: Results, budget: float) -> None:
     fig.update_yaxes(autorange="reversed")
     st.plotly_chart(fig, width="stretch")
     label_line("Overlap uses shared road segments, or the corridor rule (tau) when larger.", "ASSUMPTION")
-    rules = [{"pair": f"{a} × {b}", "rule": res.overlap_rules.loc[a, b], "overlap people": mat.loc[a, b]}
+    rules = [{"pair": f"{name_of(res, a)} × {name_of(res, b)}", "rule": res.overlap_rules.loc[a, b],
+              "overlap people": mat.loc[a, b]}
              for i, a in enumerate(ids) for b in ids[i + 1:]]
     st.dataframe(pd.DataFrame(rules).style.format({"overlap people": "{:,.0f}"}), hide_index=True,
                  width="stretch")
@@ -969,6 +1469,7 @@ def page_duplication(res: Results, budget: float) -> None:
         st.info("No placement fits the budget.")
         return
     plan = pd.DataFrame([s.__dict__ for s in res.plan])
+    plan["placement"] = plan["placement"].map(lambda i: name_of(res, i))
     st.dataframe(plan.rename(columns={
         "step": "Step", "placement": "Add", "cost_aed": "Cost AED", "incremental_relevant": "Incremental relevant reach",
         "relevant_per_1k_aed": "Relevant reach per 1,000 AED", "cumulative_cost_aed": "Spent AED",
@@ -979,9 +1480,9 @@ def page_duplication(res: Results, budget: float) -> None:
     last = res.plan[-1]
     lost = last.naive_relevant - last.combined_relevant
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=[f"Step {s.step}: +{s.placement}" for s in res.plan], y=[s.naive_relevant for s in res.plan],
+    fig.add_trace(go.Bar(x=[f"Step {s.step}: +{name_of(res, s.placement)}" for s in res.plan], y=[s.naive_relevant for s in res.plan],
                          name="Naive sum", marker_color="#6b7280"))
-    fig.add_trace(go.Bar(x=[f"Step {s.step}: +{s.placement}" for s in res.plan],
+    fig.add_trace(go.Bar(x=[f"Step {s.step}: +{name_of(res, s.placement)}" for s in res.plan],
                          y=[s.combined_relevant for s in res.plan], name="Combined (de-duplicated)",
                          marker_color=SERIES[0]))
     fig.update_layout(**PLOT_LAYOUT, barmode="group", height=340, yaxis_title="Car-relevant people / month",
@@ -998,6 +1499,7 @@ def page_delivery(res: Results, pid: str) -> None:
     df = res.delivery
     summary = df.groupby("placement").agg(planned=("planned", "sum"), forecast=("forecast", "sum"),
                                           actual=("actual", "sum")).reset_index()
+    summary["placement"] = summary["placement"].map(lambda i: name_of(res, i))
     summary["news effect"] = summary["forecast"] / summary["planned"] - 1
     summary["delivery index"] = summary["actual"] / summary["planned"]
     st.dataframe(summary.style.format({"planned": "{:,.0f}", "forecast": "{:,.0f}", "actual": "{:,.0f}",
@@ -1008,13 +1510,13 @@ def page_delivery(res: Results, pid: str) -> None:
     fig.add_trace(go.Bar(x=d["week_start"], y=d["planned"], name="Planned", marker_color="#6b7280"))
     fig.add_trace(go.Bar(x=d["week_start"], y=d["forecast"], name="News-adjusted forecast", marker_color="#F5A524"))
     fig.add_trace(go.Bar(x=d["week_start"], y=d["actual"], name="Actual (SAMPLE)", marker_color=SERIES[0]))
-    fig.update_layout(**PLOT_LAYOUT, barmode="group", height=340, title_text=f"{pid}: weekly advertiser impressions",
+    fig.update_layout(**PLOT_LAYOUT, barmode="group", height=340, title_text=f"{name_of(res, pid)}: weekly advertiser impressions",
                       yaxis_title="Impressions / week", xaxis_title="Week starting",
                       legend=LEGEND_TOP)
     st.plotly_chart(fig, width="stretch")
     fig = go.Figure()
     for i, (p, g) in enumerate(df.groupby("placement")):
-        fig.add_trace(go.Scatter(x=g["week_start"], y=g["delivery_index"], name=p, mode="lines+markers",
+        fig.add_trace(go.Scatter(x=g["week_start"], y=g["delivery_index"], name=name_of(res, p), mode="lines+markers",
                                  line=dict(color=SERIES[i % len(SERIES)], width=2)))
     fig.add_hline(y=1.0, line_dash="dot", line_color="#999999")
     fig.update_layout(**PLOT_LAYOUT, height=320, title_text="Delivery index (actual / planned) per week",
@@ -1025,8 +1527,9 @@ def page_delivery(res: Results, pid: str) -> None:
                "planned plays) from the media owner's play log (SAMPLE).")
 
 
-def page_sensitivity(pid: str, overrides: tuple, road_rows: tuple) -> None:
-    st.header(f"Sensitivity: what moves {pid}'s unique monthly audience")
+def page_sensitivity(pid: str, overrides: tuple, road_rows: tuple, campaign_id: str | None = None) -> None:
+    label = next((x.label for x in load_placements().placements if x.id == pid), pid)
+    st.header(f"Sensitivity: what moves the {label} audience")
     df = get_sensitivity(pid, overrides, road_rows)
     base = df["base_unique"].iloc[0]
     fig = go.Figure()
@@ -1085,7 +1588,94 @@ def page_activation(res: Results) -> None:
 
 
 def page_signals(res: Results, pcfg, params: Params) -> None:
-    st.header("Area signals: online news in the forecast")
+    st.header("Area signals: news as a data source")
+    tab_people, tab_road = st.tabs(["👥 People numbers", "🚧 Road events"])
+    with tab_people:
+        _people_tab(res, pcfg, params)
+    with tab_road:
+        _road_tab(res, pcfg, params)
+
+
+def _people_tab(res: Results, pcfg, params: Params) -> None:
+    c = pcfg.campaign
+    st.markdown(
+        "Claude searches the web for **numbers about people** at each location: event attendance, visitors to "
+        "malls and attractions, new homes and offices, metro riders and traffic counts. A number is kept only "
+        "when its quote states it and its link is a page the search really returned. Only dated crowd events "
+        "inside the campaign window are turned into extra people passing a board (config shares); the rest is "
+        "evidence. " + badge("ESTIMATE") + " quoted numbers (source quality varies: open the link) · "
+        + badge("ASSUMPTION") + " pass share and audience match",
+        unsafe_allow_html=True)
+    store = footprint_mod.PeopleStore.load()
+    c_btn, c_force, c_info = st.columns([1.3, 1, 2.2])
+    force = c_force.toggle("Search again today", value=False, help="By default each location is searched once a day.")
+    has_key = env_key("ANTHROPIC_API_KEY") is not None
+    if c_btn.button("Search for people numbers", type="primary", width="stretch", disabled=not has_key,
+                    help="One Claude web-search call per location plus one for car events (about 1 to 3 min)."):
+        with st.spinner("Searching news and official pages for people numbers..."):
+            store = footprint_mod.refresh(pcfg, force=force)
+        st.rerun()
+    counts = store.counts()
+    c_info.caption(f"Last search {store.updated_at[:16].replace('T', ' ') or 'never'} UTC · "
+                   f"{counts.get('kept', 0)} kept · {counts.get('filtered', 0)} filtered out · "
+                   + ("Claude web search" if has_key else "no Claude key: add facts in data/inputs/people_facts.yaml"))
+
+    pulse, crowd_plan, _ = crowd_pulse(res, pcfg, params)
+    st.subheader(f"Effect on the {c.title} ({c.plan_start:%d %b} – {c.plan_end:%d %b})")
+    rows = [{"Face": name_of(res, pid), "Crowd events in window": len(lp.events),
+             f"Of which {c.audience_short}": len(lp.car_events),
+             "Extra people passing": lp.extra_people,
+             f"Extra {c.audience_short}": lp.extra_target,
+             "Share of a normal month": lp.extra_people / (res.placements[pid].metrics["people_day"].value
+                                                           * ((c.plan_end - c.plan_start).days + 1) or 1),
+             "Context numbers": len(lp.context) + len(lp.later)} for pid, lp in pulse.items()]
+    st.dataframe(pd.DataFrame(rows).style.format({"Extra people passing": "{:,.0f}", f"Extra {c.audience_short}": "{:,.0f}",
+                                                  "Share of a normal month": "{:.2%}"}),
+                 hide_index=True, width="stretch")
+    before = " → ".join(name_of(res, s.placement) for s in res.plan) or "none"
+    after = " → ".join(name_of(res, s.placement) for s in crowd_plan) or "none"
+    st.markdown(f"**Plan without crowds:** {before}  \n**Plan with crowds counted:** {after}"
+                + ("  \n✅ Same pick." if before == after else "  \n🔀 The pick changes."))
+
+    st.subheader("Every number found")
+    show = st.segmented_control("Show", ["Kept", "Filtered out"], default="Kept", key="people_filter")
+    want = "filtered" if show == "Filtered out" else "kept"
+    facts = [f for f in footprint_mod.all_facts(pcfg, store) if f["status"] == want]
+    if not facts:
+        st.info("Nothing here yet. Press 'Search for people numbers', or add facts to data/inputs/people_facts.yaml.")
+        return
+    per = {"event": "", "hour": "/hour", "day": "/day", "week": "/week", "month": "/month", "year": "/year", "total": ""}
+    df = pd.DataFrame([{
+        "Use": bool(f.get("enabled", True)), "Kind": footprint_mod.KINDS[f["kind"]]["icon"] + " "
+        + footprint_mod.KINDS[f["kind"]]["label"], "What": f["what"], "Place": f.get("place", ""),
+        "Number": float(f["value"]), "Unit": f"{f.get('unit', '')}{per.get(f.get('period'), '')}",
+        "When": (f"{f['event_start']} → {f.get('event_end') or f['event_start']}" if f.get("event_start")
+                 else (f"{f['figure_year']} figure" if f.get("figure_year") else "")),
+        "Measure": f.get("measure", "count"), "Tags": ", ".join(f.get("tags", [])),
+        "Faces": ", ".join(name_of(res, i) for i in f.get("placements", []) if i in res.placements) or "elsewhere",
+        "Quote": f.get("quote", ""), "Source": f.get("source_url", ""), "Note": f.get("note", ""),
+        "Why filtered": f.get("reason", ""), "Confidence": float(f.get("confidence", 0)), "id": f["id"]}
+        for f in sorted(facts, key=lambda f: (f["kind"], -float(f["value"])))])
+    cols = [c_ for c_ in df.columns if c_ != "id" and (want == "filtered" or c_ != "Why filtered")]
+    edited = st.data_editor(df, hide_index=True, width="stretch", key="people_editor", column_order=cols,
+                            disabled=[c_ for c_ in df.columns if c_ != "Use"],
+                            column_config={"Use": st.column_config.CheckboxColumn("Use", help="Switch a number off if it is wrong"),
+                                           "Number": st.column_config.NumberColumn(format="%,.0f"),
+                                           "Source": st.column_config.LinkColumn("Source", display_text="open ↗"),
+                                           "Confidence": st.column_config.ProgressColumn(min_value=0, max_value=1, format="%.2f")})
+    changed = {r["id"]: bool(r["Use"]) for r in edited.to_dict("records")
+               if r["id"] in store.facts and bool(store.facts[r["id"]].get("enabled", True)) != bool(r["Use"])}
+    if changed:
+        for fid, on in changed.items():
+            store.facts[fid]["enabled"] = on
+        store.save()
+        st.rerun()
+    st.caption("Stored in data/signals/people.json (online) and data/inputs/people_facts.yaml (typed in by a planner; "
+               "switch those off in the file). Sources are news sites and official pages found by Claude's web search; "
+               "a commercial product needs licensed data.")
+
+
+def _road_tab(res: Results, pcfg, params: Params) -> None:
     st.markdown(
         "Recent headlines for each corridor and area are collected, filtered for relevance and turned into "
         "**dated events** (closures, roadworks, major events). Switched-on events adjust the campaign forecast; "
@@ -1139,7 +1729,7 @@ def page_signals(res: Results, pcfg, params: Params) -> None:
         rows = []
         for pid, f in res.forecasts.items():
             day_hits = {h["date"]: h["change"] for h in f.applied}
-            rows.append({"Face": pid, "Events applied": len({h["event"] for h in f.applied}),
+            rows.append({"Face": name_of(res, pid), "Events applied": len({h["event"] for h in f.applied}),
                          "Worst day": min(day_hits, key=day_hits.get) if day_hits else "—",
                          "Worst-day change": min(day_hits.values()) if day_hits else 0.0,
                          "Campaign change": f.adjusted.value / f.baseline.value - 1 if f.baseline.value else 0.0,
@@ -1172,7 +1762,7 @@ def page_signals(res: Results, pcfg, params: Params) -> None:
                "product needs a licensed news API.")
 
 
-def page_sources() -> None:
+def page_sources(res: Results, pcfg, params: Params) -> None:
     st.header("Data sources")
     data = diagram_data()
     srcs = data["sources"]
@@ -1183,15 +1773,22 @@ def page_sources() -> None:
     st.markdown(
         f"<span class='ooh-live'></span>**{len(live)}** live or cached · **{len(connected)}** of {len(srcs)} "
         f"connected · **{len(sample)}** still placeholders · Claude: **{ai['status']}**. "
-        "Geometry and traffic data do the counting. Claude explains the numbers and turns news into dated "
-        "events; the reach model applies them with effect sizes from config.",
+        "Every source files facts into the knowledge layer; the campaign picks the facts it needs. "
+        "Links below are counted from those facts, so a source only shows a link it actually feeds.",
         unsafe_allow_html=True)
-    components.html(brain_html(data), height=820, scrolling=False)
+    flow = flow_payload(res, pcfg, params)
+    html_block(flow_viz.flow_html(flow), height=760)
+    derived = {x["id"]: x for x in flow["sources"]}
+    for x in srcs:
+        d = derived.get(x["id"], {})
+        x["feeds_names"] = ([sources_mod.OUTPUTS.get(o, o) for o in d.get("feeds", [])]
+                            or (["context only"] if d.get("facts") else ["—"]))
+        x["facts_n"] = d.get("facts", 0)
 
     st.subheader("Confidence by source")
     df = pd.DataFrame([{
         "Source": x["name"], "Status": x["status"], "Confidence": x["score"], "Potential": x["potential"],
-        "Label of its numbers": x["label"], "Feeds": ", ".join(x["feeds_names"]),
+        "Label of its numbers": x["label"], "Facts": x["facts_n"], "Feeds": ", ".join(x["feeds_names"]),
         "Note": x["status_note"], "Upgrade": x["upgrade"], "Link": x["url"],
     } for x in sorted(srcs, key=lambda x: -x["score"])])
     st.dataframe(df, hide_index=True, width="stretch", height=460, column_config={
@@ -1267,28 +1864,35 @@ def page_assumptions(res: Results, acfg: AssumptionConfig, params: Params) -> No
 
 
 def main() -> None:
-    acfg, pcfg = load_assumptions(), load_placements()
+    acfg, pcfg_all = load_assumptions(), load_placements()
     st.markdown(MOTION_CSS, unsafe_allow_html=True)
-    page, pid, overrides, road_rows, use_llm = sidebar(acfg, pcfg)
+    apply_pending()
+    campaign, pid = context_bar(pcfg_all)
+    pcfg = pcfg_all.with_campaign(campaign.id)
+    page, overrides, road_rows, use_llm = sidebar(acfg, pcfg)
     okey = tuple(sorted(overrides.items()))
     ekey = tuple(sorted(st.session_state.get("event_overrides", {}).items()))
-    results = get_results(okey, road_rows, ekey, ledger_stamp())
+    results = get_results(okey, road_rows, ekey, ledger_stamp(), campaign.id)
     params = Params(build_cfg(road_rows), overrides)
 
     if page in ANALYST_PAGES:
         analyst_tag()
-    if page == "Decision":
-        page_decision(results, pcfg, params)
-    elif page == "Billboard league":
-        page_league(results)
-    elif page == "Audience":
-        page_audience(results)
+    if page == "Overview":
+        page_overview(results, pcfg, params, pid)
+    elif page == "Explore a location":
+        page_explore(results, pcfg, params, pid)
+    elif page == "Score & compare":
+        page_score(results, pcfg, params, pid, okey, road_rows, ekey)
+    elif page == "Knowledge layer":
+        page_knowledge(results, pcfg, params, pid)
+    elif page == "Decision":
+        page_decision(results, pcfg, params, pid)
     elif page == "Campaign health":
-        page_health(results, pcfg, params)
+        page_health(results, pcfg, params, pid)
     elif page == "Map":
-        page_map(results, params, pid)
+        page_map(results, params, pid, pcfg)
     elif page == "Data sources":
-        page_sources()
+        page_sources(results, pcfg, params)
     elif page == "Placement detail":
         page_detail(results, pid, params, use_llm, pcfg.campaign.brand)
     elif page == "Compare locations":
@@ -1298,7 +1902,7 @@ def main() -> None:
     elif page == "Planned vs actual":
         page_delivery(results, pid)
     elif page == "Sensitivity":
-        page_sensitivity(pid, okey, road_rows)
+        page_sensitivity(pid, okey, road_rows, campaign.id)
     elif page == "Activation":
         page_activation(results)
     elif page == "Area signals":

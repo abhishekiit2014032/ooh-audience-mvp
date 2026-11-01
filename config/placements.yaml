@@ -6,6 +6,8 @@
 
 placements:
   - id: H1
+    short_name: DIFC
+    nearby_places: ["DIFC", "Downtown Dubai", "Dubai Mall", "Burj Khalifa", "Dubai World Trade Centre", "Dubai Opera"]   # where news crowds count for this face
     name: Sheikh Zayed Road near Financial Centre Metro
     area: DIFC / Downtown
     lat: 25.2115            # approximate, verify on OSM
@@ -22,6 +24,8 @@ placements:
     cost_per_month_aed: 150000   # ASSUMPTION, for the plan builder only
 
   - id: H2
+    short_name: Umm Al Sheif
+    nearby_places: ["Al Barsha", "Mall of the Emirates", "Umm Al Sheif", "Umm Suqeim", "Ski Dubai"]   # where news crowds count for this face
     name: Sheikh Zayed Road near Umm Al Sheif exit
     area: Umm Al Sheif / Al Barsha
     lat: 25.1407            # doc gave 25.1440, 55.2120 (750 m off, on Al Wasl Road); moved to the SZR carriageway on OSM
@@ -38,6 +42,8 @@ placements:
     cost_per_month_aed: 90000    # ASSUMPTION
 
   - id: H3
+    short_name: Dubai Marina
+    nearby_places: ["Dubai Marina", "JLT", "JBR", "Bluewaters", "Dubai Harbour", "Dubai Marina Mall"]   # where news crowds count for this face
     name: Sheikh Zayed Road near Dubai Marina
     area: Dubai Marina / JLT
     lat: 25.0805
@@ -54,6 +60,8 @@ placements:
     cost_per_month_aed: 120000   # ASSUMPTION
 
   - id: H4
+    short_name: Al Quoz
+    nearby_places: ["Al Quoz", "Alserkal Avenue", "Al Khail Road", "Meydan", "Al Quoz Industrial Area"]   # where news crowds count for this face
     name: Al Khail Road, Al Quoz area
     area: Al Quoz
     lat: 25.1694            # doc gave 25.1700, 55.2520 (1.7 km west of Al Khail Road); moved to the E44 carriageway on OSM
@@ -69,11 +77,59 @@ placements:
     cone_radius_m: 400
     cost_per_month_aed: 70000    # ASSUMPTION
 
-campaign:
+# Campaigns the app can switch between. Each one defines its target audience: the share of the
+# unique audience the brand cares about. Shares are ASSUMPTIONS until Meta values are entered in
+# data/inputs/meta_reach.json (then the Meta interest named in meta_interest is used instead).
+# Budgets drive the plan builder; the executive pages show them as shares of the budget, not AED.
+campaign: &suv_launch
+  id: suv_launch
+  name: SUV launch
+  emoji: "🚙"
   brand: Example SUV launch
   brand_category: automotive_suv
+  audience: people interested in cars and SUVs
+  audience_short: car & SUV fans
+  interest_share: 0.30         # ASSUMPTION (Meta 'Automobiles' once real values are in)
+  meta_interest: automobiles
+  news_tags: [cars]            # news crowd events with these tags count as this audience
+  creative_hint: Show the SUV, the brand and one line; a 'test drive nearby' call to action where showrooms cluster.
   plan_start: 2026-11-01
   plan_end: 2026-11-30
   budget_aed: 400000
   baseline_start: 2025-11-01   # same weeks of a prior period, used for the plan
   baseline_end: 2025-11-30
+
+campaigns:
+  - *suv_launch
+  - id: luxury_launch
+    name: Luxury saloon launch
+    emoji: "🏎️"
+    brand: Example luxury saloon
+    brand_category: automotive_luxury
+    audience: people interested in luxury cars
+    audience_short: luxury-car fans
+    interest_share: 0.09       # ASSUMPTION (Meta 'Luxury vehicles' once real values are in)
+    meta_interest: luxury_vehicles
+    news_tags: [cars, luxury]
+    creative_hint: Premium look, one hero shot of the car; premium areas matter more than raw traffic.
+    plan_start: 2026-12-01
+    plan_end: 2026-12-31
+    budget_aed: 300000
+    baseline_start: 2025-12-01
+    baseline_end: 2025-12-31
+  - id: service_promo
+    name: Winter car-service offer
+    emoji: "🔧"
+    brand: Example dealer service centre
+    brand_category: automotive_aftersales
+    audience: drivers passing the board
+    audience_short: drivers
+    interest_share: 1.0        # every driver owns or uses a car that needs servicing
+    meta_interest: null        # targets everyone who passes
+    news_tags: [cars]
+    creative_hint: One big hook ('Winter check-up') and the nearest service centre; drivers read it at speed.
+    plan_start: 2027-01-01
+    plan_end: 2027-01-31
+    budget_aed: 200000
+    baseline_start: 2026-01-01
+    baseline_end: 2026-01-31

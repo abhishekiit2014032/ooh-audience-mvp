@@ -31,30 +31,27 @@ STATUS_FACTOR = {"live": 1.0, "cached": 1.0, "configured": 1.0, "on demand": 1.0
 
 ENGINE = {
     "geo": "Geospatial reach model",
-    "ai": "Claude: narratives and news sorting",
+    "ai": "Claude: news reading, people numbers and narratives",
 }
 
+# Outcomes the knowledge layer feeds (same ids as config/knowledge.yaml "outcomes").
 OUTPUTS = {
-    "map": "Exposure map and visibility",
-    "reach": "Impressions and unique reach",
-    "profile": "Audience profile and relevant reach",
-    "duplication": "Duplication and plan",
-    "delivery": "Planned vs actual",
-    "sensitivity": "Sensitivity",
-    "activation": "Activation zones",
-    "narrative": "Persona narratives",
-    "news": "Area news",
+    "reach": "Everyone passing",
+    "target": "Campaign audience",
+    "value": "Value for money",
+    "fit": "Audience fit",
+    "timing": "Crowd timing",
+    "forecast": "Delivery forecast",
+    "profile": "Audience profile",
 }
 
-# Outputs each engine half produces.
+# Outcomes each engine half produces. Claude only reads text (news, web pages); every number it
+# returns is checked and converted by the geospatial model with config assumptions.
 ENGINE_OUTPUTS = {
-    "geo": ["map", "reach", "profile", "duplication", "delivery", "sensitivity", "activation"],
-    "ai": ["narrative", "news"],
+    "geo": ["reach", "target", "value", "fit", "timing", "forecast", "profile"],
+    "ai": ["timing", "forecast"],
 }
-
-# Hand-offs between the halves: Claude turns headlines into dated events (an event ledger), and the
-# geospatial model applies them, with effect sizes from config, to the campaign forecast.
-ENGINE_HANDOFF = {"ai": ["reach", "delivery"]}
+ENGINE_HANDOFF: dict[str, list[str]] = {}
 
 
 @dataclass
@@ -157,6 +154,18 @@ def _news_status() -> tuple[str, str, float]:
     return "on demand", "Press 'Refresh signals' on the Area signals page to build the event ledger", 0.85
 
 
+def _people_status() -> tuple[str, str, float]:
+    from .footprint import PEOPLE_PATH
+
+    if PEOPLE_PATH.exists():
+        data = json.loads(PEOPLE_PATH.read_text())
+        kept = sum(1 for f in data.get("facts", {}).values() if f.get("status") == "kept")
+        updated = data.get("updated_at", "")[:10]
+        return ("live" if _days_since(updated) <= 1 else "cached",
+                f"Searched {updated}: {kept} sourced numbers kept", _freshness(_days_since(updated)))
+    return "on demand", "Press 'Search for people numbers' on the Area signals page", 0.85
+
+
 # --------------------------------------------------------------------------- registry
 
 
@@ -171,13 +180,13 @@ def registry() -> list[Source]:
     sources = [
         Source("osm", "OpenStreetMap", "OSM contributors via Overpass / OSMnx",
                "Roads, lanes, one-way, speed limits, building footprints, points of interest, metro lines",
-               "geo", ["map", "reach", "profile", "duplication", "activation"], "VERIFIED",
+               "geo", ["reach", "target", "fit", "profile"], "VERIFIED",
                osm_status, osm_note, 0.75, 0.90, osm_fresh,
                "Refresh with scripts/fetch_osm.py; add building heights and Mapillary imagery in Phase 2",
                "https://www.openstreetmap.org"),
         Source("rta", "RTA lane capacity", "Roads and Transport Authority (via Time Out Dubai)",
                "Up to 14,000 vehicles per hour on 7 lanes: 2,000 per lane, the base of the volume estimate",
-               "geo", ["reach", "duplication", "delivery", "sensitivity"], "VERIFIED",
+               "geo", ["reach", "target", "value", "fit", "timing", "profile"], "VERIFIED",
                "configured", "Published figure, used with a utilisation assumption", 1.0, 0.50, 0.6,
                "Request segment counts from RTA, or replace with TomTom / HERE modelled volumes",
                "https://www.timeoutdubai.com"),
@@ -189,52 +198,70 @@ def registry() -> list[Source]:
                "https://developer.tomtom.com"),
         Source("tomtom_stats", "TomTom Traffic Stats / Volume", "TomTom",
                "Historical speeds, probe sample counts and modelled vehicle volumes per segment and date range",
-               "geo", ["reach", "delivery"], "ESTIMATE", "not connected",
+               "geo", ["reach", "forecast"], "ESTIMATE", "not connected",
                "No access on the free key (403 Forbidden, checked 2026-10-31); UAE volume coverage unconfirmed",
                0.85, 0.85, 1.0, "Request a Traffic Stats trial; would make planned vs actual real data",
                "https://developer.tomtom.com/traffic-stats/documentation/product-information/introduction"),
         Source("metro", "RTA metro ridership", "Dubai Pulse (rta_metro_ridership-open)",
-               "Daily riders at the station nearest each face", "geo", ["reach"], "SAMPLE",
+               "Daily riders at the station nearest each face", "geo", ["reach", "fit", "profile"], "SAMPLE",
                sample_or("cached", _csv_sample("metro_ridership.csv")),
                "Placeholder values in data/inputs/metro_ridership.csv", 1.0, 0.40, 0.85,
                "Download the Dubai Pulse CSV (free) and set is_sample to false",
                "https://www.dubaipulse.gov.ae"),
         Source("meta", "Meta reach estimates", "Meta Ads Manager",
-               "Audience size, age, gender and interest share for a pin plus radius", "geo", ["profile"],
+               "Audience size, age, gender and interest share for a pin plus radius. Interest share replaces the "
+               "campaign assumption once real values are entered", "geo", ["profile"],
                "SAMPLE", sample_or("cached", _json_sample("meta_reach.json")),
                "Placeholder values in data/inputs/meta_reach.json", 0.70, 0.60, 0.85,
                "Copy the reach estimate for each face from Ads Manager (free) and set is_sample to false",
                "https://adsmanager.facebook.com"),
         Source("dsc", "Dubai Statistics Center", "Government of Dubai",
-               "Population by area, age and gender: sanity check on the Meta mix", "geo", ["profile"], "SAMPLE",
+               "Population by area, age and gender: sanity check on the Meta mix", "geo", [], "SAMPLE",
                sample_or("cached", _json_sample("dsc_population.json")),
                "Placeholder values in data/inputs/dsc_population.json", 1.0, 0.40, 0.6,
-               "Enter the latest DSC publication figures and set is_sample to false", "https://www.dsc.gov.ae"),
+               "Enter the latest DSC publication figures and set is_sample to false", "https://www.dsc.gov.ae",
+               context_only=True),
         Source("playlog", "Media owner play log", "Media owner",
-               "Planned vs actual plays per day for the digital faces", "geo", ["delivery"], "SAMPLE",
+               "Planned vs actual plays per day for the digital faces", "geo", ["forecast"], "SAMPLE",
                sample_or("cached", _csv_sample("play_log.csv")),
                "Placeholder log in data/inputs/play_log.csv", 0.90, 0.90, 0.85,
                "Make the play log a contract deliverable and load it weekly"),
         Source("assumptions", "Model assumptions", "This model (config/assumptions.yaml)",
                "Utilisation, occupancy, pass frequency, cone, visibility weights: every lever in the sidebar",
-               "geo", ["reach", "duplication", "sensitivity", "profile"], "ASSUMPTION", "configured",
+               "geo", ["reach", "target", "value", "fit", "timing", "profile"], "ASSUMPTION", "configured",
                "Editable in the sidebar; frequency is the weakest input", 0.40, 0.50, 0.6,
                "Calibrate frequency and duplication with mobile panel data (Phase 2)"),
-        Source("news", "Online signals (news)", "Google News RSS, GDELT DOC 2.0, Claude web search",
+        Source("news", "Road events from news", "Google News RSS, GDELT DOC 2.0, Claude web search",
                "Recent headlines per corridor and area. Claude extracts dated closures, roadworks and events "
-               "into an event ledger; the reach model applies them to the campaign forecast",
-               "ai", ["news", "reach", "delivery"], "ESTIMATE",
+               "into an event ledger; the forecast applies them with effect sizes from config (not the plan)",
+               "ai", ["forecast"], "ESTIMATE",
                news_status, news_note, 0.60, 0.45, news_fresh,
                "Licensed news API (NewsAPI, Factiva) plus RTA announcements; calibrate effect sizes in the pilot",
                "https://news.google.com"),
+        Source("people_news", "People numbers from news", "Claude web search over news and official pages",
+               "Event attendance, visitors, new homes, metro riders and traffic counts, each quoted from its page. "
+               "Only dated crowds inside a campaign window become extra people (config shares)",
+               "ai", ["timing"], "ESTIMATE", *_people_status(), 0.60, 0.50,
+               "Licensed event calendars (DWTC, Dubai Calendar) and venue footfall feeds",
+               "https://www.visitdubai.com"),
+        Source("inventory", "Billboard inventory", "Media owner (config/placements.yaml)",
+               "Location, facing, size, digital loop and share of voice, and the planning price of each board",
+               "geo", ["reach", "value", "forecast"], "VERIFIED", "configured",
+               "Location and size checked on OSM; prices are planning values until quotes arrive", 0.90, 0.90, 0.85,
+               "Replace planning prices with media-owner quotes"),
+        Source("briefs", "Campaign briefs", "Marketing team (config/placements.yaml)",
+               "Who each campaign is after, its share of passers-by, dates and budget",
+               "geo", ["target", "value", "timing", "forecast"], "ASSUMPTION", "configured",
+               "Audience shares are assumptions until Meta values are entered", 0.70, 0.80, 0.85,
+               "Enter Meta interest shares per board; confirm budgets"),
         Source("mapillary", "Mapillary street imagery", "Meta / Mapillary",
-               "Street-level images to confirm line of sight with a vision model", "geo", ["map", "reach"],
+               "Street-level images to confirm line of sight with a vision model", "geo", ["reach"],
                "CONCEPT", "not connected", "Phase 2: needs MAPILLARY_TOKEN and the vision check", 0.75, 0.70, 0.85,
                "Add the token and the Claude vision line-of-sight check", "https://www.mapillary.com",
                phase="Phase 2"),
         Source("mobility", "Telco / mobility panel", "e&, du, Veraset, Azira, Blis",
                "Unique devices, repeat visits, true duplication, home/work origin, audience export",
-               "geo", ["reach", "duplication", "profile", "activation"], "CONCEPT", "not connected",
+               "geo", ["reach", "target", "fit"], "CONCEPT", "not connected",
                "Phase 2: paid licence, quote-only", 0.85, 0.95, 1.0,
                "Sign one vendor for Dubai; replaces the frequency and duplication assumptions",
                phase="Phase 2"),

@@ -91,6 +91,23 @@ numbers are ESTIMATES, and anything that uses metro ridership or Meta values is 
 
     Refresh with the button on the Area signals page or `python scripts/refresh_signals.py`. Planners
     can add known closures in `data/inputs/events.yaml`.
+
+    **People numbers from the news** (`src/ooh/footprint.py`). News is also a data source for how many
+    people are at each location: event attendance, visitors to malls and attractions, new homes and
+    offices, metro riders and traffic counts.
+    - **Search:** one Claude web-search call per location (its `nearby_places` in `placements.yaml`)
+      plus one for car events anywhere in Dubai, with recent headlines as leads.
+    - **Validate:** a number is kept only when its quote states it (35,000 / 35k / 35 thousand) and its
+      link is a page the search really returned. Venue capacities are marked and never modelled.
+    - **Group:** the same thing on the same date from several sources becomes one number with a range.
+    - **Per campaign:** facts are stored without a campaign. Each campaign takes the dated crowds inside
+      its window and turns them into extra people passing a nearby board with config ASSUMPTIONS
+      (`news_event_pass_share`, `news_audience_match_share` for crowds that match the campaign's
+      `news_tags`, capped by `event_max_daily_change`). Visitor, resident and ridership numbers are
+      evidence only. The plan is re-run with the crowds added to show whether the pick would change.
+
+    Refresh with the button on the Area signals page or `python scripts/refresh_people.py`. Facts go to
+    `data/signals/people.json`; planners can add their own in `data/inputs/people_facts.yaml`.
 11. **Activation.** Exports the exposure zones as GeoJSON plus a centre and radius CSV for a data partner
     or platform. Nothing is executed.
 
@@ -131,27 +148,57 @@ Both are noted in `config/placements.yaml`.
 
 ## Pages
 
-The app opens on four executive pages (white theme, animated, one decision each). The original technical
-pages sit below them under **Analyst toolkit**.
+The app opens on five executive pages (white theme, animated, one decision each). The technical pages sit below
+them under **Analyst toolkit**. Two pickers at the top of every page set the context:
+
+- **Campaign** (`campaigns:` in `config/placements.yaml`): dates, budget and target audience. The target audience is
+  everyone passing × the campaign's interest share (an ASSUMPTION until Meta values are entered; then the Meta interest
+  in `meta_interest` is used). Three example car campaigns ship: SUV launch, luxury saloon launch, winter car-service offer.
+- **Location in focus**: set here, by clicking a pin on the Overview map, or with a location card's "Explore" button.
+
+Executive pages call locations by name (`short_name`), split "everyone who passes" from the campaign audience, and
+show no AED figures: value for money (best billboard = 100), price level relative to the other boards, and the budget
+as a share of plan. AED stays on the analyst pages.
+
+### Knowledge layer
+
+Every data source files **facts** into one campaign-free knowledge layer (`src/ooh/knowledge.py`): a number or
+statement about a location (or all of Dubai) with its sources, trust label, topic, tags and the outcomes it feeds.
+About 140 facts come from 12 sources today. When a campaign is picked, a readable relevance rule
+(`config/knowledge.yaml`) keeps only what matters for it:
+
+`relevance = topic base + tag match (campaign audience) + inside campaign window − weak figure`; core numbers are
+always used, another campaign's brief and other audiences' interests are dropped, and a fact is used at 0.6 or more.
+The SUV launch uses about 77 of 142 facts, the luxury launch about 66 and the service offer about 59.
+
+Locations are scored 0–100 on five criteria from those facts, weighted per campaign (weights movable on the page):
+campaign audience, value for money (both relative to the best board), audience fit (local signals per campaign, e.g.
+car showrooms and drivers for the SUV launch, premium area, hotels and offices for the luxury launch), crowd timing
+(sourced crowds in the window; 5% extra audience = 100) and data confidence (trust of the facts used).
+
+The registry's "feeds" for each source are checked against the facts in `tests/test_knowledge.py`, so the diagram
+only shows links the facts back up.
 
 | Executive page | The decision it supports |
 | --- | --- |
+| Overview | The map first: every board with its viewing wedge, the roads that see it and its rank for the campaign; click a pin or a card to explore it. Below it, the knowledge-layer flow: sources → facts by topic → outcomes, with particles on the facts the chosen campaign uses (switch campaigns in place) |
+| Explore a location | One board through the chosen campaign's eyes: ID card with rank, engagement (people and campaign audience a month, seconds in view, visibility, rush share, metro riders), the funnel "N facts known → M matter", fact cards by topic with relevance, trust and source links; then "Who passes" or "Crowds & news" |
+| Score & compare | Ranking on the five criteria with live weight sliders and reasons per criterion, why a board is or is not in the plan (overlap with plan boards, budget, value), and every campaign × location score at a glance |
 | Decision | Which billboards to book for the budget: recommended mix, de-duplicated car-interested reach, cost per person, unspent budget, and why the left-out board did not make it. Toggle billboards or move the budget to try other mixes instantly |
-| Billboard league | Each billboard on its own: price, audience with likely range, cost per car-interested person; sortable by value, size or price |
-| Audience | Who passes each board and when (age, gender, rush-hour share, nearby car showrooms), with a creative and scheduling "so what" |
 | Campaign health | Delivered vs planned views per billboard, status, weekly trend, and road events that change the forecast |
 
 | Analyst page | What it shows |
 | --- | --- |
+| Knowledge layer | Every fact with its relevance for the chosen campaign, why it is (not) used, topic, value, trust, sources, outcomes it feeds and link; filter by used / location |
 | Map | Light basemap, pins, exposure cones, visible segments coloured by V, tooltip with factor breakdown |
-| Data sources | Animated diagram: every source flows into the engine (geospatial reach model + Claude) and on to the analytics. Hover or click to trace a source or output; confidence score per source with its breakdown |
+| Data sources | The same knowledge-layer flow, plus the confidence table: status, score, facts filed and the outcomes each source feeds (counted from its facts) |
 | Placement detail | The planner's five questions, reach funnel (low/base/high), hourly impressions, persona card |
 | Compare locations | H1 to H4: daily impressions, unique monthly, relevant reach, AED per 1,000 relevant impressions |
 | Duplication and plan | Overlap heatmap, overlap rules, greedy plan, combined vs naive reach |
 | Planned vs actual | Weekly planned vs actual and the delivery index (SAMPLE) |
 | Sensitivity | Tornado chart: which assumption moves unique reach most |
 | Activation | GeoJSON and CSV downloads, partner routes, privacy limits |
-| Area signals | Online news turned into dated events (closures, roadworks, major events) with on/off switches, their effect on each face, cited sources, and the full ledger including what was filtered out as noise |
+| Area signals | Two tabs. People numbers: every sourced number with its quote, link, on/off switch, what was filtered out and why, the crowd effect per board and the plan with crowds counted. Road events: online news turned into dated events (closures, roadworks, major events) with on/off switches, their effect on each face, cited sources, and the full ledger including what was filtered out as noise |
 | Assumptions and sources | Every parameter with label and source, data sources, snapping log, known limits |
 
 The sidebar's **Analyst controls** have a slider for every scalar assumption in `config/assumptions.yaml`. The seven
@@ -197,14 +244,15 @@ Copy `.env.example` to `.env` (or set them as Streamlit secrets / environment va
 ## Repository layout
 
 ```
-config/            placements.yaml, assumptions.yaml
+config/            placements.yaml, assumptions.yaml, knowledge.yaml
 data/inputs/       SAMPLE inputs (flagged is_sample)
 data/cache/        OSM GeoPackages (committed), API response cache (ignored)
 data/outputs/      results.json, segments_H*.geojson, zones.geojson, zones_radius.csv, snap_log.json
 src/ooh/           config, geometry, roads, traffic, visibility, reach, duplication, profile,
-                   narrative, delivery, activation, metrics, pipeline
+                   narrative, delivery, activation, metrics, pipeline, footprint (people numbers),
+                   knowledge (facts, relevance, scoring), exec_ui / flow_viz (page widgets)
 app/               streamlit_app.py
-scripts/           fetch_osm.py
+scripts/           fetch_osm.py, refresh_signals.py (road events), refresh_people.py (people numbers)
 tests/             pytest suite, including a Streamlit AppTest smoke test of every page
 ```
 
