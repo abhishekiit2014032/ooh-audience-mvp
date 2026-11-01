@@ -25,7 +25,8 @@ def test_every_edge_points_to_a_known_output():
         assert s.feeds, s.id
         for o in s.feeds:
             assert o in sources.OUTPUTS, (s.id, o)
-            assert o in sources.ENGINE_OUTPUTS[s.engine], (s.id, o, "output built by the other engine half")
+            assert o in sources.ENGINE_OUTPUTS[s.engine] or o in sources.ENGINE_HANDOFF.get(s.engine, []), \
+                (s.id, o, "output built by the other half without a declared hand-off")
     covered = {o for outs in sources.ENGINE_OUTPUTS.values() for o in outs}
     assert covered == set(sources.OUTPUTS)
 

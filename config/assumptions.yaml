@@ -237,6 +237,68 @@ parameters:
     description: Upper bound of the simulated actual-versus-plan factor.
     source: Solution design doc, Pipeline step 10
 
+  # ---------------------------------------------------------------- events from online signals
+  event_full_closure_factor:
+    value: 0.0
+    label: ASSUMPTION
+    group: Events
+    unit: x traffic in affected hours
+    min: 0.0
+    max: 1.0
+    step: 0.05
+    description: Traffic kept on the corridor during a full closure (Dubai Ride, Dubai Run, marathon).
+    source: Assumption; calibrate against observed traffic in the pilot
+  event_partial_closure_factor:
+    value: 0.7
+    label: ASSUMPTION
+    group: Events
+    unit: x traffic in affected hours
+    min: 0.0
+    max: 1.0
+    step: 0.05
+    description: Traffic kept during a partial closure or diversion.
+    source: Assumption; calibrate against observed traffic in the pilot
+  event_roadworks_factor:
+    value: 0.85
+    label: ASSUMPTION
+    group: Events
+    unit: x traffic in affected hours
+    min: 0.3
+    max: 1.0
+    step: 0.05
+    description: Traffic kept while roadworks or lane closures last.
+    source: Assumption; calibrate against observed traffic in the pilot
+  event_major_event_uplift:
+    value: 1.10
+    label: ASSUMPTION
+    group: Events
+    unit: x traffic in affected hours
+    min: 1.0
+    max: 1.5
+    step: 0.01
+    description: Extra traffic past the face during a major event in the area (exhibition, concert, festival).
+    source: Assumption; calibrate against observed traffic in the pilot
+  event_max_daily_change:
+    value: 0.6
+    label: ASSUMPTION
+    group: Events
+    unit: max share of a day's impressions
+    min: 0.1
+    max: 1.0
+    step: 0.05
+    description: Cap on how much events can move one day's impressions, up or down.
+    source: Assumption (guard rail)
+  event_min_confidence:
+    value: 0.6
+    label: ASSUMPTION
+    group: Events
+    unit: extractor confidence
+    min: 0.0
+    max: 1.0
+    step: 0.05
+    description: Events extracted with at least this confidence are switched on by default; others wait for review.
+    source: Assumption (guard rail)
+
 # Per road class: lanes per direction when OSM has no lanes tag, a utilisation multiplier
 # relative to the motorway utilisation above, and a fallback speed when OSM has no maxspeed.
 # All ASSUMPTIONS. Motorway 5 / trunk 4 / primary 3 lanes come from the solution design doc.
@@ -264,3 +326,11 @@ hourly_profile:
   source: Default commuter curve (solution design doc, Step 4); replaced by the TomTom hourly profile when available
   shares: [0.012, 0.008, 0.006, 0.005, 0.007, 0.015, 0.038, 0.066, 0.075, 0.062, 0.050, 0.047,
            0.047, 0.047, 0.048, 0.053, 0.062, 0.071, 0.075, 0.065, 0.051, 0.040, 0.030, 0.021]
+
+# Event types the signal extractor may return. Effect sizes come only from the parameters above,
+# never from the extractor. Default hours apply when an article states no time (ASSUMPTION).
+event_types:
+  full_closure:    {factor_param: event_full_closure_factor, default_start_hour: 4, default_end_hour: 10, scope: corridor}
+  partial_closure: {factor_param: event_partial_closure_factor, default_start_hour: 6, default_end_hour: 22, scope: corridor}
+  roadworks:       {factor_param: event_roadworks_factor, default_start_hour: 0, default_end_hour: 24, scope: corridor}
+  major_event:     {factor_param: event_major_event_uplift, default_start_hour: 16, default_end_hour: 23, scope: area}

@@ -117,10 +117,20 @@ class HourlyProfile(BaseModel):
         return [s / total for s in v]
 
 
+class EventType(BaseModel):
+    """How one kind of event moves traffic. The size comes from ``factor_param``, never from the extractor."""
+
+    factor_param: str
+    default_start_hour: int = Field(ge=0, le=23)
+    default_end_hour: int = Field(ge=1, le=24)
+    scope: Literal["corridor", "area"]
+
+
 class AssumptionConfig(BaseModel):
     parameters: dict[str, Parameter]
     road_classes: dict[str, RoadClass]
     hourly_profile: HourlyProfile
+    event_types: dict[str, EventType] = Field(default_factory=dict)
 
     def road_class(self, highway: str) -> RoadClass:
         return self.road_classes.get(highway, self.road_classes["default"])

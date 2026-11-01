@@ -52,6 +52,10 @@ ENGINE_OUTPUTS = {
     "ai": ["narrative", "news"],
 }
 
+# Hand-offs between the halves: Claude turns headlines into dated events (an event ledger), and the
+# geospatial model applies them, with effect sizes from config, to the campaign forecast.
+ENGINE_HANDOFF = {"ai": ["reach", "delivery"]}
+
 
 @dataclass
 class Source:
@@ -139,12 +143,18 @@ def _csv_sample(name: str) -> bool:
 
 
 def _news_status() -> tuple[str, str, float]:
-    folder = CACHE_DIR / "api" / "news"
-    today = date.today().isoformat()
-    fetched = sorted({p.name.split("_")[0] for p in folder.glob(f"H*_{today}.json")}) if folder.exists() else []
-    if fetched:
-        return "live", f"Fetched today for {', '.join(fetched)}; others on demand", 1.0
-    return "on demand", "Fetched when the Area news page or panel is opened (cached daily)", 0.85
+    from .signals import LEDGER_PATH
+
+    if LEDGER_PATH.exists():
+        data = json.loads(LEDGER_PATH.read_text())
+        arts = data.get("articles", {}).values()
+        kept = sum(1 for a in arts if a.get("status") == "applied")
+        events = sum(1 for e in data.get("events", {}).values() if e.get("enabled"))
+        updated = data.get("updated_at", "")[:10]
+        return ("live" if _days_since(updated) <= 1 else "cached",
+                f"Ledger {updated}: {len(data.get('articles', {}))} articles, {kept} kept, {events} events on",
+                _freshness(_days_since(updated)))
+    return "on demand", "Press 'Refresh signals' on the Area signals page to build the event ledger", 0.85
 
 
 # --------------------------------------------------------------------------- registry
@@ -210,11 +220,13 @@ def registry() -> list[Source]:
                "geo", ["reach", "duplication", "sensitivity", "profile"], "ASSUMPTION", "configured",
                "Editable in the sidebar; frequency is the weakest input", 0.40, 0.50, 0.6,
                "Calibrate frequency and duplication with mobile panel data (Phase 2)"),
-        Source("news", "Google News / GDELT", "Google News RSS, GDELT DOC 2.0",
-               "Last 30 days of headlines for each corridor and area", "ai", ["news"], "VERIFIED",
-               news_status, news_note, 0.60, 0.30, news_fresh,
-               "Licensed news API (NewsAPI, Factiva) for commercial use", "https://news.google.com",
-               context_only=True),
+        Source("news", "Online signals (news)", "Google News RSS, GDELT DOC 2.0, Claude web search",
+               "Recent headlines per corridor and area. Claude extracts dated closures, roadworks and events "
+               "into an event ledger; the reach model applies them to the campaign forecast",
+               "ai", ["news", "reach", "delivery"], "ESTIMATE",
+               news_status, news_note, 0.60, 0.45, news_fresh,
+               "Licensed news API (NewsAPI, Factiva) plus RTA announcements; calibrate effect sizes in the pilot",
+               "https://news.google.com"),
         Source("mapillary", "Mapillary street imagery", "Meta / Mapillary",
                "Street-level images to confirm line of sight with a vision model", "geo", ["map", "reach"],
                "CONCEPT", "not connected", "Phase 2: needs MAPILLARY_TOKEN and the vision check", 0.75, 0.70, 0.85,

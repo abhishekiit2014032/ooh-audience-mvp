@@ -145,11 +145,15 @@ const eg = DATA.engine;
 text(brain, 515, 372, "Geospatial", "lobe-label"); text(brain, 515, 391, "reach model", "lobe-label");
 text(brain, 515, 410, "counts every number", "lobe-sub");
 text(brain, 688, 372, "Claude", "lobe-label");
-text(brain, 688, 391, eg.ai.status === "active" ? "explains, sorts news" : "templates (no key)", "lobe-sub");
+text(brain, 688, 391, eg.ai.status === "active" ? "explains, dates events" : "templates (no key)", "lobe-sub");
 // computed numbers -> Claude arc
 const arc = el("path", {id:"arc", d:"M545 262 C 580 205, 620 205, 655 262", fill:"none", stroke:"#c4b5fd",
   "stroke-width":1.8, "stroke-dasharray":"3 4", opacity:.8}, gBrain);
 text(gBrain, CX, 214, "computed numbers only", "sub", {"text-anchor":"middle"});
+// Claude -> reach model: dated events from news (effect sizes from config)
+const arc2 = el("path", {id:"arc2", d:"M655 505 C 625 565, 575 565, 545 505", fill:"none", stroke:"#fbbf24",
+  "stroke-width":1.8, "stroke-dasharray":"3 4", opacity:.85}, gBrain);
+text(gBrain, CX, 580, "dated events · sizes from config", "sub", {"text-anchor":"middle"});
 
 // ---------- edges
 const edgeEls = [];   // {el, from, to, kind}
@@ -193,6 +197,7 @@ outputs.forEach((o, i) => {
   edgeEls.push({el:p, parts, out:o.id, engine:o.engine});
 });
 particles(arc, "#e9d5ff", 2, 2.4, gParticles);
+particles(arc2, "#fde68a", 2, 2.4, gParticles);
 
 // ---------- source cards with score rings
 const cards = {};

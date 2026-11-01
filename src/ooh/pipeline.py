@@ -25,6 +25,7 @@ from . import activation, delivery, duplication, narrative, profile as profile_m
 from . import geometry as geo
 from .config import (OUTPUT_DIR, AssumptionConfig, Params, Placement, PlacementConfig, load_assumptions,
                      load_placements)
+from . import signals as signals_mod
 from .metrics import Metric
 from .roads import OsmArea, SnappedPlacement, load_area, snap_placement
 from .visibility import build_segments, score_metro, score_segments
@@ -76,6 +77,8 @@ class Results:
     radius_csv: str
     snap_log: list[dict] = field(default_factory=list)
     narratives: dict[str, dict] = field(default_factory=dict)
+    forecasts: dict[str, "signals_mod.CampaignForecast"] = field(default_factory=dict)
+    events: list[dict] = field(default_factory=list)
 
 
 # --------------------------------------------------------------------------- stage 1
@@ -118,7 +121,23 @@ def unique_only(prep: GeoPrep, params: Params) -> float:
     return r.metrics["unique_month"].value
 
 
-def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params) -> Results:
+def campaign_forecasts(results: dict[str, PlacementResult], pcfg: PlacementConfig, params: Params,
+                       events: list[dict], overrides: dict[str, bool] | None = None) -> dict:
+    """News-adjusted campaign forecast per placement. Metro impressions are left untouched."""
+    shares = np.asarray(params.cfg.hourly_profile.shares)
+    out = {}
+    for pid, res in results.items():
+        sc = res.reach.scenarios
+        road_hourly = {k: np.clip(v.hourly_impressions - v.metro_impressions_day * shares, 0, None)
+                       for k, v in sc.items()}
+        other = {k: v.metro_impressions_day for k, v in sc.items()}
+        out[pid] = signals_mod.campaign_forecast(res.prep.placement, pcfg.campaign, road_hourly, other,
+                                                 res.metrics["unique_month"], params, events, overrides)
+    return out
+
+
+def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params,
+            events: list[dict] | None = None, event_overrides: dict[str, bool] | None = None) -> Results:
     brand = pcfg.campaign.brand
     results = {pid: compute_placement(prep, params, brand) for pid, prep in preps.items()}
 
@@ -139,9 +158,14 @@ def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params) ->
     combined_all = duplication.combined_unique(list(uniques), uniques, mat)
 
     # Delivery
+    events = signals_mod.active_events() if events is None else events
+    forecasts = campaign_forecasts(results, pcfg, params, events, event_overrides)
+    day_ratio = {pid: {d: (a / b if b else 1.0) for d, a, b in zip(f.days, f.adjusted_daily, f.baseline_daily)}
+                 for pid, f in forecasts.items()}
+
     adv_daily = {pid: r.metrics["advertiser_impressions_day"].value for pid, r in results.items()}
     deliv, deliv_label = delivery.delivery_table([r.prep.placement for r in results.values()], adv_daily,
-                                                 pcfg.campaign, params)
+                                                 pcfg.campaign, params, day_ratio)
 
     # Activation
     radius = params.base("cone_radius_m")
@@ -153,6 +177,7 @@ def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params) ->
         rows.append(activation.radius_row(p.id, p.name, s.lon, s.lat, s.facing_bearing_deg, radius, half))
 
     return Results(
+        forecasts=forecasts, events=events,
         placements=results, overlap=mat, overlap_rules=rules, plan=plan,
         naive_unique=duplication.naive_sum(items), combined_unique_all=combined_all,
         delivery=deliv, delivery_label=deliv_label,

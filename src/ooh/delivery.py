@@ -40,8 +40,14 @@ def campaign_weeks(campaign: Campaign) -> list[tuple[pd.Timestamp, pd.Timestamp]
 
 
 def delivery_table(placements: list[Placement], advertiser_daily: dict[str, float],
-                   campaign: Campaign, params: Params) -> tuple[pd.DataFrame, str]:
-    """Weekly planned vs actual advertiser impressions per placement, and the label of 'actual'."""
+                   campaign: Campaign, params: Params,
+                   day_ratio: dict[str, dict] | None = None) -> tuple[pd.DataFrame, str]:
+    """Weekly planned vs actual advertiser impressions per placement, and the label of 'actual'.
+
+    ``day_ratio`` maps placement -> {date: news-adjusted / baseline}. It gives the news-adjusted
+    forecast, which is also what the simulated "actual" starts from (reality includes the events).
+    """
+    day_ratio = day_ratio or {}
     rng = np.random.default_rng(SEED)
     lo, hi = params.base("sample_actual_min"), params.base("sample_actual_max")
     play_log = load_play_log()
@@ -53,6 +59,8 @@ def delivery_table(placements: list[Placement], advertiser_daily: dict[str, floa
         for w, (start, end) in enumerate(campaign_weeks(campaign), start=1):
             days = (end - start).days + 1
             planned = daily * days
+            ratios = day_ratio.get(p.id, {})
+            forecast = sum(daily * ratios.get((start + pd.Timedelta(days=k)).date(), 1.0) for k in range(days))
             traffic_factor = float(rng.uniform(lo, hi))  # drawn for every week so the seed is stable
             play_factor, play_label = 1.0, "n/a (static face)"
             if p.type == "digital":
@@ -62,10 +70,10 @@ def delivery_table(placements: list[Placement], advertiser_daily: dict[str, floa
                     play_label = "SAMPLE" if wk["is_sample"].any() else "VERIFIED"
                 else:
                     play_label = "no play log rows"
-            actual = planned * traffic_factor * play_factor
+            actual = forecast * traffic_factor * play_factor
             rows.append({
                 "placement": p.id, "week": w, "week_start": start.date().isoformat(),
-                "week_end": end.date().isoformat(), "days": days, "planned": planned,
+                "week_end": end.date().isoformat(), "days": days, "planned": planned, "forecast": forecast,
                 "traffic_factor": traffic_factor, "play_factor": play_factor, "play_log": play_label,
                 "actual": actual, "delivery_index": actual / planned if planned else np.nan,
             })

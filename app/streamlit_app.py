@@ -21,7 +21,7 @@ import streamlit.components.v1 as components  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 
 from ooh import narrative as narrative_mod  # noqa: E402
-from ooh import news as news_mod  # noqa: E402
+from ooh import signals as signals_mod  # noqa: E402
 from ooh import sources as sources_mod  # noqa: E402
 from ooh.brain_viz import brain_html, diagram_data  # noqa: E402
 from ooh.activation import PLATFORM_MIN_RADIUS_KM  # noqa: E402
@@ -42,7 +42,7 @@ PAGES = [
     "Planned vs actual",
     "Sensitivity",
     "Activation",
-    "Area news",
+    "Area signals",
     "Assumptions and sources",
 ]
 MAIN_SLIDERS = ["utilisation", "occupancy", "monthly_frequency", "cone_radius_m", "half_angle_deg",
@@ -59,7 +59,6 @@ PLOT_LAYOUT = dict(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_b
                    title=dict(x=0, xanchor="left", y=0.98, yanchor="top"))
 LEGEND_TOP = dict(orientation="h", y=1.02, yanchor="bottom", x=1, xanchor="right")
 SERIES = ["#4C9AFF", "#F5A524", "#36B37E", "#E5484D"]
-SIGNAL_COLORS = {"traffic_risk": "#E5484D", "audience_boost": "#36B37E", "category": "#4C9AFF", "other": "#6b7280"}
 _to_wgs = Transformer.from_crs("EPSG:32640", "EPSG:4326", always_xy=True)
 
 
@@ -82,11 +81,19 @@ def build_cfg(road_rows: tuple) -> AssumptionConfig:
     return cfg
 
 
+def ledger_stamp() -> str:
+    """Changes whenever the event ledger or the manual events file changes (part of the cache key)."""
+    parts = []
+    for path in (signals_mod.LEDGER_PATH, signals_mod.MANUAL_EVENTS_PATH):
+        parts.append(str(path.stat().st_mtime_ns) if path.exists() else "-")
+    return "|".join(parts)
+
+
 @st.cache_resource(max_entries=24, show_spinner="Recomputing...")
-def get_results(overrides: tuple, road_rows: tuple) -> Results:
+def get_results(overrides: tuple, road_rows: tuple, event_overrides: tuple = (), stamp: str = "") -> Results:
     pcfg = load_placements()
     params = Params(build_cfg(road_rows), dict(overrides))
-    return compute(get_preps(), pcfg, params)
+    return compute(get_preps(), pcfg, params, event_overrides=dict(event_overrides))
 
 
 @st.cache_resource(max_entries=24, show_spinner="Running sensitivity...")
@@ -95,32 +102,22 @@ def get_sensitivity(pid: str, overrides: tuple, road_rows: tuple) -> pd.DataFram
     return sensitivity(get_preps()[pid], params)
 
 
-@st.cache_data(ttl=3 * 3600, show_spinner="Fetching the latest news for this area (cached for the day)...")
-def get_news(pid: str, use_llm: bool) -> dict:
-    pcfg = load_placements()
-    placement = next(p for p in pcfg.placements if p.id == pid)
-    return news_mod.area_news(placement, pcfg.campaign.brand, use_llm=use_llm).to_dict()
+EVENT_LABELS = {"full_closure": "Full closure", "partial_closure": "Partial closure", "roadworks": "Roadworks",
+                "major_event": "Major event"}
+STATUS_COLORS = {"applied": "#36B37E", "pending": "#F5A524", "rejected": "#6b7280"}
 
 
-def news_cached_today(pid: str) -> bool:
-    from datetime import date
-
-    from ooh.config import CACHE_DIR
-    return (CACHE_DIR / "api" / "news" / f"{pid}_{date.today().isoformat()}.json").exists()
-
-
-def signal_chip(signal: str) -> str:
-    color = SIGNAL_COLORS.get(signal, "#6b7280")
-    return (f"<span style='border:1px solid {color};color:{color};border-radius:10px;padding:0 7px;"
-            f"font-size:0.72rem;white-space:nowrap'>{news_mod.SIGNALS.get(signal, signal)}</span>")
+def event_hours(ev: dict, params: Params) -> str:
+    et = params.cfg.event_types.get(ev["type"])
+    s_, e_ = ev.get("start_hour"), ev.get("end_hour")
+    if s_ is None and et:
+        return f"{et.default_start_hour:02d}:00–{et.default_end_hour:02d}:00 (default, ASSUMPTION)"
+    return f"{s_:02d}:00–{e_:02d}:00" if s_ is not None and e_ is not None else "unknown"
 
 
-def news_list(items: list[dict], limit: int | None = None) -> None:
-    for it in items[:limit]:
-        reason = f" · <span style='opacity:0.6'>{it['reason']}</span>" if it.get("reason") else ""
-        st.markdown(f"{signal_chip(it['signal'])} [{it['title']}]({it['url']}) "
-                    f"<span style='opacity:0.6;font-size:0.8rem'>{it['source']} · {it['published']}</span>{reason}",
-                    unsafe_allow_html=True)
+def event_faces(ev: dict, pcfg) -> str:
+    types = load_assumptions().event_types
+    return ", ".join(p.id for p in pcfg.placements if signals_mod.affects(ev, p, types)) or "none"
 
 
 MOTION_CSS = """
@@ -389,8 +386,10 @@ def page_detail(res: Results, pid: str, params: Params, use_llm: bool, brand: st
          f"Ranks {pos} of {len(rank)} on car-relevant reach ({fmt_num(rr.value)} people/month); see Compare",
          rr.label],
         ["Delivery against the original plan?",
-         f"Delivery index {res.delivery[res.delivery['placement'] == pid]['delivery_index'].mean():.2f} "
-         f"over {res.delivery['week'].max()} weeks; see Planned vs actual", "SAMPLE"],
+         (f"News-adjusted forecast {res.forecasts[pid].adjusted.value / res.forecasts[pid].baseline.value - 1:+.1%} "
+          f"vs plan ({len({h['event'] for h in res.forecasts[pid].applied})} event(s)); delivery index "
+          f"{res.delivery[res.delivery['placement'] == pid]['delivery_index'].mean():.2f} (simulated actual); "
+          "see Planned vs actual and Area signals"), "ESTIMATE"],
         ["Can the exposed audience be re-engaged?",
          "Zone exported as GeoJSON and radius list; live re-targeting needs a data partner", "CONCEPT"],
     ], columns=["Question", "MVP answer", "Label"])
@@ -483,18 +482,32 @@ def page_detail(res: Results, pid: str, params: Params, use_llm: bool, brand: st
         else:
             st.caption("No metro track inside the exposure cone.")
 
-    st.subheader("What's happening nearby")
-    if news_cached_today(pid) or st.button("Load the latest area news", key=f"news_btn_{pid}"):
-        n = get_news(pid, use_llm)
-        risk = [i for i in n["items"] if i["signal"] == "traffic_risk"]
-        st.markdown(f"{n['summary']} {badge('ESTIMATE')}", unsafe_allow_html=True)
-        if risk:
-            st.warning(f"{len(risk)} traffic-risk headline(s) in the last 30 days: check delivery against plan.")
-        news_list(sorted(n["items"], key=lambda i: i["signal"] == "other")[:5])
-        st.caption(f"Headlines: Google News / GDELT, last 30 days (VERIFIED as published). "
-                   f"Classification and summary: {n['summary_source']} (ESTIMATE). Full list on the Area news page.")
+    st.subheader("News-adjusted campaign forecast")
+    f = res.forecasts[pid]
+    change = f.adjusted.value / f.baseline.value - 1 if f.baseline.value else 0.0
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        metric_card(f"Campaign impressions, baseline ({len(f.days)} days)", f.baseline, "")
+    with c2:
+        metric_card(f"Campaign impressions, news-adjusted ({change:+.1%})", f.adjusted, "")
+    with c3:
+        metric_card("Unique people, news-adjusted", f.unique_adjusted, "/month")
+    if f.applied:
+        days = pd.DataFrame(f.applied)
+        st.markdown("".join(
+            f"- **{h['date']}** · {EVENT_LABELS.get(h['type'], h['type'])}: {h['change']:+.1%} that day "
+            f"({fmt_num(h['impressions_delta'])} impressions)\n" for h in days.drop_duplicates("date").to_dict("records")))
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=f.days, y=f.baseline_daily, name="Baseline", line=dict(color="#6b7280", width=2)))
+        fig.add_trace(go.Scatter(x=f.days, y=f.adjusted_daily, name="News-adjusted", fill="tonexty",
+                                 fillcolor="rgba(229,72,77,0.18)", line=dict(color=SERIES[0], width=2.5)))
+        fig.update_layout(**PLOT_LAYOUT, height=260, title_text="Daily impressions over the campaign",
+                          yaxis_title="Impressions / day", legend=LEGEND_TOP)
+        st.plotly_chart(fig, width="stretch")
     else:
-        st.caption("Fetches Google News and GDELT headlines for this area (about 30 s the first time each day).")
+        st.caption("No switched-on event touches this face in the campaign window.")
+    st.caption("Events come from the Area signals page: Claude dates them from headlines and web search; the "
+               "effect sizes are ASSUMPTIONS in config (Events group in the sidebar).")
 
     with st.expander("Traffic flows inside the cone (base case)"):
         flows = sc["base"].flows
@@ -614,13 +627,17 @@ def page_delivery(res: Results, pid: str) -> None:
     st.header("Planned vs actual delivery")
     label_line(res.delivery_label.split(": ", 1)[1], "SAMPLE")
     df = res.delivery
-    summary = df.groupby("placement").agg(planned=("planned", "sum"), actual=("actual", "sum")).reset_index()
+    summary = df.groupby("placement").agg(planned=("planned", "sum"), forecast=("forecast", "sum"),
+                                          actual=("actual", "sum")).reset_index()
+    summary["news effect"] = summary["forecast"] / summary["planned"] - 1
     summary["delivery index"] = summary["actual"] / summary["planned"]
-    st.dataframe(summary.style.format({"planned": "{:,.0f}", "actual": "{:,.0f}", "delivery index": "{:.2f}"}),
+    st.dataframe(summary.style.format({"planned": "{:,.0f}", "forecast": "{:,.0f}", "actual": "{:,.0f}",
+                                       "news effect": "{:+.1%}", "delivery index": "{:.2f}"}),
                  hide_index=True, width="stretch")
     d = df[df["placement"] == pid]
     fig = go.Figure()
     fig.add_trace(go.Bar(x=d["week_start"], y=d["planned"], name="Planned", marker_color="#6b7280"))
+    fig.add_trace(go.Bar(x=d["week_start"], y=d["forecast"], name="News-adjusted forecast", marker_color="#F5A524"))
     fig.add_trace(go.Bar(x=d["week_start"], y=d["actual"], name="Actual (SAMPLE)", marker_color=SERIES[0]))
     fig.update_layout(**PLOT_LAYOUT, barmode="group", height=340, title_text=f"{pid}: weekly advertiser impressions",
                       yaxis_title="Impressions / week", xaxis_title="Week starting",
@@ -634,8 +651,9 @@ def page_delivery(res: Results, pid: str) -> None:
     fig.update_layout(**PLOT_LAYOUT, height=320, title_text="Delivery index (actual / planned) per week",
                       yaxis_tickformat=".0%", xaxis_title="Week starting", legend=LEGEND_TOP)
     st.plotly_chart(fig, width="stretch")
-    st.caption("Plan = baseline advertiser impressions × days. Actual = plan × campaign traffic factor × "
-               "(actual plays / planned plays) from the media owner's play log (digital faces only).")
+    st.caption("Plan = baseline advertiser impressions × days. News-adjusted forecast = plan with the switched-on "
+               "events from Area signals (ESTIMATE). Actual = forecast × simulated traffic factor × (actual plays / "
+               "planned plays) from the media owner's play log (SAMPLE).")
 
 
 def page_sensitivity(pid: str, overrides: tuple, road_rows: tuple) -> None:
@@ -697,37 +715,92 @@ def page_activation(res: Results) -> None:
         "- **Data partner terms:** audiences usually stay inside the partner's DSP or clean room.")
 
 
-def page_news(pid: str, use_llm: bool, pcfg) -> None:
-    placement = next(p for p in pcfg.placements if p.id == pid)
-    st.header(f"Area news: {placement.id} · {placement.area}")
-    st.markdown("Latest headlines about the corridor and the area around the face, sorted into signals a planner "
-                "can act on. Context only: news never changes the reach numbers. " + badge("VERIFIED") +
-                " headlines as published · " + badge("ESTIMATE") + " classification", unsafe_allow_html=True)
-    n = get_news(pid, use_llm)
-    if not n["items"]:
-        st.info("No headlines found, or the news feeds were unreachable.")
-    counts = n["counts"]
+def page_signals(res: Results, pcfg, params: Params) -> None:
+    st.header("Area signals: online news in the forecast")
+    st.markdown(
+        "Recent headlines for each corridor and area are collected, filtered for relevance and turned into "
+        "**dated events** (closures, roadworks, major events). Switched-on events adjust the campaign forecast; "
+        "the size of each effect comes from config, never from the AI. "
+        + badge("VERIFIED") + " headlines as published · " + badge("ESTIMATE") + " event extraction · "
+        + badge("ASSUMPTION") + " effect sizes", unsafe_allow_html=True)
+
+    ledger = signals_mod.Ledger.load()
+    c_btn, c_gdelt, c_info = st.columns([1.3, 1, 2.2])
+    gdelt = c_gdelt.toggle("Include GDELT", value=False, help="Second news source; rate-limited on some networks.")
+    has_key = env_key("ANTHROPIC_API_KEY") is not None
+    if c_btn.button("Refresh signals", type="primary", width="stretch",
+                    help="Fetch news, extract new events with Claude, look up missing dates and hours online."):
+        with st.spinner("Collecting headlines, extracting events, checking sources (about 10 s to 2 min)..."):
+            ledger = signals_mod.refresh(pcfg, params, use_gdelt=gdelt)
+        st.rerun()
+    c_info.caption(f"Ledger updated {ledger.updated_at[:16].replace('T', ' ') or 'never'} UTC · "
+                   + ("Claude extracts events" if has_key else "no Claude key: articles stay pending"))
+
+    counts = ledger.counts()
     cols = st.columns(4)
-    for col, (key, label) in zip(cols, news_mod.SIGNALS.items()):
-        col.markdown(f"<div style='border-left:3px solid {SIGNAL_COLORS[key]};padding-left:10px'>"
+    tiles = [("Articles tracked", len(ledger.articles), "#4C9AFF"), ("Kept (in events)", counts.get("applied", 0), "#36B37E"),
+             ("Pending (no date)", counts.get("pending", 0), "#F5A524"), ("Filtered out as noise", counts.get("rejected", 0), "#6b7280")]
+    for col, (label, n, color) in zip(cols, tiles):
+        col.markdown(f"<div class='ooh-card' style='border-left:3px solid {color};padding:6px 12px;border-radius:6px'>"
                      f"<div style='font-size:0.8rem;opacity:0.75'>{label}</div>"
-                     f"<div style='font-size:1.6rem;font-weight:650'>{counts.get(key, 0)}</div></div>",
-                     unsafe_allow_html=True)
-    st.subheader("Summary")
-    st.markdown(n["summary"])
-    st.caption(f"{n['summary_source']}. Fetched {n['fetched_on']}; cached for the day.")
-    signal = st.segmented_control("Show", ["All"] + list(news_mod.SIGNALS.values()), default="All", key="news_filter")
-    items = n["items"] if signal in (None, "All") else [
-        i for i in n["items"] if news_mod.SIGNALS[i["signal"]] == signal]
-    st.subheader(f"Headlines ({len(items)})")
-    news_list(items)
-    if n["errors"]:
-        with st.expander("Feed errors"):
-            for e in n["errors"]:
-                st.caption(e)
-    st.caption("Sources: Google News RSS search (region AE) and the GDELT DOC 2.0 API, last 30 days. Suitable for "
-               "a demo; a commercial product needs a licensed news API. Without ANTHROPIC_API_KEY, keyword rules "
-               "classify the headlines.")
+                     f"<div style='font-size:1.7rem;font-weight:700'>{n}</div></div>", unsafe_allow_html=True)
+
+    st.subheader("Events")
+    events = sorted(signals_mod.active_events(ledger), key=lambda e: e["date"])
+    if not events:
+        st.info("No dated events yet. Press 'Refresh signals', or add a known closure to data/inputs/events.yaml.")
+    else:
+        overrides = st.session_state.get("event_overrides", {})
+        df = pd.DataFrame([{
+            "Apply": overrides.get(e["id"], e.get("enabled", False)), "Date": e["date"],
+            "Event": EVENT_LABELS.get(e["type"], e["type"]), "Hours": event_hours(e, params),
+            "Faces hit": event_faces(e, pcfg), "Section": e.get("stretch") or e.get("corridor") or ", ".join(e.get("areas", [])),
+            "Confidence": e.get("confidence", 0), "Articles": len(e.get("articles", [])), "Source": e.get("source", ""),
+            "id": e["id"]} for e in events])
+        edited = st.data_editor(df, hide_index=True, width="stretch", key="events_editor",
+                                disabled=[c for c in df.columns if c != "Apply"], column_order=[c for c in df.columns if c != "id"],
+                                column_config={"Apply": st.column_config.CheckboxColumn("Apply", help="Use this event in the forecast"),
+                                               "Confidence": st.column_config.ProgressColumn("Confidence", min_value=0, max_value=1, format="%.2f")})
+        new = {r["id"]: bool(r["Apply"]) for r in edited.to_dict("records")}
+        if new != {r["id"]: bool(r["Apply"]) for r in df.to_dict("records")}:
+            st.session_state["event_overrides"] = {**overrides, **new}
+            st.rerun()
+
+        st.subheader("Effect on the forecast")
+        rows = []
+        for pid, f in res.forecasts.items():
+            day_hits = {h["date"]: h["change"] for h in f.applied}
+            rows.append({"Face": pid, "Events applied": len({h["event"] for h in f.applied}),
+                         "Worst day": min(day_hits, key=day_hits.get) if day_hits else "—",
+                         "Worst-day change": min(day_hits.values()) if day_hits else 0.0,
+                         "Campaign change": f.adjusted.value / f.baseline.value - 1 if f.baseline.value else 0.0,
+                         "Adjusted impressions": f.adjusted.value})
+        st.dataframe(pd.DataFrame(rows).style.format({"Worst-day change": "{:+.1%}", "Campaign change": "{:+.2%}",
+                                                       "Adjusted impressions": "{:,.0f}"}),
+                     hide_index=True, width="stretch")
+        for e in events:
+            if e.get("citations"):
+                with st.expander(f"Sources for {EVENT_LABELS.get(e['type'], e['type'])} on {e['date']}"):
+                    for c in e["citations"]:
+                        st.markdown(f"- [{c.get('title') or c['url']}]({c['url']})")
+
+    st.subheader("Signal ledger")
+    status = st.segmented_control("Show", ["Kept", "Pending", "Filtered out"], default="Kept", key="ledger_filter")
+    want = {"Kept": "applied", "Pending": "pending", "Filtered out": "rejected"}.get(status or "Kept")
+    arts = sorted((a for a in ledger.articles.values() if a["status"] == want),
+                  key=lambda a: a.get("published", ""), reverse=True)
+    for a in arts[:60]:
+        color = STATUS_COLORS[a["status"]]
+        st.markdown(f"<span style='border:1px solid {color};color:{color};border-radius:10px;padding:0 7px;"
+                    f"font-size:0.72rem'>{a['status']}</span> [{a['title']}]({a.get('url', '')}) "
+                    f"<span style='opacity:0.6;font-size:0.8rem'>{a.get('source', '')} · {a.get('published', '')} · "
+                    f"{', '.join(a.get('placements', []))}</span><br/>"
+                    f"<span style='opacity:0.65;font-size:0.8rem'>{a.get('reason', '')}</span>", unsafe_allow_html=True)
+    if not arts:
+        st.caption("Nothing in this group.")
+    st.caption("Sources: Google News RSS (region AE), GDELT DOC 2.0 and Claude web search (cited). Headlines and "
+               "links only are stored in data/signals/ledger.json; extractions are frozen once made. A commercial "
+               "product needs a licensed news API.")
 
 
 def page_sources() -> None:
@@ -741,7 +814,8 @@ def page_sources() -> None:
     st.markdown(
         f"<span class='ooh-live'></span>**{len(live)}** live or cached · **{len(connected)}** of {len(srcs)} "
         f"connected · **{len(sample)}** still placeholders · Claude: **{ai['status']}**. "
-        "Geometry and traffic data do the counting; Claude only explains the numbers and sorts news.",
+        "Geometry and traffic data do the counting. Claude explains the numbers and turns news into dated "
+        "events; the reach model applies them with effect sizes from config.",
         unsafe_allow_html=True)
     components.html(brain_html(data), height=820, scrolling=False)
 
@@ -828,7 +902,8 @@ def main() -> None:
     st.markdown(MOTION_CSS, unsafe_allow_html=True)
     page, pid, overrides, road_rows, use_llm = sidebar(acfg, pcfg)
     okey = tuple(sorted(overrides.items()))
-    results = get_results(okey, road_rows)
+    ekey = tuple(sorted(st.session_state.get("event_overrides", {}).items()))
+    results = get_results(okey, road_rows, ekey, ledger_stamp())
     params = Params(build_cfg(road_rows), overrides)
 
     if page == "Map":
@@ -847,8 +922,8 @@ def main() -> None:
         page_sensitivity(pid, okey, road_rows)
     elif page == "Activation":
         page_activation(results)
-    elif page == "Area news":
-        page_news(pid, use_llm, pcfg)
+    elif page == "Area signals":
+        page_signals(results, pcfg, params)
     else:
         page_assumptions(results, acfg, params)
 

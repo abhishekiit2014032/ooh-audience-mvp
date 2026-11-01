@@ -1,0 +1,17 @@
+# Known events a planner can enter by hand (no API key needed). They join the online signals on the
+# Area signals page and adjust the campaign forecast when enabled. Effect sizes come from config.
+#
+# type: full_closure | partial_closure | roadworks | major_event
+# corridor: must match a placement corridor (e.g. "Sheikh Zayed Road", "Al Khail Road") for road events
+# areas: area names (e.g. "Dubai Marina") for major events
+# placements: optional list of face ids when the source names the exact section
+events: []
+#  - type: roadworks
+#    corridor: Al Khail Road
+#    date: 2026-11-10
+#    end_date: 2026-11-14
+#    start_hour: 22
+#    end_hour: 24
+#    placements: [H4]
+#    note: RTA night lane closures (example)
+#    enabled: true

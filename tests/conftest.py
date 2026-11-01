@@ -20,8 +20,12 @@ LON, LAT = 55.2770, 25.2115
 
 
 @pytest.fixture(autouse=True)
-def offline_no_keys(monkeypatch):
-    """Tests never read .env or call external APIs."""
+def offline_no_keys(monkeypatch, tmp_path):
+    """Tests never read .env, call external APIs or read the real signal ledger."""
+    from ooh import signals
+
+    monkeypatch.setattr(signals, "LEDGER_PATH", tmp_path / "ledger.json")
+    monkeypatch.setattr(signals, "MANUAL_EVENTS_PATH", tmp_path / "events.yaml")
     monkeypatch.setenv("OOH_NO_DOTENV", "1")
     for k in ["TOMTOM_API_KEY", "DUBAI_PULSE_KEY", "DUBAI_PULSE_SECRET", "MAPILLARY_TOKEN", "ANTHROPIC_API_KEY"]:
         monkeypatch.delenv(k, raising=False)

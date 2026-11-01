@@ -76,11 +76,21 @@ numbers are ESTIMATES, and anything that uses metro ridership or Meta values is 
    incremental relevant reach per AED within the budget.
 9. **Planned vs actual.** Plan = baseline advertiser impressions. Actual = campaign traffic × actual / planned
    plays from the play log. Delivery index = actual / planned, per week.
-10. **Area news (context only).** Google News RSS and GDELT headlines for the corridor and the area,
-    last 30 days, cached daily. Each headline is classified as traffic risk, audience boost, category
-    relevance or other. Claude does the classifying when a key is set; keyword rules otherwise. Traffic-risk
-    headlines flag a delivery risk. News never changes the reach numbers. Google News RSS suits a demo; a
-    commercial product needs a licensed news API.
+10. **Online signals → dated events → forecast.** Recent headlines are collected per corridor and area
+    from Google News and GDELT, and stored once in `data/signals/ledger.json`. The flow:
+    - **Extract:** Claude reads each new article once and returns the event type, date, hours, corridor or
+      area, and confidence. The extraction is then frozen.
+    - **Look up:** for events missing a date, hours or road section, Claude's web search finds them, with
+      cited links.
+    - **Filter:** off-location, undated and out-of-window articles are kept but marked rejected or pending,
+      with a reason, so the noise filter can be audited.
+    - **De-duplicate:** articles collapse into one event per (type, corridor or area, date).
+    - **Apply:** switched-on events adjust a separate news-adjusted campaign forecast. The typical month
+      stays unchanged, so faces remain comparable. Effect sizes are ASSUMPTIONS in config (Events group);
+      the AI never sets them.
+
+    Refresh with the button on the Area signals page or `python scripts/refresh_signals.py`. Planners
+    can add known closures in `data/inputs/events.yaml`.
 11. **Activation.** Exports the exposure zones as GeoJSON plus a centre and radius CSV for a data partner
     or platform. Nothing is executed.
 
@@ -131,7 +141,7 @@ Both are noted in `config/placements.yaml`.
 | Planned vs actual | Weekly planned vs actual and the delivery index (SAMPLE) |
 | Sensitivity | Tornado chart: which assumption moves unique reach most |
 | Activation | GeoJSON and CSV downloads, partner routes, privacy limits |
-| Area news | Latest 30 days of headlines for the corridor and area, sorted into traffic risk / audience boost / category relevance |
+| Area signals | Online news turned into dated events (closures, roadworks, major events) with on/off switches, their effect on each face, cited sources, and the full ledger including what was filtered out as noise |
 | Assumptions and sources | Every parameter with label and source, data sources, snapping log, known limits |
 
 The sidebar has a slider for every scalar assumption in `config/assumptions.yaml`. The seven key ones are
@@ -150,8 +160,8 @@ page all read from it. Each source gets a 0–100 confidence score:
 - Status is read locally: API keys present, cache dates and `is_sample` flags. The page makes no network calls.
 
 The score is a planning heuristic (ASSUMPTION). It is separate from the labels on individual numbers and
-never enters the reach maths. In the diagram, the geospatial model does the counting; Claude only explains
-the numbers and sorts news.
+never enters the reach maths. In the diagram, the geospatial model does the counting. Claude explains the
+numbers and turns news into dated events, which the model applies with effect sizes from config.
 
 ## API keys (all optional)
 

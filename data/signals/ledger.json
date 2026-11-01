@@ -1,0 +1,2224 @@
+{
+ "updated_at": "2026-11-01T08:19:35+00:00",
+ "articles": {
+  "4c402f228535e2a7": {
+   "title": "Thousands pedal into action as Dubai Ride takes over Sheikh Zayed Road",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOTTNHalhEZHpORml3VmltZE1ReHpBZERkdzgzdHh2QmJiamNJdnpYcUpPdFo3M0VnWmZycnRSbTFob0FFTEdSUFRPX2ZVYzlYRHdSN1Blc20xcnBYdk1QbENUXzdrWjQ5Z3VId0lPNlNmaFFESTVsWDlmWFRwMmhERV9LLXhGV2ZIem5lcXJhMXJqVHVpbkxKRWdiY3h6eE85VGdhTWg4WjFVUTBUZ3VUSk55dw?oc=5",
+   "published": "2026-11-01",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Dubai Ride cyclists take over Sheikh Zayed Road today",
+   "classified_by": "keyword rules",
+   "id": "4c402f228535e2a7",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "applied",
+   "extraction": {
+    "id": 0,
+    "relevant": true,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Dubai Ride cyclists take over Sheikh Zayed Road today",
+    "start_hour": 3,
+    "end_hour": 10,
+    "placements": [
+     "H1"
+    ],
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+   },
+   "event": "full_closure|sheikh-zayed-road|2026-11-01",
+   "last_seen": "2026-11-01",
+   "enrichment": {
+    "found": true,
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "start_hour": 3,
+    "end_hour": 10,
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge",
+    "placements": [
+     "H1"
+    ],
+    "note": "RTA closures run 3am\u20139:30am on Sunday, November 1. Lower Financial Centre Street, between Sheikh Zayed Road and Al Khail Road, is also closed.",
+    "citations": [
+     {
+      "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+     },
+     {
+      "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+      "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+     },
+     {
+      "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+      "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+     },
+     {
+      "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+      "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+     },
+     {
+      "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+     },
+     {
+      "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+      "url": "https://dubaifastliving.com/dubai-ride-2026/"
+     }
+    ]
+   }
+  },
+  "79169586c481e3f2": {
+   "title": "Dubai Ride 2026 in pictures and videos as cyclists take over Sheikh Zayed Road",
+   "source": "Emirates 24|7",
+   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNTzN4bERoc3hOMkczYURiN21jVm5MRERMY3JfY2ljN1FBX3NFYjR0TlV6MWt2amNmQXhBOFBpVk1CWk9nT2lHSWtjSnlvNTIyWVR4cWNYLVItbTlzempPTG5DOXNoUUFBZGk0TC0xS2FkVy1PenprcFpVMUJ6eTZMNmxJNU9HaTFPNllwV1ZtVTJMUjNJV3JaZDNySFU5Y3RpYU5fZmxjemh2d0xxSnltRmF0OHJrU1p0c3g1Rzhqcy1RTlJW0gHfAUFVX3lxTFBJV040QzRwUDQ5YjhuNXlFNTNiQlpTcU11dVJrc1VRclRnQ0RSWklVSEdpZUZvelZrdjRoZ0xvcnNaajlBNmdjeEowcXlGajZZYlN3MkpOT095UmdLRnJkN2M4Y1RmRE05OGF0WjRfR2J3S3NJUmd6RUJUMWFTX0JlSTZ5OEFhUVl1eEhQbEVlTWRxY1YyWnM4ZVZ3bEpybllaR1FsSGtvMExXajBnVnpXMVRsWGppakluTVZaZFRoaWNrZFRLM2plSHdqbWVmcW1QMVU5SjBacmJUSkx1Mzg?oc=5",
+   "published": "2026-11-01",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Dubai Ride coverage, cyclists on Sheikh Zayed Road",
+   "classified_by": "keyword rules",
+   "id": "79169586c481e3f2",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "applied",
+   "extraction": {
+    "id": 1,
+    "relevant": true,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Dubai Ride coverage, cyclists on Sheikh Zayed Road",
+    "start_hour": 3,
+    "end_hour": 10,
+    "placements": [
+     "H1"
+    ],
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+   },
+   "event": "full_closure|sheikh-zayed-road|2026-11-01",
+   "last_seen": "2026-11-01",
+   "enrichment": {
+    "found": true,
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "start_hour": 3,
+    "end_hour": 10,
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge",
+    "placements": [
+     "H1"
+    ],
+    "note": "RTA closures run 3am\u20139:30am on Sunday, November 1. Lower Financial Centre Street, between Sheikh Zayed Road and Al Khail Road, is also closed.",
+    "citations": [
+     {
+      "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+     },
+     {
+      "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+      "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+     },
+     {
+      "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+      "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+     },
+     {
+      "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+      "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+     },
+     {
+      "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+     },
+     {
+      "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+      "url": "https://dubaifastliving.com/dubai-ride-2026/"
+     }
+    ]
+   }
+  },
+  "164b400bb3e088c5": {
+   "title": "Dubai Ride 2026 in pictures: Thousands cycle along Sheikh Zayed Road",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNR29HVzlyZC1lS085aUdNcVRrcmdOblBjeTN5c0FzMnJMZ2FlWVk1NTVtOEp5WGFIb2gzMXFzb29UdzFpNXVpMGdyOGtJMHg2REpsQTBxOEk0YmJ3dGR3MTBqMkI1Ynp5bHR6ZFVWZ0I3NVhDSjF1SFZKbkltZndqQm8zY09fLV82bmFwQ1FYaVc4MndHdnprZF9WVWRDR2E3T0hicGt1ZENTRUstVjNv0gHCAUFVX3lxTFAxbjdnenpvT1NDeF9WS3J4Q05HakZST0o4R1RTSmNsaDZtMWdwcHFhRG9peUNLZ1dseWxYSGNib2JYTGZhZ1lHclFfZm5oQjRtaVpoUXdGYW9BMW5WUHhNX0d2WmVCNW1xMkFCd1VOLVFCbHZqcjYzbnE4UkFybUVCREUtNzhWZ1pxQmRsb3VSRnF6cU1GMF8tYjN3MlVWU3J3WWhzS2l0Rm1SRnc0elZOM2RsMURKR0pmNWZ3Yi1NdGpR?oc=5",
+   "published": "2026-11-01",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Thousands cycle along Sheikh Zayed Road for Dubai Ride",
+   "classified_by": "keyword rules",
+   "id": "164b400bb3e088c5",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "applied",
+   "extraction": {
+    "id": 2,
+    "relevant": true,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Thousands cycle along Sheikh Zayed Road for Dubai Ride",
+    "start_hour": 3,
+    "end_hour": 10,
+    "placements": [
+     "H1"
+    ],
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+   },
+   "event": "full_closure|sheikh-zayed-road|2026-11-01",
+   "last_seen": "2026-11-01",
+   "enrichment": {
+    "found": true,
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "start_hour": 3,
+    "end_hour": 10,
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge",
+    "placements": [
+     "H1"
+    ],
+    "note": "RTA closures run 3am\u20139:30am on Sunday, November 1. Lower Financial Centre Street, between Sheikh Zayed Road and Al Khail Road, is also closed.",
+    "citations": [
+     {
+      "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+     },
+     {
+      "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+      "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+     },
+     {
+      "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+      "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+     },
+     {
+      "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+      "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+     },
+     {
+      "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+     },
+     {
+      "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+      "url": "https://dubaifastliving.com/dubai-ride-2026/"
+     }
+    ]
+   }
+  },
+  "59c0dad930e358b9": {
+   "title": "Cyclists could win Dh10,000 at Dubai Ride 2026",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQOWhPSWJXRXhoZDVKcjJaN2NBa3k1dTVZTTBRaXpBem5DSFBnVmlkVE9rSUp6elZqVEVBWXFYNWM3UU1qV1dicnBoUkVjMjBmSmNOR240eDN0ZWZldndER1RBc2I4ZFVNOUhSbmNzMEVqZEMyMFhDdFhrS0twcEg4dWlKcnlDNmNIc1ROc9IBnAFBVV95cUxPSkxIaHhOUjh2Uk1RREx6MmR1blFOYU9hbzRzV1FURVo1c25aeEhzQnlKaFRTUzFaZjlGM0N0MkwwdHhzREVVX2hKSFR2dWZWcGNnZk9ZM3NMQmk2T19hMS1OMGFQUFVtZjBnblZJMzFHVjhtSFJabkxtUWJ0cllOUlVheUJiN3NJYks2MXFSMjhqb0FrSWNIN0ZueEY?oc=5",
+   "published": "2026-11-01",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Prize story; no road or area stated",
+   "classified_by": "keyword rules",
+   "id": "59c0dad930e358b9",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 3,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Prize story; no road or area stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "9f800204e6b79dd0": {
+   "title": "UAE in November 2026: New rules, Etihad Rail stations, Dubai road changes and major events",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQX2UyUERoTTNmV1NyVGM1UGduMk1hTkdHNXpsZWpHOUZKTVFEdzVCaVV3ejlRRXl3SURHc3BiNEtsUE9OMUZGRjVNXzBhTVhBVzFmeU9UV09IV1JXTzBxSXZVeWphUjBZVXR2UWZwam5OZzBfSjR6YlQ4TWJZdlJucnZXaWZQd3pkOFNUNkFOWEo0SUhEOTdGbUVIQWdBckZPTzVmVNIBtwFBVV95cUxOTlhNbVJxcE05eUh5ejdQLWE0YnVlWmY0TDN6VTFFTjNseTk1MnBwc1pQOTdVN29tc2lWWkdiMzA2a2VuRHZ3bGhQUDhONThJVzRvMHNXOTQzUEs0c0lWSDJWNmR4RTd5VFNHNlJfdDFHOFNDdmQ1SG01M1ltSFY2WkhjZ0N3WkhrVHA2WkVYMnI5T3g1Z1FvV3F4bktkOGdpRFFERUpvWnhKRzRyLUdYdkdXZ0haME0?oc=5",
+   "published": "2026-11-01",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "General monthly roundup; no specific tracked road or date",
+   "classified_by": "keyword rules",
+   "id": "9f800204e6b79dd0",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3",
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 4,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.5,
+    "reason": "General monthly roundup; no specific tracked road or date"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "e40158b2fec50b08": {
+   "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours",
+   "source": "Arabian Business",
+   "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxObWhBTGpnVFZtMnA5cWF6Z1FaZEdPYVUxVzdScTdnSTRaTFdLX1RGeXFuRlptRVU3ak10ODlHNU45SkFXVHRILUd6c2duZmFtVW1YazVkRFJrNmVxZ0dJdGFSMFRDZG5vN0N4a2ZUaDd1ZWlYV3lOcDJrdnN5ODJwZ09jQUdZNmtn?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Sheikh Zayed Road closures Sunday Nov 1; timings not in headline",
+   "classified_by": "keyword rules",
+   "id": "e40158b2fec50b08",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "applied",
+   "extraction": {
+    "id": 5,
+    "relevant": true,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.95,
+    "reason": "Sheikh Zayed Road closures Sunday Nov 1; timings not in headline",
+    "start_hour": 3,
+    "end_hour": 10,
+    "placements": [
+     "H1"
+    ],
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+   },
+   "event": "full_closure|sheikh-zayed-road|2026-11-01",
+   "last_seen": "2026-11-01",
+   "enrichment": {
+    "found": true,
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "start_hour": 3,
+    "end_hour": 10,
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge",
+    "placements": [
+     "H1"
+    ],
+    "note": "RTA closures run 3am\u20139:30am on Sunday, November 1. Lower Financial Centre Street, between Sheikh Zayed Road and Al Khail Road, is also closed.",
+    "citations": [
+     {
+      "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+     },
+     {
+      "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+      "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+     },
+     {
+      "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+      "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+     },
+     {
+      "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+      "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+     },
+     {
+      "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+     },
+     {
+      "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+      "url": "https://dubaifastliving.com/dubai-ride-2026/"
+     }
+    ]
+   }
+  },
+  "74ca5f8f34c66e2d": {
+   "title": "Dubai to close three major roads for 6.5 hours during Dubai Ride on Sunday",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPbUhreFJ2UGFMalJDaHhMS0ZIOXUxSTZmZm95UVlOcjFZUk9DbkJmaXJpQldFS2ZnMEEtanlzTWgtTTNrZ3dEek1BdGJkdnBGdEZGa0ZyZWozQjJlMUxGM3BSd1JzeUJ4dlU5bkIwQnlhRDNoendVZE5jMmZBYlNaRTJCdTF4eVA2S2Qtek5xOFJmdDczdTBrLVJnT2VIVk5yVnFMMWJ1NDM1MmRwUzAwa1I2OHNUTUZCM093ZDhKNkFncXM3MEp5M29B0gHcAUFVX3lxTFBRSUlHVE5yTzF5X1I3NmJlMzBSTklPQ1MtZS13MG4xdEU2YS0tNFJZeWRGRlVKWDREZ01lSUtrZXB4UDVMYjVBQW5sZzJfLWt0bzNTd2FNa0xtNUVERGliTmVfLUU4LW5Gb0p1eUVkMFJ1LUN5T0NLc0lZZUE5d0JpTGJzUUIzTXRINVc1WDVLX25rOXFaNXFFdGE2a2t1U21HU2xqcGRrdUhObUdQNWVXUlJBeF9nTnBVQ2NFejB6VV8yRUVFcnBWeE5vMWd2dHdLVm1wdEVPTGtYNkc?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Three roads closed 6.5 hours Sunday; roads and times unnamed",
+   "classified_by": "keyword rules",
+   "id": "74ca5f8f34c66e2d",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3",
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 6,
+    "relevant": false,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Three roads closed 6.5 hours Sunday; roads and times unnamed"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "e2ae433bc6a1f041": {
+   "title": "Driving this weekend? UAE road closures, parking updates, revised Metro timings and speed limits - explained",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxQd1haWmRoUEFqUFQ3d0xfOFg2N0Z5MlRITVBJcUxWNVA3TE5QSUlRWG1ONDRaSzMwRklVVk84aktIdG9FM2JlV1FmWFRia1dpQW04eGpXUFBsTzhrREFfMVhqZE9nZ1VYWkZRNDVmUTFjbVF1bmdtQ2RQM1cxY2RnV2VpUVZwX2lkRm41ZG43aDFnTllqVGdGQ3dsYWN5Zjg2MnlQb2NGZWgxb3EzdTBhM0VRQnFWMGduaVpvQjlNT0FOak9tNjduVnYycWdFOV9iQ29fWjNtVExUT2M?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "General weekend explainer; no tracked road named",
+   "classified_by": "keyword rules",
+   "id": "e2ae433bc6a1f041",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 7,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.5,
+    "reason": "General weekend explainer; no tracked road named"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "91dc9161581cd460": {
+   "title": "Dubai Ride 2026: Routes, registration, parking and what cyclists must bring",
+   "source": "Khaleej Times",
+   "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOZEJYYm5HWE5hUG5NYnpMaFFaaThWdHdrd1A4T0phemgteU91c2RKSDJQXzBlSW15OGJ3ZlVTNjRnSmFzNG1sNjdjdlZ2NThJX1RtSTVwUG5YZXVXWE9HQ0JqbWhYeHBxd0VuX2tNeTd1ZmJjaW01UlJWZ0VKSkhRcURDWUJGZkhLMUZn0gGTAUFVX3lxTE41OC1QQm96ZU43OHd3aVB2U2R1LTR4ZHRKVnRoRlhwSkZpV29OVTJQVWxONDNhTXVrVjdwdHU5Y3VUMHZKeTJPQjAwWFNvSDlMYjJEMllCcW1PeWIwbkczQm1ubGx3cUNhS2ZBWFNGcVpob2R1aGdqZ1A3U1hHb2VtYjVEYXZJUy1SUExSbVlmdHFhQQ?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Participant guide; no tracked road named",
+   "classified_by": "keyword rules",
+   "id": "91dc9161581cd460",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 8,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.5,
+    "reason": "Participant guide; no tracked road named"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "5045bcf587232d9e": {
+   "title": "RTA warns of traffic delays on several roads during Dubai Ride on Sunday",
+   "source": "Khaleej Times",
+   "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPNUFTek9SOTN5eFlrRVJiNlRFZHpDSzNWbXY0N1pIV3NFTEhPZGNFQ1ZCWkdGdEpjYkRWRFo4QnowNlFOZnNhZTJjRzVzT1lMNU5ETWpNdWZpVklFWjlmRFh2bFVCWXFMa0FqbnE0UmVwUElzM3hBX1lWX3RPOU5OUU95bWRCN0psRVHSAZIBQVVfeXFMT1gxZDU2cm5DWC1qNGxhdEg0M2pWaGpreFpITGg1U0tkbFB0WVVRWDNhanJ3eVNLUHdpSjNRNW5vRDRicmlCNGI5NHVMZzBQUGo2T1JqWWdZMlBqano5Vl9OQ3dFdXhZV2hhRGNSU0pFdGczaDU1RGJ4LXczek5UZHhZVE1VZ1ZoUVVJbV82ZGpPaVE?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Delays on several unnamed roads Sunday",
+   "classified_by": "keyword rules",
+   "id": "5045bcf587232d9e",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 9,
+    "relevant": false,
+    "event_type": "partial_closure",
+    "event_date": "2026-11-01",
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Delays on several unnamed roads Sunday"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "3354ade1ec5ded71": {
+   "title": "Dubai Metro to open at 3am as Dubai Ride takes over Sheikh Zayed Road",
+   "source": "The Global Filipino Magazine",
+   "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNVjI5aUdaOFRHUU1BdnpQdkdtbkdJc2J6MmZPcF9uZklQTzFMS0gwY0Nxc2xVcGp5MHVmd0tHTnJCMWlWc3pCdTRWM29RMGR2V2ZybkxTVHZVX2FubVVwMVhWMzJ0T1M3WktIYVR6ZXFCak9BYTh4bkRvXzhzQTczZm5uU2lTa0dwM050UUFwX3c2cEIyZkdzQTZTRkZrS09ZNGUtUEpibkVKYUpi?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Dubai Ride on Sheikh Zayed Road; implied Sunday Nov 1",
+   "classified_by": "keyword rules",
+   "id": "3354ade1ec5ded71",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "applied",
+   "extraction": {
+    "id": 10,
+    "relevant": true,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Dubai Ride on Sheikh Zayed Road; implied Sunday Nov 1",
+    "start_hour": 3,
+    "end_hour": 10,
+    "placements": [
+     "H1"
+    ],
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+   },
+   "event": "full_closure|sheikh-zayed-road|2026-11-01",
+   "last_seen": "2026-11-01",
+   "enrichment": {
+    "found": true,
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "start_hour": 3,
+    "end_hour": 10,
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge",
+    "placements": [
+     "H1"
+    ],
+    "note": "RTA closures run 3am\u20139:30am on Sunday, November 1. Lower Financial Centre Street, between Sheikh Zayed Road and Al Khail Road, is also closed.",
+    "citations": [
+     {
+      "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+     },
+     {
+      "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+      "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+     },
+     {
+      "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+      "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+     },
+     {
+      "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+      "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+     },
+     {
+      "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+     },
+     {
+      "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+      "url": "https://dubaifastliving.com/dubai-ride-2026/"
+     }
+    ]
+   }
+  },
+  "1f710093f9c5e1d9": {
+   "title": "Spain should look beyond Dubai\u2019s AI investment figures",
+   "source": "Atalayar",
+   "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPNWxxZHhnejB5NzdCRHFIUE1IaU1zQlVSMjBuRkN2dk1zUHpLbEF3Y2lUMklKc18tdnJSRVRzcGhoV1FYZkVldnNvcXRNY0JYUlptZVM2U2VOQU5RallXZEx4RFh4M3RoS21feHVVd3RiUWJBNUpBanNiZXdfRjFyd0NqTGJiRVQ0SU13MDlFb3dwQjBDYWtwam4tdExHTS15ek9qMHNmaG1rZWhXNm04S1pzc1Z5VE1HSmRSV2xmMk1lUG1ha1VUVUFmWjFHdHlyc0c1aQ?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Investment opinion piece",
+   "classified_by": "keyword rules",
+   "id": "1f710093f9c5e1d9",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 11,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.95,
+    "reason": "Investment opinion piece"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "ba47abf4bf17799f": {
+   "title": "ATE THOMS GIG IN DIFC EP | 26-001 #dubailife #uaelife",
+   "source": "YouTube",
+   "url": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE9IY0tQMXAzNHY5djdTNlczWENwTHB4MzROTmdCMGp1eWpfcnVkTGkxY09iOEh2YXk3OUVEandOcEVKVVozdjB1WFF3cldRb3BUa0tCbmpB?oc=5",
+   "published": "2026-10-31",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "no dated traffic or audience event",
+   "classified_by": "keyword rules",
+   "id": "ba47abf4bf17799f",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 12,
+    "relevant": true,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "DIFC"
+    ],
+    "confidence": 0.6,
+    "reason": "Gig video in DIFC; no date given"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "aa9d55f139d9af23": {
+   "title": "Dubai Fitness Challenge 2026: Free workouts, community runs and events to try",
+   "source": "The National",
+   "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPZXRoQllvMXdWQWxneFd4NW1vRTlJTXhDcWdjVEJ6Y0RGZFpaLWc0TzZGTTdMOGJmVVJQLVVfTEd3QXlCT01TMFFxZWxlSzNqU1VQbzY1QWhjR1g3Uy0tRUxxQXNBb0RYZFdRN2Uwdm0yMVkwZDZsSDZyejNDVnZTT0JsS0QwYnJNY3dqakh5dTFNcXhiaFN3cHY1dGN5WG1PZ2ZPSHNfNkl0VWJ5MHRYQk1LemtHY0NSLUE?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "General fitness events; no locations or dates",
+   "classified_by": "keyword rules",
+   "id": "aa9d55f139d9af23",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 13,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "General fitness events; no locations or dates"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "94c9451deadc8df6": {
+   "title": "Dubai Ride 2026: RTA announces extended Metro hours, parking locations",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPZEdSckNkZnlVMlVISVhpNUxiZk41dll2dUFGWmhJLTg2TE1nVDk2eDlIaUV3eE5BMHBxY1h0bFhYVTNJTHhzc3M3S1pHVF81VHBLbTBJRXFaQjFHZ0dPM1JjZi1FYm5GZ0hyNEhRLTh0UThJS0dJVHBvTU5BZElPXzlhSnREM25VNXA3TGdJNWhKdTVxSnZhMk8weUdmR0lQR3FpcmdWbUc0ZDJoZHFKedIBwwFBVV95cUxNRkQ0dDFQRFBJSnJjcWx1b1pFLTd4ODZXZXNQaXNFMDUwWXBYNkl1T21tV3NIX0pjY2lHLWtqbWV4elpCcUwwbWZ4X1NnSmN1VVhmZXBHbU5NbEc1T0JYd0hqd0lsaEQ5NDNJSzhjcF84a1E3SGNNdlRyT0pIQ0ZiVDJZSlNjNGVHbXNTYWpRVUF0ektJUmRNaGpFZDFjU0NfRUFiV1A3U0pwQ1hHZU9tbWE0YjNxSl95TEJpbWNSd0FXSTg?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Metro hours and parking; no tracked road named",
+   "classified_by": "keyword rules",
+   "id": "94c9451deadc8df6",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 14,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Metro hours and parking; no tracked road named"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "bd798c88beb18dd4": {
+   "title": "Dubai Ride: Dress up your bike and win Dh10,000",
+   "source": "Travels Dubai",
+   "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQQndOa1R1dTNCWi1VYkpXMmFmeHJONk9xVHZ4TkpveXlNZXQ2U09SZ0MweWNvNDFveVZQWjQ4RWE4azVGbnB6dWhXd0Nxc0VYZ3pzclFmYklKS2dHQkgzZFZTSDVaVmlXTHJNX2ZETU00ZEFrczQ0TlJQUnUyTjhBSDdkeDJsSGp4Q1lUeWNEZVVyamd4OEtKUkJtMFZkem1VbFZ5Tm5kb001ZGtMeGNubTREQ3p2Zw?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Contest promotion; no location",
+   "classified_by": "keyword rules",
+   "id": "bd798c88beb18dd4",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 15,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.7,
+    "reason": "Contest promotion; no location"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "e6a863b0ec34c00c": {
+   "title": "Dubai opens final World Trade Centre bridge, cutting intersection delays to 90 seconds",
+   "source": "The Global Filipino Magazine",
+   "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQRTdXZkdlTTRUOWJYLXV1Qy1GV1gtU2xwUmhmUVhyNTZFSEdVdUxoQVZWcFVDaXRqaHVaZVEzNDI3SXBtUmZIRGdReW1CZGVnS3hWekZnZENLY0drcVR4RFJfSUlrVXZXUEltZTRfWHl3RG1FRGlzWmVCTUdSV0Ixc0c3SHBFUnZJMkkzdnB4Q2dBdlVnZ2VDM1h4MFdPNkxVTXgtWjc5OG5BTVY0RjRxM1BSclgzajFNZ1BPNGxfVmZ4Zw?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Bridge opening; tracked corridor not named",
+   "classified_by": "keyword rules",
+   "id": "e6a863b0ec34c00c",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 16,
+    "relevant": false,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.5,
+    "reason": "Bridge opening; tracked corridor not named"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "2c571353a75dbf2b": {
+   "title": "Standard Chartered Says It Provides Digital-Asset Custody in Luxembourg and DIFC",
+   "source": "The Defiant",
+   "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPQ3FGNkVhdExlSHdFTE9uTVFzZ0xRdk1EcGhIYnp2MUE2Y2p1cW5JcFhMQ1IxUFpaZDJSYVdZUzZqYTZqV1BjeTNuNE1NT19JMk9MQTdvdkdpd0VzUGxHckI4UElXR0pDQUFJMDIyeVJlZkhjN1RPLThGOHVTWGVZVmdLUF9yamVlcnNwbXV3QnBucmhFck11X2hNQ29TYmJJSkYxRkdjUVFYdmEzODJkZVQ2QllFUzFGcXpFWU95bWtETm9hUjJFQm5B?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Financial service news, no physical event",
+   "classified_by": "keyword rules",
+   "id": "2c571353a75dbf2b",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 17,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Financial service news, no physical event"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "033baa6fe8ffaa06": {
+   "title": "Absa Group launches Dubai office",
+   "source": "Africa Business Communities",
+   "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOeklZSmxKcGlNQkpWc2JGeWpfQ0lEbTZrNmJ6cXM5dm5KZVpJeHVUOXFCNmRVZllBbVB2MjdmLVc5UEJJb0R2V09NU0ZfZjZ4ZXpCbUVWallKWWhlclRvLW9qRERIZUhXdDdZQmEza05teV8zcnFpZExING84VEV3UFVjWQ?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Office opening; area not stated",
+   "classified_by": "keyword rules",
+   "id": "033baa6fe8ffaa06",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 18,
+    "relevant": false,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Office opening; area not stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "df75aff6b6577ab9": {
+   "title": "Why Siena Restaurant Dubai Is The Next DIFC Dining Destination To Add To Your Diary",
+   "source": "Harper's Bazaar Arabia",
+   "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBpaE1QdGRxYVVCcS13dTZPYWtiZXVvUGpUNV9KTTN2aDNzRzZfVHhWSV9xTU0tMDFMYTMzdGdGb3FJQ2pKTVlPNG45em9MSGF5VDhNcmhTWmhlSmRzcDBXRU1jSFlCTmRwbnd2YnEzeHYyOG8wWVhBRmJaVQ?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "df75aff6b6577ab9",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 19,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "DIFC"
+    ],
+    "confidence": 0.6,
+    "reason": "New DIFC restaurant; opening date not stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "28daf7b1e23c4161": {
+   "title": "Dubai Future Finance Week to spotlight fintech, tokenization and sustainable finance",
+   "source": "Fast Company Middle East",
+   "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPOTFTblBEdGhhU2dKTHFtRkw5UVRmdWVpNFN2R2FlaFlHQUVfRDY4SW81Z0lybDJHWUFvRjJfY1RhVW9aUUdYSW1MVk40Nl9mTXFadFAxR1pMSVQ5c0dqTXc4R3FXTy15RnNJWTNqcGpOY1U0ajgyV1lhMUpGajBOZkpnSEoxMzhtbUo0dnpPV05HZmlGNTROUkdnNy1FeTdwN2pnTUlLdk5PejhrLXJoNlRhUHdvUQ?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Finance week; dates and venue not stated",
+   "classified_by": "keyword rules",
+   "id": "28daf7b1e23c4161",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 20,
+    "relevant": false,
+    "event_type": "major_event",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.5,
+    "reason": "Finance week; dates and venue not stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "725938e744589c83": {
+   "title": "Emirates NBD to champion AI, FinTech innovation as Premium Banking Partner at Dubai FinTech Summit 2026",
+   "source": "www.wam.ae",
+   "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPQ3l3SFlVN3ZOMlQySUt2c0JETEF4MGxDUDhwMTk3WkVOZ1ItR0NSQWRFbXd4bU9tbFBEVnh5dVVFR3p1RmIzM2xMbXl3b2g2NGtaVGdTVnJFeU1ONUpLOVBRVFRha0Q4by12TG1DT2hid0FtNzEyV1pIV1VhUTJfR004NjRPYnQw?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Summit sponsorship; dates and venue not stated",
+   "classified_by": "keyword rules",
+   "id": "725938e744589c83",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 21,
+    "relevant": false,
+    "event_type": "major_event",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.5,
+    "reason": "Summit sponsorship; dates and venue not stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "2b965bca07c1281e": {
+   "title": "South Africa\u2019s Absa opens first Gulf office in Dubai to tap $158bn UAE-Africa trade boom",
+   "source": "Arabian Business",
+   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQMlVIS1pDMm03VWxmTkcyWFk3T2hCaVBXMFlXSWtDdHkxdHAtZTlpQzcwN2NfTUpQeVpuS3pBekdxbnFCTVZnS0h4OGZJcEpXQlpEOExOMTQwc0RDNVB3OTJwV0tOUE1OdWNLOU50eWExRGhIQXNFcl9QNEpTVEVLVXdmXy1UbmZ5c3VUR2hDTlhCd0t3cHppQW4yMFhGSEo4anF5UU1jLURxM3BtSWNoMHBMenk3UnA4MVVMSTVIV1Z0cWZx?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Office opening; area not stated",
+   "classified_by": "keyword rules",
+   "id": "2b965bca07c1281e",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 22,
+    "relevant": false,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Office opening; area not stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "b6545ae3bfc4d18a": {
+   "title": "Dubai Has A New DIFC Gallery Showcasing Rare Herm\u00e8s Bags, Vintage F1 Cars And More",
+   "source": "Curly Tales",
+   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPWkR1alhDVzhHbDNfM2R2dFlNSmtGUm5mUUhBeWhkc3ZNTzhSZGFzcnN3bERZS0UxUnhwRVhTcHFDOFI5X0ZmSVBEVUtLdFNSWDM5OHVjM1ZBdXNyWU9aMXFBTzI3UU1icm9Xajhfd1JHb2s5OWcwbkpoTFVlbTBVS3NKdGcya3U4eDF4a1RPVlZsSnVkRERWck42cUdYRVZYRnpuY0NuMjBCZTlIZ0JZVkl4T2pLZXVfLW1nRWVqRmVuRVNI?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "b6545ae3bfc4d18a",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 23,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "DIFC"
+    ],
+    "confidence": 0.7,
+    "reason": "New gallery opens in DIFC; date not stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "8cf0fe25c9b82152": {
+   "title": "Dubai Ride 2026: RTA announces designated car parks for cyclists, here\u2019s where to park on Sunday",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPNHpMYzJmT2J0cHVaSXRRRVIxeGdCbzMxM210cW5xaTZkSTBIV3dyR3ZRLUplWThjenF2Y1BiR0d3eThOallPZXotcW5NVUwyWFNVMEFpRnZNcGxvOUIxLWRjSUN2SkZIRm9FeXBDMXB0UjJsdXQzRGduc0xBdUJHLWZDc2xNaUwtbjZJeWJpZ1pqY2hOVlR2LXlIQnFVWTU2T0JiVVR1aDVVMzhFQnFQRWVnaXRyNUhBOG5NdTY4WXAxclBtMHVNdVZR0gHaAUFVX3lxTE9aQVJOZWk1WVZZYUF2U1BKOURtSVFadXlHMzBpTDVpcFVGS0hzS0cyYUY2WDczLWczeWpJeWZiSGN5SGU5MkFEMC0xbjZJSWEtazB0Qm1RaWN1bkwzal95Z0ZrV1ZXNE1xR1E3c1RGX1cyb0M1anZYR2tTVzFXVlZDc1RTQkVBSWhwTk8tY3RvdFZrM2hUd3ltQzBPdXFzaGRyRTNiVkRqb29PdnJpX3hyT1BCYW5tS1JXMkxPX0txS195ekxrcnQwVlROMm9SQm1lX1Z3ZFNQaUxB?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Parking info; no tracked road named",
+   "classified_by": "keyword rules",
+   "id": "8cf0fe25c9b82152",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 24,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Parking info; no tracked road named"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "be4d6f90a57b92fa": {
+   "title": "Quiet Confidence Has Arrived In Mall of The Emirates With Calvin Klein\u2019s New Flagship",
+   "source": "graziamagazine.com",
+   "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBaV1BxR3Z6MWRpOUVLUVZZMDc5eUppOHRRdzZvbUxJaE1RREIxUERnN09uc3lpcDB6VUYwaXdYQ0xPUVFXZEpoODlZZWpRc2ltODZJdHFjRUprQ3BrLXBlbDllWDVhei00U3V1R2hWQ2Jpb0tkaUJyRlBBTzZTdw?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "be4d6f90a57b92fa",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 25,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "Al Barsha"
+    ],
+    "confidence": 0.6,
+    "reason": "Flagship store at Mall of the Emirates, Al Barsha"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "9c8bfc56c6ede9f9": {
+   "title": "Mohammed bin Rashid reviews plans for Sobha Realty\u2019s AED500 million Arab Reading Challenge Endowment",
+   "source": "Emirates 24|7",
+   "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxPd05VUkNFaTdDd0dtUllBMVoydTVja09XMHRVU2JqSEZrZkN0OGJrXzJPVWtGYnhLT21uVmZFY2NEemNHb2JPOFhjR3hnZ2RaajJ0eFJ2NWhhY2ZRNVZJdGw3ckRrNlZKLTVSQWxjVjdfeEc0cmdPdlJjRzMwQXRNUHduTk0yekpFMk9FbGZGeTNreUptRzNHblF2WDhFX2hrbzNlNThpYzl6LUxEVlJVal9TdnUxd3NSM3VhZEJqei1ZYm9iVS1TeEFtc2pXN0R5WFNHeFI0UjE0SGxsUk9YM1hWMUZKSExXcGtZRNIB7AFBVV95cUxPd05VUkNFaTdDd0dtUllBMVoydTVja09XMHRVU2JqSEZrZkN0OGJrXzJPVWtGYnhLT21uVmZFY2NEemNHb2JPOFhjR3hnZ2RaajJ0eFJ2NWhhY2ZRNVZJdGw3ckRrNlZKLTVSQWxjVjdfeEc0cmdPdlJjRzMwQXRNUHduTk0yekpFMk9FbGZGeTNreUptRzNHblF2WDhFX2hrbzNlNThpYzl6LUxEVlJVal9TdnUxd3NSM3VhZEJqei1ZYm9iVS1TeEFtc2pXN0R5WFNHeFI0UjE0SGxsUk9YM1hWMUZKSExXcGtZRA?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Endowment plan review",
+   "classified_by": "keyword rules",
+   "id": "9c8bfc56c6ede9f9",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 26,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Endowment plan review"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "bc98575eea24b6cd": {
+   "title": "Vinsmera Jewels marks UAE expansion with softlaunches of stores at Al Barsha and Bur Dubai",
+   "source": "The Retail Jeweller India",
+   "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOSi1hb0dvY3RZeUw4TnJURUtTbFNVcC10V2lGdnAzdlVab2lNTDZzZzRBSk95SHZWelpUR1UyQkdrX1A5WmhqYmdVQ0UxQk9JWXUtOV9WYzExWGhnYU02elRZc2kyb1Bpdnlha2N5Tk5jNVA5T3Eyck8tSzBUZzNuYUNkaEhfQ2V2Rl9nS1ZYSlFxYkM4Qzh5RlE4eTYzQWZwMkR3X2ltQ1QtNGpoakVkLTd6QXBnY3M1TTRnMzA2Mmo?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "bc98575eea24b6cd",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 27,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "Al Barsha"
+    ],
+    "confidence": 0.7,
+    "reason": "Jewellery store soft launch in Al Barsha"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "6ddf03e96a9404f7": {
+   "title": "Mark your calendars: Unique Dubai Fitness Challenge events to check out",
+   "source": "What's On",
+   "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxORFcySDgwSDN0U0hrLV9YeFZaLWxmcHBrSHlqYmZCczBrRlFYUHhJOWFCaW1QTG92VVd4UklUZEo4VFdnRTNOVEprVVNENUpLLXpQc19vWWZkTm93dWZINXdiTE5MVFMtQ2d2UEY5QUlhMlg4YmVJR3NoRTFNVVJVUjBJNlk?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "General events listing; no location or date",
+   "classified_by": "keyword rules",
+   "id": "6ddf03e96a9404f7",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 28,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "General events listing; no location or date"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "28377cadcec8afe9": {
+   "title": "Pune Cryptocurrency Investment Fraud: Investors Cheated of Rs 14.71 Crore; Dubai-Based Mastermind Among 23 Accused",
+   "source": "Punekar News",
+   "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOVFFNM3FhTVpfUDZtTGZfak5vUHZNckVESzc4OXZBelAtUXRhM0hjbmRaNURPSkw2VGpKNTYwdkV3YzRwXzBpa3VpM3FyQUlrU0piVGVPa3VPeFhFVXhSb3NUUE9RUm1hOG5HYlk2YjhnZkRRWGRQUUlQZ2QwcmI4eVlXTUplVkVJZTY4UU84MFBWbG1TSUpKOEljaFpLWlpvNHVZM0Iyay01ejBSTFd1QUQ0c3h2Rjh4TzVyNzFodTRJWkVKb1BaYnd4cU5PQnZpd214Y3BqTQ?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Fraud case in India",
+   "classified_by": "keyword rules",
+   "id": "28377cadcec8afe9",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 29,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.95,
+    "reason": "Fraud case in India"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "984bbe6218213275": {
+   "title": "Dubai Ride on November 1: How to register, collect your bib and plan your morning",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQY3d3UGNLMGROdGdiSzNZYzNvT0RBNF8wM2lfZ3d4UVFIeWNTVS10Q0tDMmtHVWVWanNRZzZ0NWFrRmJHa084Z0VIeklNbEZBMV94b0xRY3NsT09XZHVaV1hLdm84SVBOVkFIVUtRV2N3S2Z3dVU1UlN2VWJKNUhIZVVnZk9wXzh2UUk4UGRpejU3aWFvZHdpQ1A0Y2w2Sk5hZE05MkhmWGZfUVhkMlNPNml4RjRwQWfSAccBQVVfeXFMT0dWR3RFdnVLb3NHQ0pQb1ZJbVdCVHJpa29CNkJLUElMczVMMDQ5SEctN21GUEMySDVNZ2IwRml2SFkwcF90ZUl2SmI1eUtGdC1QZEVpa2d5bGR4TXhuMFJoU204OVZfeHNNNmFRUkdCNzl0MjBOM2JkY1ppeG1sdUVKT2hoOWlqS1d3M3NHSjZlX2E3cUZCUk54T2xYUlItWW5ud0R5cERrLUt1M0p1c3lvTHF4QWNvVjhqYXQyc19WNlNhbEs5bw?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Dubai Ride on Nov 1; headline doesn't name route or hours",
+   "classified_by": "keyword rules",
+   "id": "984bbe6218213275",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2",
+    "H3"
+   ],
+   "status": "applied",
+   "extraction": {
+    "id": 0,
+    "relevant": true,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Dubai Ride on Nov 1; headline doesn't name route or hours",
+    "start_hour": 3,
+    "end_hour": 10,
+    "placements": [
+     "H1"
+    ],
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+   },
+   "event": "full_closure|sheikh-zayed-road|2026-11-01",
+   "last_seen": "2026-11-01",
+   "enrichment": {
+    "found": true,
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "start_hour": 3,
+    "end_hour": 10,
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge",
+    "placements": [
+     "H1"
+    ],
+    "note": "RTA closures run 3am\u20139:30am on Sunday, November 1. Lower Financial Centre Street, between Sheikh Zayed Road and Al Khail Road, is also closed.",
+    "citations": [
+     {
+      "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+     },
+     {
+      "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+      "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+     },
+     {
+      "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+      "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+     },
+     {
+      "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+      "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+     },
+     {
+      "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+     },
+     {
+      "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+      "url": "https://dubaifastliving.com/dubai-ride-2026/"
+     }
+    ]
+   }
+  },
+  "7f1d2eddf05e955e": {
+   "title": "Dubai World Trade Centre\u2019s final bridge set to open as travel time slashed",
+   "source": "Arabian Business",
+   "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOZ0tBTW9laEtUYmM4aTdKRXZBQWtOdFpnM2RkeVFjSDQ0TjRBNTVZekpJWGZtMnhvOUJsMExGU0kyS19QV1E1bFB2MTJyYzhsb20teFdJaFoxMXdNdjRtWGZrZmdVbTZTSk10a084dy02SnN6WjZpWXUwbzNpd0pvbGFSOTF4VG93R2hEemhSMkJjM1ZUb1ZpeFd6bEoxeUZEWXNGcnloMTZLT2NSbFhRSHE5T25EWkZ1TjJDTk82OWhfdw?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "DWTC bridge opening; no date or tracked corridor stated",
+   "classified_by": "keyword rules",
+   "id": "7f1d2eddf05e955e",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 1,
+    "relevant": false,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.4,
+    "reason": "DWTC bridge opening; no date or tracked corridor stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "b6719558c93f2c5d": {
+   "title": "Dubai Ride on Sunday: Where to hire a bike, rental prices and when to get your bib",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPTVdxd1JjdkFvWGpYT2p0c0todjhLeVl2V3VDb2dibGVkNll0TTVEcVpxTUQ3Rnktbk5CTnNQMnYwSDYwYlhzbW9Ha1B6M0tBRDk2Y0FtOVN1alNZUHo4TXlQd1dBazUxbDNXX2x5Y2pJUXBURHR2TE1TNmRFbzR2dlJXNElHNHBOMDV5c0JlQUp6aVVKWjMxZGVrWVFOclBrTV96MzRZUTRmT0lJMWZUdlcwaTEySEQzZ2ZRWFU1T0pITUlDQmdyOWFaVE5EdXdHNFY2adIB5wFBVV95cUxQcVlULUkwOENyMTV4LWUzRi1ZdjF1VUVfNmp4aWNDMkdIeEZObTVYQ1VjaUNNTl9GSWlodVZBSUVPaUhxczJ5MG9QNnpzM3A2MFRNaUx2aFNRTUlXRjdrQ3loSnhfVGFOOFkwX29qaU81SmpkTGM5Vjd5N2N4Zld2anJSZnVJZWRPZk9PR3NiTzBCQTJnQnYwekF2d1dESHB4czRHUS1ERW1mNGJKQnB3WTJLRXhYUGd6LVJGSzEzZDRjd1FqWmxpNF8wWDhsQmRmM0kxRUp5RDNfY1NQQlRFOUpXa1hPYnc?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Sunday after Oct 29 is Nov 1; route not named",
+   "classified_by": "keyword rules",
+   "id": "b6719558c93f2c5d",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2",
+    "H3"
+   ],
+   "status": "applied",
+   "extraction": {
+    "id": 2,
+    "relevant": true,
+    "event_type": "full_closure",
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Sunday after Oct 29 is Nov 1; route not named",
+    "start_hour": 3,
+    "end_hour": 10,
+    "placements": [
+     "H1"
+    ],
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+   },
+   "event": "full_closure|sheikh-zayed-road|2026-11-01",
+   "last_seen": "2026-11-01",
+   "enrichment": {
+    "found": true,
+    "event_date": "2026-11-01",
+    "end_date": "2026-11-01",
+    "start_hour": 3,
+    "end_hour": 10,
+    "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge",
+    "placements": [
+     "H1"
+    ],
+    "note": "RTA closures run 3am\u20139:30am on Sunday, November 1. Lower Financial Centre Street, between Sheikh Zayed Road and Al Khail Road, is also closed.",
+    "citations": [
+     {
+      "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+     },
+     {
+      "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+      "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+     },
+     {
+      "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+      "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+     },
+     {
+      "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+      "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+     },
+     {
+      "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+      "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+     },
+     {
+      "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+      "url": "https://dubaifastliving.com/dubai-ride-2026/"
+     }
+    ]
+   }
+  },
+  "a40bebf87cceecbc": {
+   "title": "The best happy hour deals in Dubai for every day of the week",
+   "source": "Time Out Dubai",
+   "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQVVpuVWtsX3k4enRCNTBSUTNVWmNFSDhPdU4zSGZhU1d6ZkNHeEVWNkxiNDJxRjRPeVJidkpHYVEwVnFqV2RhSHRxeWg0bFhjaVU4bXpqZWNvcmJoSFRSdk8tcm0zb2hjWk1JUWc0ZEVqcGRUcnN4eFJiNV9hMXVDUnNR?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Generic happy hour listing",
+   "classified_by": "keyword rules",
+   "id": "a40bebf87cceecbc",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H2",
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 3,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Generic happy hour listing"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "2b4adfaaec5baaa5": {
+   "title": "8 Restaurants Serving Special Diwali Menus In Dubai To Celebrate The Festival Of Lights",
+   "source": "Curly Tales",
+   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNeFNqZXV5VEI3dmFnQ1B5Yl9vQll0djdrQXVlWXcxRDVXM2RrQklOd1piRmxWTkdWSmRzVThIcE1wNXBGVDI1bFQ4THVNSEh4UzAtRTk1Q3FWTHZBMkhycGJTbm9VMldqVUhzdlhyOF84alNtekd2MDlMWkFHUXdxV0FUWGVDN3ZYMTdPZFdIOFdVM1RiNUZCZHdpU1VNR3NwUDZQMGh1ODJacDNBUDZhRVgwZEs2a190cDJOdTI0NTYydUNL?oc=5",
+   "published": "2026-10-30",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Restaurant menus, no tracked location",
+   "classified_by": "keyword rules",
+   "id": "2b4adfaaec5baaa5",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 4,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Restaurant menus, no tracked location"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "bf2b078cf9e51a9f": {
+   "title": "HRD Antwerp Opens a Larger Dubai Office and Lab, Boosting Middle East Grading Capacity 20%",
+   "source": "instoremag.com",
+   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNeUhpZEJZdExnRUhtaEdyYTBaUkxNTkV1R3JQTlI0cHNyUk1fRm51TG90eTY5eVdUUHZUemptZk1GYVhtam5XNTlKcktUTk4zWW51NFJiUzdrU2tST0Y3NEJyR1pUWF9fRG1TX2daWGJ0U3paX1VueWlHNENad05WWEx4bl94SUJuSUc0bGFqc2kzWWxJXzVyUDBJazBQdFYtTUdOdUFuVUpROTlLRXozUm9R?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Office opening, location not tracked or stated",
+   "classified_by": "keyword rules",
+   "id": "bf2b078cf9e51a9f",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 5,
+    "relevant": false,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.7,
+    "reason": "Office opening, location not tracked or stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "7ed16d12f994e7d7": {
+   "title": "A New Chapter of Waterfront Living at InterContinental Dubai Marina",
+   "source": "Business Traveller",
+   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNTG02RTdNRWxXTGNreUpoTkF4YkROcElHYndRQk53Sk41NWZGazhHNk9qaVlYV0tTa0ZSRXRhRkNNc0lFcFFxZUFCRWRNZ3FtaXN1X0o0NUlWTzhXLWx3MHdfMGJwM0I0OWltZ0YzcFFRaDNkZ1BRUlVBUElsazlfQWRxUm1JVEtGbFg3c2ZJZ25lTFAtQTI2SVBSYVMzU0p0R3pfZkVVQW5ESF8xdkhjM1l3?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "no dated traffic or audience event",
+   "classified_by": "keyword rules",
+   "id": "7ed16d12f994e7d7",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 6,
+    "relevant": true,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "Dubai Marina"
+    ],
+    "confidence": 0.5,
+    "reason": "Hotel feature in Dubai Marina; no dated event"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "2305da350fe11369": {
+   "title": "Best Thursday ladies' nights in Dubai: 21 top-rated deals and discounts",
+   "source": "Time Out Dubai",
+   "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNYXh4WlM2NVhXeUpramtSZWdQNUhhNWh5VlZpNllCNHg1ZU1XelB6WTZSVDU5ZzlzamZMdUpncEFEZXEyUm9rZy12eVB3LUU0WldVRHV0WkhWNVh3U0ZfRUZKX0RWZzdlLTVKMmZNLUp4ZXlmQUNxZjVPRXdkd0RObDNvWjBTQVFIdkc4WW1fWTBpSHRqQ080ZzhpMTc?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Generic ladies' night listing",
+   "classified_by": "keyword rules",
+   "id": "2305da350fe11369",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 7,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Generic ladies' night listing"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "bd709529ef75ef7c": {
+   "title": "Rockefeller launches Dhs1.1 billion office tower on Dubai\u2019s Sheikh Zayed Road",
+   "source": "Gulf Today",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNUWtpZ3kyRFlRbWxwWVh4WlVDdXJGUXdyeXNqRFdsQWpSSmRQeV9vWTZxNjZfM1YtN0N2dzZISy1kaVpYZVo2RVhac0lVTW84eW9JSU04UXdRNmZReWFXeVM3U0NJWnQ3RHcydzJTMDZEcEN5XzRta3Etb1lobVZSWGluREtlUnN3VnM2anBZQXpnSEg2WGMwNUktMUJKS1g3Ti0yVTZNTG1nYUZJRkJzdUpjQlpZek0?oc=5",
+   "published": "2026-10-28",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "no dated traffic or audience event",
+   "classified_by": "keyword rules",
+   "id": "bd709529ef75ef7c",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H3"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 8,
+    "relevant": true,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": "Sheikh Zayed Road",
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Project launch on SZR, not an opening; no date"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "fc6e560470b8a21d": {
+   "title": "CLUB 15 OFFICIALLY OPENS IN DUBAI, UNVEILING A 15,000 SQM SPORTS AND LIFESTYLE DESTINATION IN AL QUOZ",
+   "source": "Menafn",
+   "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOQ0ZhMlAwSlZyVFlDYS0xdXBJZi1HdTM1QUhRQ25UMWQzeEk1OGJhSEdyR2RlNHk3LWVsSFd1SFJ3LTJoSmVNMkJzUGVhdzlNck0ydnFSVEtMbnNQaXhXQmNhUDNpODQ2SWl2M2oySGFkbWxnMk44aGluOUdsS0kzLWtXR2dLLXpySUxIMVF1QXFTUjdjaHJreWRPZGRNN1JBMmdWbzZKa1ZjTGNzd3VZeEhRR3dvNDByTVZ2SHozUUtjd01IQlFjbg?oc=5",
+   "published": "2026-10-29",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "fc6e560470b8a21d",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 9,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "Al Quoz"
+    ],
+    "confidence": 0.8,
+    "reason": "Club 15 opened in Al Quoz; exact date not stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "a43158f389cd832e": {
+   "title": "Dubai traffic alert: Accident on Umm Suqeim bridge, delays on Al Khail and Sheikh Mohammed bin Zayed roads",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxNZE0zdllVYThoXzg1ZEh5WldqX1Q0UWV1WW1GTzR4UnNmeWF2c3lRaDZnY0Z4VnczS1JnT1FlcjA0R20wMWRQWWYxS2lTVFQtY2VFZXFLWHBvRUk1eEdGMVFicG85QzRVTThQTW1qZklPOEpac3VqREQwdG45RkpZRkJYTWhlbU5FN1VDVmxtMVN0bjd2RlRlUFkxMndRYVFWNTR3dk9Hb0Rqb2VJUnREM0NmUWFSMkZqQnl4UTZWc240dVVkV0ViOHpFRHRHdGRGellUSkZxQm13Vm1LMVAxcXpWUDBZd9IB-AFBVV95cUxPVlB0MDREMkN2Z3AtSmJpcHVzZVh2dFdGMGE0V0g0REZtLWZuN21IYmFEZ2dwaG5xeTRkRW0zMDdXUzV5UmdGRm1vMkMzSzZEbWt0YndBTlpYbkZhWm9ldXRQOU5sSHlVdEdWQWNfQ09vbnR2bjhReUdsb0tsdURiVEhjZmFXa05Wbmx1dUROUjkwZFBlVVFycTA3cnk4bWlkVnNwaWZBRjRNalQ1bnVDeHBNZ1pZQkdhQm9MamRab01PTC1nVGthcVBPSUh2LWR0a1cySHQxNUpJbDFsQThKdlFQWjZyZGxIMkZPTmZPUU9BVkQ4Y2d3aw?oc=5",
+   "published": "2026-10-27",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "no dated traffic or audience event",
+   "classified_by": "keyword rules",
+   "id": "a43158f389cd832e",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 10,
+    "relevant": true,
+    "event_type": "none",
+    "event_date": "2026-10-27",
+    "end_date": null,
+    "corridor": "Al Khail Road",
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past accident delay, before campaign window"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "0753786d28f903a4": {
+   "title": "Dubai awards AED3bn in contracts for phase 3 of Tasreef stormwater programme",
+   "source": "Smart Water Magazine",
+   "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxQdTBHanhKVWU3M2o0OXloMURTcDJMM2F6SC1JXzRDQ0dOZ3VveTNQWGIwcUhTOXdSSDhKMDBwamlsRHBlRGNnWmJYMDRsS29KVlNYNEhNcVVZQUFJSFVjLUlza0U0V3BhYWtMd08tU2tkRkFaQzVYNjVfd3o0RENmYW5hQm1KQnpMMmtuckppSFlSaDBpdG4tZ25PYTJTSlQtSGJHaGlVYTRIQmlkZ2NsRDVRTzVIMThlWURhSEVxbWFQVWVUemJnNkxYWHRrZw?oc=5",
+   "published": "2026-10-26",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Contracts awarded; no location or dates given",
+   "classified_by": "keyword rules",
+   "id": "0753786d28f903a4",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 11,
+    "relevant": false,
+    "event_type": "roadworks",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Contracts awarded; no location or dates given"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "b8205c0c82ae30d4": {
+   "title": "Dubai road closures this week for driverless taxi tests: Diversions, timings and travel tips",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPNDVnVFRpMElfUi16MkUtbDR6R3had2NPYllIb2FwRjFMM1p6Tk5ULWd2aUhNWHo3MlJkN0U0d2JzLTFCY2tZaUNhakNhcjIydDgyRjU2ZVQweWRpbkZHX3VMa3ExS0Q3OTVhZkgwZDJrTVF3ZGZoYkpzdldVZS1XWkRiRHdhOTJ0VUNnLWNycUVkYklqcHpGSE93bDdHd0dJVGwxWWU5cG85MGRrRWZGU0pVOXN5MGc1Y0Z1cHRxem9kRFI2S1pOdUVYZVU3Z9IB4AFBVV95cUxNTzJobk5hT3lkeGhQNWNUSm11bHVnVUhYN0ZybGhObU1FYV9oX2x2a29mNnhDSm81TW1sa0g1eURNY3UxWUh1d0RWX2g5RVZqR1Z3MzFmUFVQUklUdEt4YUNPNEthRE5kaW9JVVl2a0QzVEpWRVdfV2lCZG5DR2ZUbkt5Mlp3WjhSU08yb0VCeWdSc2FPclFnejkyRmVPbE1PWXZyaXh4ZlpMamhsc0ZEYUZJcFJUT1RsTVNhUy11V3gtdHUtNVpRSzJINTdjY2h6MG5ndVNOTGR5aVN0U2RfQw?oc=5",
+   "published": "2026-10-26",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Closures week of Oct 26; roads not named",
+   "classified_by": "keyword rules",
+   "id": "b8205c0c82ae30d4",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 12,
+    "relevant": false,
+    "event_type": "partial_closure",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.5,
+    "reason": "Closures week of Oct 26; roads not named"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "951a0bb6a6c6756b": {
+   "title": "UAE\u2019s first female paramedic recalls surprise visit from Sheikh Mohammed after Al Quoz fire",
+   "source": "Khaleej Times",
+   "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNc3VIT0gwMGdjaC1ya21KamFNbDNvX3hJTU1RQkd0S1M5clJSd2o4XzNNRUhuVVRxdnRtY2g3bVdYYmI3YlU0UGRrWmNSRlV1U1hBOXZ2ODNUS0x2QjJIOWFQcTRRVGlBRk1PNUNCVy1qNUVJRUM2QkdSQ3Bkd1M3UXZOa1lpNkpJX0xCUVVOVlZ3VWloRnpjOF9mMTFKZV9yN2tHMVhjcE9jTHRnRWZ30gG3AUFVX3lxTE9VODRaWFl4dGFkQmNBbW1Zcmc0Qi12Mll2TmlWbnp2U0J3N1ZqSzlTMGVvSUJyeDRlb1J0eGVjLUl6MW9tNVBLckNmUVIyLTI1aWJsXzJoMHhRMG41ZTJpbndWT1dpN3k2QjFFVEw3WUpwS1FuMkRwaTNnMkNYNXp3QWNidXUtODY3WFdFNVhqdmtkRXJTb20wcFp5bDlXUkFKdUJ5aUY3Z2hfQ0ZCUktqV1A1b2QxNA?oc=5",
+   "published": "2026-10-21",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "no dated traffic or audience event",
+   "classified_by": "keyword rules",
+   "id": "951a0bb6a6c6756b",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 13,
+    "relevant": true,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "Al Quoz"
+    ],
+    "confidence": 0.8,
+    "reason": "Past fire anecdote, no upcoming event"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "dac2acf0ffc1cc9a": {
+   "title": "Dubai morning traffic: Where motorists face heavy congestion",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxObEQ1eEtDZGdoeGRFcHYtZW9ZclNsd01OY2M1N09nQ0tSQWNQSXNaQ0lJRzFHWEd0cW52bFdxcjRERHZCTkwyOEo0MzgtWVJPMkpEaktoa3NRNXFQdmxqVXE1ejkwUm1fUEhkb3l6RXREd2dwZzRKRVVBNk9Pa3owNXdEbTctY3ljYkpWOUJUOUZBVTZGX1ZDVXF3U3ZoZmxuNlZuWE85TTBmZ9IBvAFBVV95cUxOWWFuV0FBSy1TZ2Q5RG5CVnp0WTBCdjlfdjg5SU1SWVlUUmtHSWh0a2dDbWZ2Y0VjYnkxc3BYQUNJZzZYRmFJVmNMd0JtRF82QWotZ0tnZ0t2ZWlpUEVMN0cxNU1hTFVjTXRoSkcyc183MUkzUmhuZS16UTlDeU1qTE9zTkVJNzhsZ2dob2ctS2xNU1FzRHZ1ZUpaTDN5VW5qNUgtOWFmR1VSNVVzanhyajhMZVEyQUd5LWJrWA?oc=5",
+   "published": "2026-10-20",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past congestion report, roads unnamed",
+   "classified_by": "keyword rules",
+   "id": "dac2acf0ffc1cc9a",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 14,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past congestion report, roads unnamed"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "e7a1bd0a26f8ec32": {
+   "title": "UAE morning traffic update: Dubai-Sharjah routes congested, minor accidents cause delays",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxQRGZfMjZkUENJU3owN3I5blp6WFluWkcySVNON2pxUjU2QWlueW9qRnZBcUJ1bTliSzNocXRkTjFtSnBmeWRhbWFIbG85WW03RUtYRWZFbVJOVVhGWDE3ZjdFWURCNTJIQTdBaUZMQjhNdXRrZUhITjlHNUd4TFV4MVRpcHFiQnJQalhDdWRnRHJQS3NpTnZnajM2LUpTVG8wODBGN1FTUEJudnI2eHhqVEV2VmQzN3pJek5NZkxrRndfT0tPQUw4cHFVVGVRd9IB4AFBVV95cUxPcUttY0V5WWFWSjhPUlNZV1BpQndSdGdsS2o3Z0U4TWJqMDljcm5qNEpmTUNzT1U0bE1nU0FfaGxsd1FCbEN3WXBMU05mQ25zNmYzaG9aNUtlZFNTaEYxY1U2V1VEb1JnNlFPRUNtNkpqc1hLbWRyMjNhM1p3dE85dTg5cHpyR2x1SThsU3NuTjFYdnBCWUZscG5fM3E4MmdJYUtydG5RamJxZG9Qd1NiTmNmb0FkTmpNTmdfRHVEUC1OdnNMSmEzbXZfYXl0WmVqQjV5cXdnby1lMFd2cFhEMQ?oc=5",
+   "published": "2026-10-19",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past Dubai-Sharjah congestion",
+   "classified_by": "keyword rules",
+   "id": "e7a1bd0a26f8ec32",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 15,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past Dubai-Sharjah congestion"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "6a238e7bc89f1a4f": {
+   "title": "Firms submit Dubai multibillion-dollar road scheme interest",
+   "source": "MEED",
+   "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNckxveVJ1Qk5SdW01Uy1CR19kWUtELWE5akhWUkpyaHhpNERYQ2MtY3NGbVRNRE5iVTZjdV9iZ0NQRVdHSXFqdksybEdUT0Rpc0VkMUQwdWEwMzRSNlZfNjE4ZFdKZmVJRXNYdUdjX0FhM2tDS09aQmVEVFdyYl9saUdkWU5VYjQ?oc=5",
+   "published": "2026-10-19",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Tender interest, no location or dates",
+   "classified_by": "keyword rules",
+   "id": "6a238e7bc89f1a4f",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 16,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Tender interest, no location or dates"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "8dfe9baf985b437b": {
+   "title": "Sharjah-Dubai traffic alert: Heavy delays on key roads this morning",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNT2FnVnloODVuNF9UYjRnLVBCV1U4M1Q1eHBieUFrTGtXNHhDdFVJaDVqTXluSlprM19IVWlicFplalNoelJ0S202UTdHaWFnTHR1X1U0RmhycjB5NHV0Sjhya2hjRUFvV0pEODhlbTZsMnhpanZWYW5tZzUwV2xTVlBmN21GdWdGcjl1OFJBYUkzbUVlSTVPc29YNloyQVcyYnFZejZ4TWdTOXV3b1ItcFZURdIBxgFBVV95cUxOMVNHdDZ6NndrSmVuYjQtNGZfZnFmcjg3cEo5WE42cnVpR1hoRV82ay12Z1NrVmY4N2wzczVPLVBJRkJJY1l1eVhtOHY1MFNtRmNTb2tTTmxxa2kwWDBPTENzRXBES1ZkNTJNeXN5eFFKemdRVkxrMThRbDhQZFVyM0IwN3I1cXVsdjlDbFlnd2JBeDhGakFhQ3lXYjdPdGd3VmFYLUg2ZmlZaGRBWlpvTlZkSVI4eUNtUmpTcjM1WXZtX3RwN2c?oc=5",
+   "published": "2026-10-14",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past Sharjah-Dubai delays",
+   "classified_by": "keyword rules",
+   "id": "8dfe9baf985b437b",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 17,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past Sharjah-Dubai delays"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "0c1710cb1533489c": {
+   "title": "Hero\u2019s Journey to Open First International Studio in Dubai\u2019s Al Quoz",
+   "source": "CairoScene",
+   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOMUhPYjlKbzVOX0FYU05ZQ0dteXhpMFN2eDRuZ3BGWGxjcFVqWlloZnZGdmJKSkNfbnFUaDlpMHVFYm5XVENqMlIwbFlfVS1kNXNmZlFtazZ3X0VsdzdINHlKWXVzbUJRWE9PLUg1dmExTnpvRXBsU21XXzVrSU1sWWl2MThnVEZHdExTTXJuRXllY3p1TnlwM080ZlNxZTZ2?oc=5",
+   "published": "2026-10-14",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "0c1710cb1533489c",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 18,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "Al Quoz"
+    ],
+    "confidence": 0.7,
+    "reason": "Studio to open in Al Quoz; no date"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "cebd93f8a057f923": {
+   "title": "Sharjah-Dubai traffic alert: Heavy delays on major routes this morning",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNSDIwT2JoT1lEcE5sajIyMzhkMFFpRzRQeGNYZllOeFd2M1A3NXdDdEtvMUNlaEROckxrWTN4SUxjc3R1X0wxTkhZcEtBcEVMTGVqbklsY0EtNExWTVV4X2pQQXY5clJlRTYycHVWNTJ1YTVFbW5hRDZrYUc1eHZYdHJnOEZieG9Mek1kOW9VWkdlZGlFUmhkZE03ZzVjWG4xalRGdFRCdFBlY25mdlI3SzFnbGU5eDDSAcoBQVVfeXFMUFZaa3NYVVpxLVpyTUNRQWRRVEVFQXpTTkFwRDdnbHpKODM1Y3JwVTFoTnVnSTFXRjV5cFJFU0pxa1RkTzgtb2dnQWRDdURvc2VseC1OSHBlakZtNmJqZzd0ODNUcng4R3hxQjM4a3Z2dkF0dWNmYVRjWHJmSlQ5dnYxVUtHWVhiZGM0WmJuX2VPcWlWVVlyZjlBLWFnZnpGRWpzU2lKeHo0UVhtZjgzYml1T2M4blEtcklta2NOcnlRdVZnRVNzVVhaQQ?oc=5",
+   "published": "2026-10-13",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past Sharjah-Dubai delays",
+   "classified_by": "keyword rules",
+   "id": "cebd93f8a057f923",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 19,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past Sharjah-Dubai delays"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "fb0393649034f996": {
+   "title": "Dubai traffic alert: Crashes reported on E311, Emirates Road",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQRjlJNDBrLXpuRG9sQ1ZVR1NMcGgtNTFaWUNXT2pvQWVGWGJGbElFU1plM2JWeHcta3k5cDY0YXJEa0ZfMnlrVUx4b1BvTG5aZWRod0xWVHVYbXV3cUFqRUh0NGpKTHdQWXVnSzRXYmhONWNOYmdLQnFIejl5RVRWT01keTJOdWVLbVlpeXpnSnh4TVFTb282eW5nVTRxdEdvQjZrNUZILWXSAbsBQVVfeXFMUFY3U1lXM0RITVRTOGlGZW9nWkxBbmp6dUo5X2ZoX0hYVDVSQXZUZTJkcHQ1dmxOVHVkVlNZWmNXNmhUV3Y1NlZSTnRYbHZXX3JROVhidHBKSV9SaVQ2eGpfRVBLTWZfOTFPT1Vick9lMFZSQnJNcUZ5dE5wNTRDLVBmN010MEVsZjJlN045NW1ubEpnZnpSOE80VHlRLXBlNmRXRmZwRU4xSTk4YVpGWkRzdmtQRGpva0Rrbw?oc=5",
+   "published": "2026-10-13",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past crashes on untracked roads",
+   "classified_by": "keyword rules",
+   "id": "fb0393649034f996",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 20,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past crashes on untracked roads"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "f7e9b24fcaece6c9": {
+   "title": "Dubai Police take cybercrime awareness campaign to Al Quoz workers",
+   "source": "Emirates 24|7",
+   "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNX2VMemFOSmV6cDg1bl9Vd2htclR6cExMd3R0LW12QkRWbjNIRjczMkFvN25JOXpiNGVnSUF1ajNDcG4zajdqU2d0MWU0bDQ0NUlPcXEza0xXMGVkZkxqQkpjZFZ5N0NLNExXaEJEUHNvMVE5ZXZ2Ylk2WFRMV2VpTnhBYWhWYzJPb3NGbEdzRU54UFpvd0lPSFZmR2czcDY0N0lFSVF30gHAAUFVX3lxTE8zR1RjejVxdU1RZ2M0aE03VHh3VTV4TlF2cE5YVHB3MU9pdzVoQ3U3XzFBWW55WERldkMzbFJhRU5iVXZIblEtZExJTXN0R1hHUHlZajlvTXpRMlBJRS1rS19jMHhxZG1LSTgwa3NMV29CZF9jLTdkck55RVkxSl82QzlHNVdQclU2N2t6bm15WnZ0Zk5manlGYVVCMmZkOTdkTFNUMENwczRTa0RUOFhrOFVRSENEd3MxYkpDZVF1cQ?oc=5",
+   "published": "2026-10-11",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "no dated traffic or audience event",
+   "classified_by": "keyword rules",
+   "id": "f7e9b24fcaece6c9",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 21,
+    "relevant": true,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [
+     "Al Quoz"
+    ],
+    "confidence": 0.7,
+    "reason": "Awareness campaign, not a crowd or traffic event"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "6cd5b7b8c1438106": {
+   "title": "L&T Transportation Infrastructure Wins Twin Dubai Contracts for 12-km Latifa Bint Hamdan Corridor",
+   "source": "Realty Today",
+   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPdHd4cjY4OF9GOWNrcnFfQjFNYlJBMm1RUzlvbDFUdnZvNHVaVEsxRE02clJYelcwYnVwR0ZMcmxUTkVNakFQQkhiMWJjU0pvVGJUZWc5MG9hNG5NQmhuOXcwUXZCTVVPYzRJYjN2Y19hTlBPWmZFRGRFcUNxeDlvRGswa2xHM1FMTUYtZW1sc1BYbHdEZVM2MFBjeVdGVnBoSmZ6aS1WdmRnS1BxS1hQVVBZd3gtSksyUXpEOXRROXhzSC13dVhSUnJ3dVlHTktPS2pCckMyZTZELWc?oc=5",
+   "published": "2026-10-09",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Untracked corridor contracts; no dates",
+   "classified_by": "keyword rules",
+   "id": "6cd5b7b8c1438106",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 22,
+    "relevant": false,
+    "event_type": "roadworks",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Untracked corridor contracts; no dates"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "70d7b0bfd77ff6b1": {
+   "title": "Dubai traffic alert: Heavy delays on Al Ittihad Road, Al Khail Road today",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQY1hoRVhYdlAyd0I0YkFia3ZGQTlBUDhxeGo1UkVQZFdIMlFoME5WclpndDh5RWpqQ2pNcDVUSXRabDFPcjN6VVktd3c1WDg4MjNsb1p1UTRRRTh2VkR0OXJrNklaOEN1cUpudFY0dDRpckxuMWZ1dVpieGt4MGtBMVJBRDhpcUVUdFpEYkFTVnI1WlpMTUZMLUdBdGFDWHplRl9OOWp2cG1UQjNMeWMweWludExmUDhIRUE?oc=5",
+   "published": "2026-10-09",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "no dated traffic or audience event",
+   "classified_by": "keyword rules",
+   "id": "70d7b0bfd77ff6b1",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 23,
+    "relevant": true,
+    "event_type": "none",
+    "event_date": "2026-10-09",
+    "end_date": null,
+    "corridor": "Al Khail Road",
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past delays, before campaign window"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "860d6f9c040e03f8": {
+   "title": "Dubai-Sharjah traffic: Heavy delays hit E11 and E311 as commuters face evening rush",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQODZsSjJhWkczSVpneUF4Xy1zRzVDRVpjVk4wWnpHaFJ1Z2cwdS1DajkycWE1cDVNZnhQMnowQm8zdzF3c0xRUFNOUGIxQTJVME9RSXAxYkI4ZUpqQVktR2p6RHZGWE43Z2FreG5ybE9UZUp1cXJZZzVldTlRNHhfUTB3Z3dHdkJBNlJzT2lOU2Y2empFd0VGbVRtTFFsOUpmVzlqVVk3LUNYdG8zdDc2SEFmd29MNEtOU3ljcFNsR1BtVG85THhhYdIB2wFBVV95cUxON3M1bm1RSzFodUVaN2pYOS00RTk3VGNsWVR3LTdKVmVLZG4tTXhEVHlBMkVUTzF6ZXQ3bU9JN3ZRUUtVUG5BMGdfZ1FBMl9KOXpmaDhkdE1iV0lURlZqS3h3d2JSNWRNWW9nUDNaZ3JCSXkwczlXeGM3U2J6WmVSMTRhSTRNdnQ3NGFyaHViNXJoT2t3eWxjWHNfOXdpNkI0WkF3YmNka3UtYm1YemM0bl9NZ1hfeG5IVlZpcDAyTEFySXdoTVAwdUVKMWtOWkpsOHBic0Zxa1dMc2s?oc=5",
+   "published": "2026-10-09",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past delays on untracked roads",
+   "classified_by": "keyword rules",
+   "id": "860d6f9c040e03f8",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 24,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past delays on untracked roads"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "1ffdcfb528d4a65f": {
+   "title": "14 best soft play areas in Dubai that are kid-approved",
+   "source": "Time Out Dubai",
+   "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQTmZ5ZXN5dGRRQWpOVDZBbW5YN2Rfend5SDdfZUkwQ2ROakI5VGQwekZIVjlvRDJfLTlneml5S0l1MV9ZRHo0R3dRRV9pQnR4NHBPQ1ZFMnRHbVROaTdFVDhrcEFqSFBQblZ6anhvT0hSaWtQMHQzX1pudlp4X3JLWGJB?oc=5",
+   "published": "2026-10-09",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Generic soft play listing",
+   "classified_by": "keyword rules",
+   "id": "1ffdcfb528d4a65f",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 25,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.9,
+    "reason": "Generic soft play listing"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "2fcf548079e3d65e": {
+   "title": "Dubai Thursday morning rush: Long tailbacks on three major highways",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQbnpKeDJUU0J5RmllS1R4aFpBeHUxV1FqbDA0TzJrbjFLaDcyQUIzVkhUQ1l0UTlDNGwwT0RTU0UzbnhZZG5MWFVjdm1UclpHYUxVOUJ0NnBfMVhUYk0tTFFSLWtJanVYQ3pUQUFCc0FfRElLOTRqZlNzZUUwaUx0Wk5lUkZ5MW9iNlBHTXRFUzFpUVNFWU9VaFh2NmZnQVNzcUY1SDdXdzlIOWs1cDNaV0U3a9IBxgFBVV95cUxPcEhzRVFreHRKeE1zc1c2aklkU2xKWEY3T2lRWEphbDBWc1hEd011U0dKcGFBaFM3RDNmM3Bsang3WHRJNTZQMzdFY1ZPZHdhaUJGXzc0X1NsQ1BIRDJwU01DTDdKN0xfd29iQUgzclNlSEpfaWxaRlZCaFBMcXdLYUJUS05STFdyVGdQc1lzdHdKS2k1eWh2YkNReWs5TTdkMGZlMmRMeDhyMXpaYmN3X0h0blBpMFhRU3lGVnBnUnlzRWU0dEE?oc=5",
+   "published": "2026-10-08",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past rush hour, highways unnamed",
+   "classified_by": "keyword rules",
+   "id": "2fcf548079e3d65e",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 26,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past rush hour, highways unnamed"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "4f87094e272e3047": {
+   "title": "Dubai Shopping This Autumn: Skylight Mall, New Flagships and a Football First",
+   "source": "Dubai Chronicle",
+   "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPVmZLYXFxMzRpYmFvcTBpY09sOGU5YWtwLVBnOWZHNEtaVmt5c0UtTzdwVGpjcldKWktWaDNjX196TVU2WlNrNklEanFIV2g2cUwwZUk2bkNWUEtrWTk5NlZtaXl1dDJRUmNOaGd1ZmFEWHcwSzhLdHBGM0E3ZEZsVnlEUQ?oc=5",
+   "published": "2026-10-07",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Shopping roundup, no tracked location stated",
+   "classified_by": "keyword rules",
+   "id": "4f87094e272e3047",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 27,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Shopping roundup, no tracked location stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "174a4890c6361a69": {
+   "title": "Dubai traffic alert: Where motorists face heavy delays this morning",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxORkxPTXBDVG1wVWdWMjd4aWR0YmU0d0dLUXR3X3UyZ3lJNlRLZkNIN1BPUHNwOVphMmxLVHgyZnBUdGNfUXRtb1pXME85dXJQOHN3Y0o0YXR1d3JpNklaV3NSUWV3R2Q3YzVEX1lkR1BfSUtGdXN5Mzdid3N1X1plNDQyREVlZktWcnVpcHo5Rkw0UTNmbDl5bW1BRGJhOVBkdm0xT1VKeXpURWZiUGtrcHRiZw?oc=5",
+   "published": "2026-10-07",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "Past delays, roads unnamed",
+   "classified_by": "keyword rules",
+   "id": "174a4890c6361a69",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 28,
+    "relevant": false,
+    "event_type": "none",
+    "event_date": null,
+    "end_date": null,
+    "corridor": null,
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Past delays, roads unnamed"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "3f3108978051521e": {
+   "title": "Dubai unveils Skylight Mall: Over 360 stores coming to Al Khail Road in 2027",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPTXBtWG1vSVNpaHY5b2N3R1loQ18zak91d2V6ZXhOeG44N0RKT2VVMjhsZVhYLW1zdXpjSHJZc2IyT1AwbnNBOWF1cUxhUDRSZnhyZkFZaUhrV1c4QUthdmx3c0dTdnlma2hMckdUZmF0U3NOMGRoa1VmUFJWbVNwWVljUEQwclRzdnVFRm9JQ0FmREFZek5xclZKcklYSHlDMk0wZmljWWJjWFp6LWk40gHCAUFVX3lxTE5yTkFoRTFBMGpBVl9CTE1ST2ZMRVhlYUhSY0E3UHhLWXJFRGMxU3lUQmxPb3hvMjdyMEp6TmpCU1d6YkRzdkthN1FOX0dQck1kbjRkVzE1Wl92dDdKX3Fmc1hnZFZRZ3haa1dlU3VXcnRkaFBZd21Kb3dqUTBiYTRPOC1tSUVJdi03dHlCcjZFaTkyYjlhOHZoUGFsNGNXQUVDWUducjdfSFc3RExSc2tRQ0lxSEc3dXlucE1mYy1XRnpR?oc=5",
+   "published": "2026-10-06",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "3f3108978051521e",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 29,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": "Al Khail Road",
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Mall opening in 2027, outside campaign window"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "89516222bbcb892c": {
+   "title": "Dubai reveals plans for massive new mall on Al Khail Road",
+   "source": "Arabian Business",
+   "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNTTdCNFA1NWpTd2dGa2hPM05oMDE1SjBldU9IN2tzUlVHWWN6NEdtSFVDVVFFQVZ4Y3psWjlmdTRCOTMxWHVzQVhiX09lUHpKa2M5OU1LQXpTN21MVmE1RUVNbFV1S2Q5ZmVQd1g4ajVVTHZaWEJTaWRUM1Z6a0JEUg?oc=5",
+   "published": "2026-10-06",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "89516222bbcb892c",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 0,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": "Al Khail Road",
+    "areas": [],
+    "confidence": 0.6,
+    "reason": "Mall plans announced on Al Khail Road; no opening date stated"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  },
+  "ae4bfdfaa70e0b58": {
+   "title": "Dubai Retail to open new mall on Al Khail Road in 2027",
+   "source": "ARN News Centre",
+   "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPTG5NalBLRVNrMy1zZnpUQzFWVWl4V0NmbXdjZ3ltQlZZMFFoNU5WZHN6RDJsamszaEVPTl9SZGRXa3VhUWhwQkNIY29tRkx0bng1RjdRQUt3RHFtSEdhV05KTzJZaU1kS2ZhX05sUG5rOW14a3dfZVgzRENFaW1NSkJCckxBa251d2tBYTZHY3BXalFuUU5xbnhIVVJXT2ZlZXow?oc=5",
+   "published": "2026-10-06",
+   "feed": "Google News",
+   "signal": "other",
+   "reason": "opening: context only, no traffic effect modelled",
+   "classified_by": "keyword rules",
+   "id": "ae4bfdfaa70e0b58",
+   "first_seen": "2026-11-01",
+   "placements": [
+    "H4"
+   ],
+   "status": "rejected",
+   "extraction": {
+    "id": 1,
+    "relevant": true,
+    "event_type": "opening",
+    "event_date": null,
+    "end_date": null,
+    "corridor": "Al Khail Road",
+    "areas": [],
+    "confidence": 0.8,
+    "reason": "Mall opening on Al Khail Road in 2027, outside campaign window"
+   },
+   "event": null,
+   "last_seen": "2026-11-01"
+  }
+ },
+ "events": {
+  "full_closure|sheikh-zayed-road|2026-11-01": {
+   "id": "full_closure|sheikh-zayed-road|2026-11-01",
+   "type": "full_closure",
+   "corridor": "Sheikh Zayed Road",
+   "areas": [],
+   "date": "2026-11-01",
+   "end_date": "2026-11-01",
+   "start_hour": 3,
+   "end_hour": 10,
+   "confidence": 0.95,
+   "articles": [
+    "4c402f228535e2a7",
+    "79169586c481e3f2",
+    "164b400bb3e088c5",
+    "e40158b2fec50b08",
+    "3354ade1ec5ded71",
+    "984bbe6218213275",
+    "b6719558c93f2c5d"
+   ],
+   "citations": [
+    {
+     "title": "Dubai Ride 2026: Extended Metro Hours and Parking Locations Announced by RTA",
+     "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-rta-announces-extended-metro-hours-parking-locations-1.500729931"
+    },
+    {
+     "title": "Dubai road closures on Sunday, November 1: Sheikh Zayed Road timings, alternative routes and Metro hours - Arabian Business: Latest News on the Middle East, Real Estate, Finance, and More",
+     "url": "https://www.arabianbusiness.com/business/transport/dubai-road-closures-november-1"
+    },
+    {
+     "title": "Dubai Ride 2026: Cyclists Take Over Sheikh Zayed Road for Fitness Challenge",
+     "url": "https://gulfnews.com/sport/uae-sport/dubai-ride-2026-set-to-bring-thousands-to-sheikh-zayed-road-1.500731318"
+    },
+    {
+     "title": "Dubai Ride 2026 guide: Date, registration, bib collection and more",
+     "url": "https://www.thenationalnews.com/lifestyle/things-to-do/2026/10/06/dubai-ride-2026-guide-date-registration-bib-collection-and-more/"
+    },
+    {
+     "title": "Dubai Ride 2026: Salik's variable toll rates on Nov 1",
+     "url": "https://gulfnews.com/uae/dubai/dubai-ride-2026-saliks-variable-toll-rates-on-nov-1-when-dh6-and-dh4-charges-apply-1.500730149"
+    },
+    {
+     "title": "Dubai Ride 2026: Date, Routes, Registration (Open)",
+     "url": "https://dubaifastliving.com/dubai-ride-2026/"
+    }
+   ],
+   "source": "online signals",
+   "enabled": true,
+   "note": "Dubai Ride cyclists take over Sheikh Zayed Road today",
+   "placements": [
+    "H1"
+   ],
+   "stretch": "Sheikh Zayed Road between the Trade Centre junction and Al Safa Bridge"
+  }
+ }
+}
