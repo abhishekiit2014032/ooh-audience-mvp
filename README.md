@@ -13,9 +13,15 @@ Guide*. **It runs end to end with no API keys**, and every number carries a labe
 
 
 
-## ▶ Watch the 7-minute explainer
+## ▶ Watch the xplainer
 
 0:00 The problem and the solution · 3:29 From idea to implementation · 6:49 Sheikh Zayed Road use case
+
+
+
+https://github.com/user-attachments/assets/6cb65454-b47a-4af0-ad83-c000f68ad1b2
+
+
 
 
 https://github.com/user-attachments/assets/f7fd8d8c-85d7-47c3-9291-941c0bfea8d2
