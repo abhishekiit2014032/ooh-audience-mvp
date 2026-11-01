@@ -37,9 +37,11 @@ def test_every_metric_is_labelled(results):
 
 def test_duplication_reduces_combined_reach(results):
     assert results.combined_unique_all <= results.naive_unique
-    assert results.plan, "plan builder picks at least one placement within budget"
-    spent = results.plan[-1].cumulative_cost_aed
-    assert spent <= 400_000
+    from ooh.config import load_placements
+
+    boards = load_placements().campaign.boards
+    assert len(results.plan) == boards, "the plan books the brief's number of boards"
+    assert results.plan[-1].combined_relevant <= results.plan[-1].naive_relevant
 
 
 def test_delivery_and_activation_outputs(results):
@@ -67,5 +69,5 @@ def test_no_crowds_leaves_the_plan_unchanged(results, params):
 
     pcfg = load_placements()
     pulse = fp.campaign_pulse([], pcfg, pcfg.campaign, params, {}, {})
-    plan, _ = fp.plan_with_crowds(results, pulse, pcfg.campaign.budget_aed)
+    plan, _ = fp.plan_with_crowds(results, pulse, pcfg.campaign.boards)
     assert [s.placement for s in plan] == [s.placement for s in results.plan]

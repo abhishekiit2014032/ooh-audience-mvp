@@ -12,14 +12,14 @@ topics:
   places:      {label: Places nearby,      icon: "🏬", base: 0.25}
   crowds:      {label: Crowds & events,    icon: "🎟️", base: 0.3}
   growth:      {label: Area growth,        icon: "🏗️", base: 0.25}
-  media:       {label: Format & price,     icon: "🪧", base: 0.5}
+  media:       {label: Format & price level,     icon: "🪧", base: 0.5}
   road_events: {label: Road events,        icon: "🚧", base: 0.35}
   delivery:    {label: Delivery,           icon: "📦", base: 0.4}
 
 outcomes:
   reach:    {label: Everyone passing,  icon: "👥"}
   target:   {label: Campaign audience, icon: "🎯"}
-  value:    {label: Value for money,   icon: "💎"}
+  value:    {label: Value (audience per price level), icon: "💎"}
   fit:      {label: Audience fit,      icon: "🧩"}
   timing:   {label: Crowd timing,      icon: "📅"}
   forecast: {label: Delivery forecast, icon: "📈"}
@@ -40,26 +40,27 @@ relevance:
   threshold: 0.6
 
 # Tags each campaign cares about (the fact tags that raise relevance).
+# Three industries on purpose: a car launch, a property launch and a retail festival read different facts.
 campaign_tags:
-  suv_launch:    [cars, families, drivers]
-  luxury_launch: [cars, luxury, premium, business]
-  service_promo: [cars, drivers]
-  default:       [cars]
+  suv_launch:      [cars, families, drivers]
+  property_launch: [property, premium, business, luxury]
+  retail_festival: [shopping, families, tourists, leisure]
+  default:         [cars]
 
 # Location scoring (Score & compare). Each criterion is 0-100 relative to the best location.
 # Weights are the defaults per campaign; the page lets the user move them.
 criteria:
   target:     {label: Campaign audience, icon: "🎯", help: "Campaign audience reached a month (relative to the best board)"}
-  value:      {label: Value for money,   icon: "💎", help: "Campaign audience per unit of price (relative)"}
+  value:      {label: Value,             icon: "💎", help: "Campaign audience per price level (our 1-4 rating, no prices)"}
   fit:        {label: Audience fit,      icon: "🧩", help: "Local signals that match the campaign (see fit signals)"}
   timing:     {label: Crowd timing,      icon: "📅", help: "Extra campaign audience from sourced crowd events in the window"}
   confidence: {label: Data confidence,   icon: "🔍", help: "How solid the facts behind this board are (share of verified and estimated vs placeholder)"}
 
 weights:
-  suv_launch:    {target: 30, value: 30, fit: 20, timing: 10, confidence: 10}
-  luxury_launch: {target: 20, value: 20, fit: 40, timing: 10, confidence: 10}
-  service_promo: {target: 35, value: 35, fit: 15, timing: 5, confidence: 10}
-  default:       {target: 30, value: 30, fit: 20, timing: 10, confidence: 10}
+  suv_launch:      {target: 30, value: 30, fit: 20, timing: 10, confidence: 10}   # reach car fans at a sensible price level
+  property_launch: {target: 20, value: 20, fit: 40, timing: 10, confidence: 10}   # the right districts first
+  retail_festival: {target: 30, value: 25, fit: 25, timing: 15, confidence: 5}    # crowds near malls, in season
+  default:         {target: 30, value: 30, fit: 20, timing: 10, confidence: 10}
 
 # Audience fit = weighted average of local signals, each scaled 0-1 against the best location.
 #   poi:<category>  points of interest within 1 km (OpenStreetMap)
@@ -67,10 +68,10 @@ weights:
 #   road_share      share of views from road traffic (drivers)
 #   commuters       share of traffic in the rush hours
 fit_signals:
-  suv_launch:    {"poi:Car showrooms and services": 0.5, "poi:Retail and malls": 0.2, road_share: 0.3}
-  luxury_launch: {premium: 0.5, "poi:Hotels and tourism": 0.2, "poi:Offices and business": 0.2, "poi:Car showrooms and services": 0.1}
-  service_promo: {road_share: 0.5, "poi:Car showrooms and services": 0.3, commuters: 0.2}
-  default:       {"poi:Car showrooms and services": 0.5, road_share: 0.5}
+  suv_launch:      {"poi:Car showrooms and services": 0.5, "poi:Retail and malls": 0.2, road_share: 0.3}
+  property_launch: {premium: 0.45, "poi:Offices and business": 0.3, "poi:Hotels and tourism": 0.1, commuters: 0.15}
+  retail_festival: {"poi:Retail and malls": 0.5, "poi:Food and leisure": 0.3, "poi:Hotels and tourism": 0.2}
+  default:         {"poi:Car showrooms and services": 0.5, road_share: 0.5}
 
 # Crowd timing: extra campaign audience from crowds as a share of the board's monthly campaign
 # audience. This share earns the full 100 (smaller effects score proportionally).

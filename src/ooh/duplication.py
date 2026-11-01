@@ -35,7 +35,7 @@ class PlacementSummary:
     unique: float                 # base unique monthly audience
     relevant: float               # base relevant reach
     interest_share: float
-    cost_aed: float
+    price_level: int              # ASSUMPTION rating 1-4, shown next to the plan, never used to pick it
     segment_unique: dict[str, float]  # unique audience attributable to each included segment id
 
 
@@ -85,12 +85,9 @@ def combined_unique(ids: list[str], uniques: dict[str, float], mat: pd.DataFrame
 class PlanStep:
     step: int
     placement: str
-    cost_aed: float
-    incremental_relevant: float
-    relevant_per_1k_aed: float
-    cumulative_cost_aed: float
-    combined_relevant: float
-    naive_relevant: float
+    incremental_relevant: float     # new target people this board adds to the ones before it
+    combined_relevant: float        # de-duplicated target people of the plan so far
+    naive_relevant: float           # the same boards simply added up (counts shared people twice)
 
 
 def combined_relevant(ids: list[str], items: list[PlacementSummary], mat: pd.DataFrame) -> float:
@@ -104,33 +101,38 @@ def combined_relevant(ids: list[str], items: list[PlacementSummary], mat: pd.Dat
     return max(total - ov, max(by_id[i].relevant for i in ids))
 
 
-def greedy_plan(items: list[PlacementSummary], mat: pd.DataFrame, budget_aed: float) -> list[PlanStep]:
-    """Add the placement with the highest incremental relevant reach per AED until the budget runs out."""
-    chosen: list[str] = []
+def best_plan(items: list[PlacementSummary], mat: pd.DataFrame, boards: int) -> list[PlanStep]:
+    """The mix of `boards` billboards that reaches the most target people (shared people counted once).
+
+    Every mix is tried when there are few (4 boards = at most 6 mixes); with many boards it falls back
+    to adding, one at a time, the board that adds the most new target people. Steps are listed in
+    the order that adds the most first, so "what each extra board adds" reads top to bottom.
+    """
+    from itertools import combinations
+    from math import comb
+
+    ids = [p.id for p in items]
+    k = max(0, min(boards, len(ids)))
     rel = {p.id: p.relevant for p in items}
-    spent = 0.0
+
+    def combined_rel(sel: list[str]) -> float:
+        return combined_relevant(sel, items, mat)
+
+    if k and comb(len(ids), k) <= 5000:
+        pick = list(max(combinations(ids, k), key=lambda c: (combined_rel(list(c)), tuple(-ids.index(i) for i in c))))
+    else:
+        pick = ids
+    chosen: list[str] = []
     steps: list[PlanStep] = []
-
-    def combined_rel(ids: list[str]) -> float:
-        return combined_relevant(ids, items, mat)
-
-    while True:
+    pool = [i for i in ids if i in pick]
+    while len(chosen) < k:
         current = combined_rel(chosen)
-        best = None
-        for p in items:
-            if p.id in chosen or spent + p.cost_aed > budget_aed or p.cost_aed <= 0:
-                continue
-            inc = combined_rel(chosen + [p.id]) - current
-            score = inc / p.cost_aed
-            if inc > 0 and (best is None or score > best[0]):
-                best = (score, p, inc)
-        if best is None:
+        gains = {i: combined_rel(chosen + [i]) - current for i in pool if i not in chosen}
+        if not gains:
             break
-        score, p, inc = best
-        chosen.append(p.id)
-        spent += p.cost_aed
-        steps.append(PlanStep(len(steps) + 1, p.id, p.cost_aed, inc, score * 1000, spent,
-                              combined_rel(chosen), sum(rel[i] for i in chosen)))
+        i = max(gains, key=lambda x: (gains[x], -ids.index(x)))
+        chosen.append(i)
+        steps.append(PlanStep(len(steps) + 1, i, gains[i], combined_rel(chosen), sum(rel[j] for j in chosen)))
     return steps
 
 

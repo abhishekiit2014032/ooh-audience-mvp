@@ -1,6 +1,6 @@
 """Registry of every data source, its live status and its confidence score.
 
-One place for the Data sources page, its diagram and the Assumptions page, so they never drift.
+One place for the Data sources page, its diagram, Check the data and the Assumptions page, so they never drift.
 Status is derived locally (env keys present, cache dates, is_sample flags); nothing here calls
 the network.
 
@@ -38,7 +38,7 @@ ENGINE = {
 OUTPUTS = {
     "reach": "Everyone passing",
     "target": "Campaign audience",
-    "value": "Value for money",
+    "value": "Value (audience per price level)",
     "fit": "Audience fit",
     "timing": "Crowd timing",
     "forecast": "Delivery forecast",
@@ -151,7 +151,7 @@ def _news_status() -> tuple[str, str, float]:
         return ("live" if _days_since(updated) <= 1 else "cached",
                 f"Ledger {updated}: {len(data.get('articles', {}))} articles, {kept} kept, {events} events on",
                 _freshness(_days_since(updated)))
-    return "on demand", "Press 'Refresh signals' on the Area signals page to build the event ledger", 0.85
+    return "on demand", "Press 'Refresh signals' under Check the data → Road events to build the event ledger", 0.85
 
 
 def _people_status() -> tuple[str, str, float]:
@@ -163,7 +163,7 @@ def _people_status() -> tuple[str, str, float]:
         updated = data.get("updated_at", "")[:10]
         return ("live" if _days_since(updated) <= 1 else "cached",
                 f"Searched {updated}: {kept} sourced numbers kept", _freshness(_days_since(updated)))
-    return "on demand", "Press 'Search for people numbers' on the Area signals page", 0.85
+    return "on demand", "Press 'Search for people numbers' under Check the data → Web-sourced numbers", 0.85
 
 
 # --------------------------------------------------------------------------- registry
@@ -245,15 +245,15 @@ def registry() -> list[Source]:
                "Licensed event calendars (DWTC, Dubai Calendar) and venue footfall feeds",
                "https://www.visitdubai.com"),
         Source("inventory", "Billboard inventory", "Media owner (config/placements.yaml)",
-               "Location, facing, size, digital loop and share of voice, and the planning price of each board",
+               "Location, facing, size, digital loop and share of voice, and our price-level rating (1-4) for each board",
                "geo", ["reach", "value", "forecast"], "VERIFIED", "configured",
-               "Location and size checked on OSM; prices are planning values until quotes arrive", 0.90, 0.90, 0.85,
-               "Replace planning prices with media-owner quotes"),
+               "Location and size checked on OSM; price level is our rating until quotes arrive (no prices used)", 0.90, 0.90, 0.85,
+               "Replace the price-level rating with media-owner quotes"),
         Source("briefs", "Campaign briefs", "Marketing team (config/placements.yaml)",
-               "Who each campaign is after, its share of passers-by, dates and budget",
-               "geo", ["target", "value", "timing", "forecast"], "ASSUMPTION", "configured",
+               "Who each campaign is after, its share of passers-by, dates and how many boards",
+               "geo", ["target", "timing", "forecast"], "ASSUMPTION", "configured",
                "Audience shares are assumptions until Meta values are entered", 0.70, 0.80, 0.85,
-               "Enter Meta interest shares per board; confirm budgets"),
+               "Enter Meta interest shares per board; confirm the number of boards"),
         Source("mapillary", "Mapillary street imagery", "Meta / Mapillary",
                "Street-level images to confirm line of sight with a vision model", "geo", ["reach"],
                "CONCEPT", "not connected", "Phase 2: needs MAPILLARY_TOKEN and the vision check", 0.75, 0.70, 0.85,

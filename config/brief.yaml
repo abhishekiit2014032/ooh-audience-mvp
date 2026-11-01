@@ -1,0 +1,61 @@
+# "The brief, answered" page: the parts of the AI Solution Brief response that are plans, not computations.
+# Every number about audiences and plans on that page is computed live by the engine; only the
+# text below (status of each capability, roadmap, options, risks, value) is written by hand. Edit it here.
+
+# The worked example the brief answers (Section 4, Option B): one placement on Sheikh Zayed Road,
+# for the SUV launch brief (November, 3 boards).
+campaign: suv_launch
+placement: H1
+
+# Area 1: what is achievable today. status: today | estimate | concept
+capabilities:
+  - {what: Map billboards and viewing zones, status: today, why: Free map data (OpenStreetMap)}
+  - {what: Daily impressions, status: estimate, why: Road capacity + live speeds; historical volumes make it measured}
+  - {what: Unique monthly audience, status: estimate, why: "Depends on how often people pass (could be off by 2x); needs mobile data"}
+  - {what: Overlap between billboards, status: estimate, why: Rough rules today; needs mobile data}
+  - {what: Audience profile, status: estimate, why: "Area level: Meta, census and nearby places; never individuals"}
+  - {what: Planned vs actual delivery, status: estimate, why: Needs historical traffic and media-owner play logs}
+  - {what: "QR codes, Meta / Google area ads", status: today, why: "Standard tools (Bitly, Meta Ads Manager, Google Ads)"}
+  - {what: Target the exact people who passed, status: concept, why: "Needs a location data partner (e.g. MEmob+, Azira) and consent"}
+
+# Area 5: re-engaging people who passed, simplest first.
+activation:
+  - {route: QR code / short link on the billboard, feasibility: Feasible today, precision: Exact per billboard}
+  - {route: "Meta ads (Facebook, Instagram)", feasibility: Feasible today, precision: "Neighbourhood (1 km minimum)"}
+  - {route: "Google Ads (Search, YouTube, Display)", feasibility: Feasible today, precision: "Neighbourhood (1 km minimum)"}
+  - {route: "Specialist location partner (MEmob+, Azira) via DV360 / The Trade Desk", feasibility: Feasible with a partner, precision: 100–500 m}
+  - {route: Synced digital billboard + mobile, feasibility: Feasible with the media owner, precision: Neighbourhood}
+
+# Area 6: roadmap.
+roadmap:
+  - {phase: Prototype, when: Done, adds: "Free data, four billboards", gate: Radix approves the method}
+  - {phase: Production MVP (Dubai), when: 4–6 weeks, adds: "Real profiles (Meta, Dubai Statistics Center), historical traffic report (TomTom), street-photo check, QR + area ads, user logins, UAE cloud hosting", gate: Pilot campaign agreed}
+  - {phase: "Phase 2: measured reach, UAE-wide", when: "6–8 weeks, alongside the pilot", adds: "Mobile data partner (e.g. MEmob+ or Unacast), measured overlap, all emirates, accuracy calibration", gate: Data contract signed}
+  - {phase: "Phase 3: activation", when: "4–6 weeks, in parallel with Phase 2", adds: "Passer-by targeting with a partner, showroom-visit measurement, planner assistant (Claude)", gate: Legal and privacy sign-off}
+roadmap_total: First pilot campaign live in about 6 weeks; full product in about 3 months.
+
+# Area 7: the three options and what each one needs (development is in-house). No money figures:
+# data_needed is a rating, 1 = least external data and services, 3 = most.
+costs:
+  - {option: Basic, data_needed: 1, what: "Cloud hosting (UAE region), Claude usage, Street View in the free tier, QR short links, area ads"}
+  - {option: Recommended, data_needed: 2, what: "Basic + historical traffic (TomTom via reseller) + one mobile data partner (e.g. Unacast)", recommended: true}
+  - {option: Best, data_needed: 3, what: "Recommended + UAE-wide traffic, telco profiles (e& / du) and a specialist activation partner"}
+maintenance: About half a data engineer's time for data refresh, recalibration and vendor changes.
+
+# Key limitations, dependencies and risks.
+risks:
+  - {risk: "How often people pass, and overlap, are assumptions today", impact: Unique reach can be off by 2x, handle: "Ranges, stress test, mobile data in production"}
+  - {risk: No public daily traffic count for Sheikh Zayed Road, impact: Traffic is estimated, handle: "Road capacity basis; historical traffic licence; request RTA counts"}
+  - {risk: Visibility checked on a flat map, impact: "Bridges, trees, other boards missed", handle: Street-photo check with AI}
+  - {risk: Mobile data coverage and bias in the UAE, impact: Skewed profiles, handle: "Weight against official population; compare two vendors"}
+  - {risk: Privacy law and platform rules, impact: Activation limited, handle: "Consented, grouped data only; legal review"}
+  - {risk: Data needs vs what buyers will pay for, impact: Weak margins, handle: "Start with Dubai and one data vendor; one report per billboard"}
+
+# Business value.
+value:
+  - {title: Planning, text: "Choose and combine billboards by relevant audience, and see the audience lost to overlap before booking."}
+  - {title: Selling, text: "Media owners and agencies justify billboards with transparent, labelled numbers."}
+  - {title: Measurement, text: "A weekly planned vs actual report, rare in UAE outdoor advertising today."}
+  - {title: Performance (upside), text: "Re-engaging the audience makes billboards a full-funnel channel and adds digital revenue per campaign."}
+  - {title: First mover, text: "An audience layer for the UAE, extendable to the wider GCC."}
+not_at_first: Give exact unique reach, prove sales impact, or target individuals.

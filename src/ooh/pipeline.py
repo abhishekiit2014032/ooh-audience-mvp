@@ -110,7 +110,8 @@ def compute_placement(prep: GeoPrep, params: Params, brand: str, campaign=None) 
     prof = profile_mod.build_profile(p, prep.pois, r.metrics["unique_month"], r.metrics["impressions_month"],
                                      params, road_share,
                                      interest_key=campaign.meta_interest if campaign else "automobiles",
-                                     audience=campaign.audience if campaign else "car-interest")
+                                     audience=campaign.audience if campaign else "car-interest",
+                                     category=campaign.brand_category if campaign else "automotive")
     facts = narrative.facts_for(p, r.metrics, prof)
     return PlacementResult(prep, scored, metro_scored, r, prof, facts)
 
@@ -139,10 +140,46 @@ def campaign_forecasts(results: dict[str, PlacementResult], pcfg: PlacementConfi
     return out
 
 
+def campaign_params(params: Params, campaign) -> Params:
+    """The campaign's own interest share and fit tilt, unless a slider already set them."""
+    extra = {}
+    for key in ("interest_share", "fit_tilt"):
+        v = getattr(campaign, key, None) if campaign else None
+        if v is not None and key not in params.overrides and key in params.cfg.parameters:
+            extra[key] = float(v)
+    return Params(params.cfg, {**extra, **params.overrides}) if extra else params
+
+
+def tilt_by_fit(results: dict, campaign, params: Params) -> dict:
+    """Boards that fit the campaign (config/knowledge.yaml fit signals) get a larger share of its
+    audience, boards that do not get less; the average share across boards stays as configured.
+    factor = (1 - t) + t x fit / mean fit, with t = fit_tilt (0 = flat share, 1 = fully by fit)."""
+    import dataclasses
+
+    from . import knowledge
+
+    t = params.base("fit_tilt") if "fit_tilt" in params.cfg.parameters else 0.0
+    if not campaign or campaign.meta_interest is None or t <= 0 or len(results) < 2:
+        return results
+    fit, _, _ = knowledge.fit_scores(results, campaign)
+    mean = sum(fit.values()) / len(fit)
+    if mean <= 0:
+        return results
+    out = {}
+    for pid, r in results.items():
+        factor = (1 - t) + t * fit[pid] / mean
+        prof = profile_mod.tilt_interest(r.profile, r.metrics["unique_month"], r.metrics["impressions_month"],
+                                         factor, fit[pid])
+        out[pid] = dataclasses.replace(r, profile=prof, facts=narrative.facts_for(r.prep.placement, r.metrics, prof))
+    return out
+
+
 def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params,
             events: list[dict] | None = None, event_overrides: dict[str, bool] | None = None) -> Results:
+    params = campaign_params(params, pcfg.campaign)
     brand = pcfg.campaign.brand
     results = {pid: compute_placement(prep, params, brand, pcfg.campaign) for pid, prep in preps.items()}
+    results = tilt_by_fit(results, pcfg.campaign, params)
 
     # Duplication and plan
     items = []
@@ -154,9 +191,9 @@ def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params,
             id=pid, corridor=res.prep.placement.corridor, lon=s.lon, lat=s.lat,
             travel_bearing=s.travel_bearing_deg, unique=base.unique_month,
             relevant=res.profile.relevant_reach.value, interest_share=res.profile.interest_share.value,
-            cost_aed=res.prep.placement.cost_per_month_aed, segment_unique=seg_u))
+            price_level=res.prep.placement.price_level, segment_unique=seg_u))
     mat, rules = duplication.overlap_matrix(items, params)
-    plan = duplication.greedy_plan(items, mat, pcfg.campaign.budget_aed)
+    plan = duplication.best_plan(items, mat, pcfg.campaign.boards)
     uniques = duplication.uniques_dict(items)
     combined_all = duplication.combined_unique(list(uniques), uniques, mat)
 
@@ -221,6 +258,74 @@ def sensitivity(prep: GeoPrep, params: Params, keys: list[str] | None = None) ->
                      "unique_at_low": u_lo, "unique_at_high": u_hi, "base_unique": base_value,
                      "swing": abs(u_hi - u_lo), "label": p.label})
     return pd.DataFrame(rows).sort_values("swing", ascending=True).reset_index(drop=True)
+
+
+def _range(params: Params, key: str) -> tuple[float, float]:
+    p = params.cfg.parameters[key]
+    base = params.base(key)
+    if p.low is not None and p.high is not None:
+        lo, hi = params.get(key, "low"), params.get(key, "high")
+    else:
+        lo, hi = base * 0.75, base * 1.25
+    if abs(hi - lo) < 1e-12:   # a base of 0 scales to nothing: use the configured spread instead
+        spread = (p.high - p.low) / 2 if p.low is not None and p.high is not None else 0.25 * (p.max - p.min)
+        lo, hi = base - abs(spread), base + abs(spread)
+    return float(np.clip(lo, p.min, p.max)), float(np.clip(hi, p.min, p.max))
+
+
+def plan_ids(res: Results) -> tuple[str, ...]:
+    return tuple(sorted(s.placement for s in res.plan))
+
+
+def plan_audience(res: Results) -> float:
+    return float(duplication.combined_relevant(list(plan_ids(res)), res.plan_items, res.overlap))
+
+
+def stress_test(preps: dict, pcfg: PlacementConfig, params: Params, events: list | None = None,
+                keys: list[str] | None = None, steps: int = 6) -> pd.DataFrame:
+    """Does the recommended plan survive each assumption at its low and high end (others at base)?
+
+    For an assumption that changes the plan, the tipping point is found by bisection between the
+    base and the end that flips it: "the pick holds unless <key> goes below / above <value>".
+    Ranges are the configured low / high, else base +/- 25 %.
+    """
+    events = [] if events is None else events
+    params = campaign_params(params, pcfg.campaign)
+    run = lambda pr: compute(preps, pcfg, pr, events=events)  # noqa: E731
+    base_res = run(params)
+    base_plan, base_aud = plan_ids(base_res), plan_audience(base_res)
+    rows = []
+    for key in keys or list(params.cfg.parameters):
+        p = params.cfg.parameters[key]
+        if p.min == p.max:
+            continue
+        base = params.base(key)
+        lo, hi = _range(params, key)
+        ends = {}
+        for side, v in (("low", lo), ("high", hi)):
+            r = run(params.with_override(key, v))
+            ends[side] = (v, plan_ids(r), plan_audience(r))
+        tip, tip_side, tip_plan = None, None, None
+        for side in ("low", "high"):
+            v_end, plan_end, _ = ends[side]
+            if plan_end != base_plan:
+                a, b = base, v_end              # a keeps the plan, b changes it
+                for _ in range(steps):
+                    mid = (a + b) / 2
+                    if plan_ids(run(params.with_override(key, mid))) == base_plan:
+                        a = mid
+                    else:
+                        b = mid
+                tip, tip_side, tip_plan = b, side, plan_end
+                break
+        rows.append({"parameter": key, "group": p.group, "label": p.label, "unit": p.unit,
+                     "description": p.description, "low": lo, "base": base, "high": hi,
+                     "plan_low": ends["low"][1], "plan_high": ends["high"][1], "base_plan": base_plan,
+                     "audience_low": ends["low"][2], "audience_high": ends["high"][2], "audience_base": base_aud,
+                     "holds": ends["low"][1] == base_plan and ends["high"][1] == base_plan,
+                     "tip_value": tip, "tip_side": tip_side, "tip_plan": tip_plan,
+                     "swing": abs(ends["high"][2] - ends["low"][2]) / base_aud if base_aud else 0.0})
+    return pd.DataFrame(rows)
 
 
 # --------------------------------------------------------------------------- outputs

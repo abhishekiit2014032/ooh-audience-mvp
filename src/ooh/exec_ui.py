@@ -1,8 +1,8 @@
 """HTML blocks for the executive pages of the dashboard (white theme, animated, self-contained).
 
 Each function takes plain data (dicts and lists built by the app from ``Results``) and returns one
-HTML document for ``streamlit.components.v1.html``. All interaction (toggles, sorting, the budget
-slider) runs in the browser, so it responds instantly without a Streamlit rerun. The numbers
+HTML document for ``streamlit.components.v1.html``. All interaction (toggles, sorting, the
+number-of-boards slider) runs in the browser, so it responds instantly without a Streamlit rerun. The numbers
 themselves always come from the pipeline; nothing here calculates reach.
 """
 
@@ -34,10 +34,6 @@ def people(x: float) -> str:
     if x >= 1e3:
         return f"{x / 1e3:.1f}k"
     return f"{x:,.0f}"
-
-
-def aed(x: float) -> str:
-    return f"AED {people(x)}"
 
 
 _BASE_CSS = r"""
@@ -83,7 +79,6 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function fmtP(x) { x = Math.max(0, x); if (x >= 1e6) return (x / 1e6).toFixed(1) + 'M';
   if (x >= 1e4) return Math.round(x / 1e3) + 'k'; if (x >= 1e3) return (x / 1e3).toFixed(1) + 'k';
   return Math.round(x).toLocaleString(); }
-function fmtA(x) { return 'AED ' + fmtP(x); }
 function dots(n, of) { of = of || 5; let h = '<span class="dots">';
   for (let k = 0; k < of; k++) h += `<i class="${k < n ? 'on' : ''}"></i>`; return h + '</span>'; }
 function tween(el, to, fmt, ms) {
@@ -119,8 +114,9 @@ def _doc(css: str, body: str, js: str, data: dict) -> str:
 
 def header_html(eyebrow: str, title: str, subtitle: str) -> str:
     """Page title block (plain HTML for st.markdown)."""
-    return (f"<div class='ooh-head'><div class='ooh-eyebrow'>{eyebrow}</div>"
-            f"<h1 class='ooh-title'>{title}</h1><p class='ooh-sub'>{subtitle}</p></div>")
+    return ("<div class='ooh-head'>" + (f"<div class='ooh-eyebrow'>{eyebrow}</div>" if eyebrow else "")
+            + f"<h1 class='ooh-title'>{title}</h1>" + (f"<p class='ooh-sub'>{subtitle}</p>" if subtitle else "")
+            + "</div>")
 
 
 # --------------------------------------------------------------------------- decision: plan builder
@@ -219,19 +215,20 @@ _DECISION_BODY = r"""
     <div class="bhead"><div><b>Try your own mix</b><div class="hint">Tap a billboard to add or drop it</div></div>
       <button class="reset" id="reset">↺ Back to our pick</button></div>
     <div class="faces" id="faces"></div>
-    <div class="slider"><div class="srow"><span>Budget</span><b id="bv"></b></div>
-      <input type="range" id="budget" aria-label="Budget as a share of the planned budget">
-      <div class="hint">Move the budget and we re-run our pick for that amount</div></div>
+    <div class="slider"><div class="srow"><span>Number of boards</span><b id="bv"></b></div>
+      <input type="range" id="boards" aria-label="Number of boards">
+      <div class="hint" id="bhint"></div></div>
   </section>
 </div>
 """
 
 _DECISION_JS = r"""
 const F = D.faces, byId = Object.fromEntries(F.map(f => [f.id, f]));
-let pct = 100, sel = new Set(D.picks['100'] || []), custom = false;
+let k = D.boards, sel = new Set(D.picks[String(k)] || []), custom = false;
 document.getElementById('trustname').textContent = D.trust[0];
 document.getElementById('trustpop').textContent = D.trust[1];
 document.getElementById('bigsub').innerHTML = `${D.aud_short}<br>reached every month`;
+document.getElementById('bhint').textContent = `Move it and we re-pick the mix that reaches the most ${D.aud_short} for that many boards`;
 const facesEl = document.getElementById('faces');
 F.forEach((f, i) => {
   const b = document.createElement('button');
@@ -241,32 +238,30 @@ F.forEach((f, i) => {
     <div class="ftop"><span class="dot"></span><b>${f.label}</b><span class="tick">✓</span></div>
     <div class="fname" title="${f.name}">${f.road} · ${f.type}</div>
     <div class="fnum">${fmtP(f.rel)} <small>${D.aud_short} / month</small></div>
-    <div class="fsub"><span title="Value for money: ${D.aud_short} reached per dirham, best billboard = 5 dots">Value ${dots(f.value_dots)}</span>
-      <span title="Price compared with the other billboards">Price ${dots(f.price_dots, 4)}</span></div>`;
+    <div class="fsub"><span title="Value: ${D.aud_short} reached for the board's price level, best billboard = 5 dots (a rating, no prices used)">Value ${dots(f.value_dots)}</span>
+      <span title="Our rating of price vs the other boards, no prices used">Price level ${dots(f.price_dots, 4)}</span></div>`;
   b.onclick = () => { sel.has(f.id) ? sel.delete(f.id) : sel.add(f.id); custom = true; render(); };
   facesEl.appendChild(b);
 });
-const slider = document.getElementById('budget');
-slider.min = 0; slider.max = D.pct_max; slider.step = D.pct_step; slider.value = pct;
-slider.oninput = () => { pct = +slider.value; sel = new Set(D.picks[String(pct)] || []); custom = false; render(); };
-document.getElementById('reset').onclick = () => { sel = new Set(D.picks[String(pct)] || []); custom = false; render(); };
+const slider = document.getElementById('boards');
+slider.min = 1; slider.max = D.n_max; slider.step = 1; slider.value = k;
+slider.oninput = () => { k = +slider.value; sel = new Set(D.picks[String(k)] || []); custom = false; render(); };
+document.getElementById('reset').onclick = () => { sel = new Set(D.picks[String(k)] || []); custom = false; render(); };
 
 function key(s) { return [...s].sort().join(','); }
 function list(xs) { return xs.length <= 1 ? xs.join('') : xs.slice(0, -1).join(', ') + ' and ' + xs[xs.length - 1]; }
 function names(ids) { return list(ids.map(i => byId[i].label)); }
-function share(cost) { return Math.round(cost / D.budget * 100); }
+function relOf(ids) { return ids.length ? D.subsets[key(new Set(ids))].rel : 0; }
+function boardsWord(n) { return n === 1 ? '1 board' : `${n} boards`; }
 function render() {
-  const budget = D.budget * pct / 100;
-  const pickIds = D.picks[String(pct)] || [], pickSet = new Set(pickIds);
+  const pickIds = D.picks[String(k)] || [], pickSet = new Set(pickIds);
   const ids = F.map(f => f.id).filter(i => sel.has(i));
   const order = pickIds.filter(i => sel.has(i)).concat(ids.filter(i => !pickSet.has(i)));
-  const cost = ids.reduce((a, i) => a + byId[i].cost, 0);
   const sub = ids.length ? D.subsets[key(sel)] : { rel: 0, all: 0 };
   const rel = sub.rel;
   const naive = ids.reduce((a, i) => a + byId[i].rel, 0);
   const lo = ids.reduce((a, i) => a + byId[i].rel_lo, 0), hi = ids.reduce((a, i) => a + byId[i].rel_hi, 0);
   const isPick = key(sel) === key(pickSet);
-  const over = cost > budget + 1e-6;
 
   document.querySelectorAll('.face').forEach(b => {
     b.classList.toggle('on', sel.has(b.dataset.id)); b.classList.toggle('pick', pickSet.has(b.dataset.id));
@@ -284,35 +279,33 @@ function render() {
   document.getElementById('nbs').textContent = ids.length ? `${ids.filter(i => byId[i].type === 'Digital').length} digital, ${ids.filter(i => byId[i].type !== 'Digital').length} static` : '';
   tween(document.getElementById('dup'), naive - rel, fmtP);
 
-  const used = budget ? cost / budget * 100 : (cost ? 100 : 0);
   const fill = document.getElementById('fill');
-  fill.style.width = Math.min(100, used) + '%'; fill.classList.toggle('over', over);
-  document.getElementById('budl').textContent = over ? `${Math.round(used - 100)}% over budget` : `${Math.round(used)}% of budget used`;
-  document.getElementById('budr').textContent = pct === 100 ? 'Planned budget' : `Budget at ${pct}% of plan`;
-  document.getElementById('bv').textContent = pct === 100 ? '100% · as planned' : `${pct}% of plan`;
-  slider.style.setProperty('--p', (pct / D.pct_max * 100) + '%');
+  fill.style.width = Math.min(100, ids.length / D.n_max * 100) + '%'; fill.classList.toggle('over', ids.length > k);
+  document.getElementById('budl').textContent = `${ids.length} of ${D.n_max} boards picked`;
+  document.getElementById('budr').textContent = k === D.boards ? `The brief books ${boardsWord(D.boards)}` : `Trying ${boardsWord(k)} (brief: ${D.boards})`;
+  document.getElementById('bv').textContent = k === D.boards ? `${k} · as in the brief` : `${k}`;
+  slider.style.setProperty('--p', (D.n_max > 1 ? (k - 1) / (D.n_max - 1) * 100 : 100) + '%');
 
   const msg = document.getElementById('msg'); msg.className = 'msg';
-  const pickRel = pickIds.length ? D.subsets[key(pickSet)].rel : 0;
-  const pickCost = pickIds.reduce((a, i) => a + byId[i].cost, 0);
+  const pickRel = relOf(pickIds);
   const A = D.aud_short;
   if (!ids.length) { msg.textContent = 'Pick at least one billboard to see who we reach.'; }
-  else if (over) { msg.className = 'msg bad'; msg.innerHTML = `⚠️ This mix goes <b>${Math.round(used - 100)}% over budget</b>. Drop a billboard or raise the budget.`; }
   else if (isPick) {
-    const rest = F.filter(f => !sel.has(f.id)).sort((a, b) => a.cost - b.cost);
-    const leftPct = Math.round(100 - used);
     msg.className = 'msg good';
-    msg.innerHTML = rest.length === 0 ? `✅ Every billboard fits, with ${leftPct}% of the budget to spare.`
-      : (budget - cost) < rest[0].cost
-        ? `✅ The most ${A} for this budget. The ${leftPct}% left over isn't enough for another board: the cheapest one left, ${rest[0].label}, would need ${share(rest[0].cost)}% of the budget.`
-        : `✅ The most ${A} for this budget. Another board would mostly reach drivers we already reach.`;
+    const next = D.picks[String(k + 1)];
+    msg.innerHTML = `✅ The most ${A} for ${boardsWord(k)}.` + (k < D.n_max && next
+      ? ` One more board (${names(next.filter(i => !pickSet.has(i))) || names(next)}) would add ${fmtP(Math.max(0, relOf(next) - pickRel))} ${A}.`
+      : ' Every board is in the plan.');
+  } else if (ids.length !== k) {
+    const best = D.picks[String(ids.length)] || [], bestRel = relOf(best);
+    msg.innerHTML = `ℹ️ You picked ${boardsWord(ids.length)}; the slider is set to ${k}.` +
+      (rel < bestRel - 1 ? ` For ${boardsWord(ids.length)}, ${names(best)} reaches <b>${fmtP(bestRel - rel)} more ${A}</b>.`
+                         : ` This is the best mix for ${boardsWord(ids.length)}.`);
   } else if (rel < pickRel - 1) {
-    const d = Math.round((pickCost - cost) / D.budget * 100);
-    msg.innerHTML = `💡 Our pick (${names(pickIds)}) reaches <b>${fmtP(pickRel - rel)} more ${A}</b>` +
-      (d <= 0 ? ` and uses ${-d}% less of the budget.` : ` with ${d}% more of the budget.`);
+    msg.innerHTML = `💡 Our pick for ${boardsWord(k)} (${names(pickIds)}) reaches <b>${fmtP(pickRel - rel)} more ${A}</b> than this mix.`;
   } else {
     msg.className = 'msg good';
-    msg.innerHTML = `🙌 This mix reaches ${fmtP(rel - pickRel)} more ${A} than our pick, using ${Math.round((cost - pickCost) / D.budget * 100)}% more of the budget.`;
+    msg.innerHTML = `🙌 This mix reaches as many ${A} as our pick for ${boardsWord(k)}.`;
   }
   fit();
 }
@@ -413,7 +406,7 @@ _LEAGUE_CSS = r"""
 
 _LEAGUE_BODY = r"""
 <div class="bar"><div class="seg" id="seg">
-  <button data-k="value" class="on">💎 Best value</button><button data-k="reach" id="reachbtn">🎯 Biggest target audience</button><button data-k="cost">🏷️ Lowest price</button>
+  <button data-k="value" class="on">💎 Best value</button><button data-k="reach" id="reachbtn">🎯 Biggest target audience</button><button data-k="price" title="Our 1-4 price-level rating, no prices used">🏷️ Lowest price level</button>
 </div><span class="chip trust" tabindex="0">◔ <span id="tn"></span><span class="pop" id="tp"></span></span></div>
 <div class="list" id="list"></div>
 <div class="note" id="note"></div>
@@ -435,9 +428,9 @@ D.rows.forEach(r => {
     <div class="reachcol"><div class="k">${D.aud_cap} / month</div><div class="v">${fmtP(r.rel)}</div>
       <div class="track"><div class="rng" style="left:${r.rel_lo / maxHi * 100}%;width:${(r.rel_hi - r.rel_lo) / maxHi * 100}%"></div><div class="fillb" data-w="${r.rel / maxHi * 100}"></div></div>
       <div class="rtxt">likely ${fmtP(r.rel_lo)} – ${fmtP(r.rel_hi)}</div></div>
-    <div class="cppcol"><div class="k">Value for money</div><div class="v">${r.value}<small> / 100</small></div>
+    <div class="cppcol"><div class="k" title="Target audience for the price level of the board (a rating, no prices used)">Value</div><div class="v">${r.value}<small> / 100</small></div>
       <div class="cppbar"><i data-w="${r.value}"></i></div><div class="rtxt">${r.value_note}</div></div>
-    <div class="pricecol"><div class="k">Price level</div><div class="v" style="font-size:15px;margin-top:6px">${dots(r.price_dots, 4)}</div><div class="rtxt">${r.price_note}</div></div>`;
+    <div class="pricecol"><div class="k" title="Our rating of price vs the other boards, no prices used">Price level</div><div class="v" style="font-size:15px;margin-top:6px">${dots(r.price_dots, 4)}</div><div class="rtxt">${r.price_note}</div></div>`;
   L.appendChild(d); els[r.id] = d;
 });
 const medals = ['🥇', '🥈', '🥉', '🎗️'];
@@ -1056,7 +1049,7 @@ function rank() {
   const planNames = D.plan.join(', ');
   document.getElementById('recon').innerHTML = top.in_plan
     ? `🎯 <b>${esc(top.label)} scores highest and is in our plan</b> (${esc(planNames)}). The plan also counts drivers who pass several boards only once, so it can include boards that score lower here.`
-    : `🤔 <b>${esc(top.label)} scores highest on its own, but our plan (${esc(planNames)}) leaves it out</b>: ${esc(top.why_out)} The score rates each board alone; the plan buys the best <i>set</i> for the budget.`;
+    : `🤔 <b>${esc(top.label)} scores highest on its own, but our plan (${esc(planNames)}) leaves it out</b>: ${esc(top.why_out)} The score rates each board alone; the plan picks the best <i>set</i> for the brief's number of boards.`;
   fit();
 }
 drawWts(); rank();
@@ -1075,3 +1068,152 @@ drawWts(); rank();
 
 def score_html(data: dict) -> str:
     return _doc(_SCORE_CSS, _SCORE_BODY, _SCORE_JS, data)
+
+
+# --------------------------------------------------------------------------- the brief, answered
+
+# The brief's four labels, and how the engine's labels map onto them.
+BRIEF_LABELS = [
+    ("Confirmed", "good", "From an official or named source", "RTA: 2,000 vehicles per lane per hour"),
+    ("Estimate", "accent", "Calculated from confirmed data plus a stated assumption", "Unique people a month"),
+    ("Assumption", "warn", "A setting we chose; editable in the tool", "1.5 people per vehicle"),
+    ("Concept", "crit", "Needs a partner or further validation", "Targeting the exact people who passed"),
+]
+ENGINE_TO_BRIEF = {"VERIFIED": "Confirmed", "ESTIMATE": "Estimate", "SAMPLE": "Estimate on sample inputs",
+                   "ASSUMPTION": "Assumption", "CONCEPT": "Concept"}
+
+_BRIEF_CSS = r"""
+h2.sec { font-size:17px; margin:22px 0 10px; display:flex; align-items:center; gap:8px; }
+h2.sec .chip { font-size:11px; }
+.hero { padding:22px 24px; display:grid; grid-template-columns:1.25fr 1fr; gap:22px; align-items:center;
+        background:linear-gradient(135deg,#ffffff 0%,#f4f2ff 100%); }
+@media (max-width:860px) { .hero { grid-template-columns:1fr; } }
+.hero .eb { font-size:12px; font-weight:700; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; }
+.hero h3 { font-size:22px; line-height:1.3; margin:6px 0 8px; letter-spacing:-.01em; }
+.hero p { margin:0; color:var(--ink2); font-size:14px; line-height:1.5; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.st { background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 14px; }
+.st .v { font-size:26px; font-weight:800; letter-spacing:-.02em; }
+.st .k { font-size:12px; color:var(--ink2); margin-top:2px; line-height:1.35; }
+.boards { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.bd { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; padding:4px 10px; border-radius:999px;
+      background:#fff; border:1px solid var(--line); }
+.bd i { width:9px; height:9px; border-radius:50%; background:var(--c); }
+table.cmp { width:100%; border-collapse:separate; border-spacing:0; font-size:13.5px; }
+table.cmp th { text-align:right; font-size:11.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+               padding:12px 14px; border-bottom:1px solid var(--line); }
+table.cmp th:first-child, table.cmp td:first-child { text-align:left; }
+table.cmp td { text-align:right; padding:12px 14px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
+table.cmp tr:last-child td { border-bottom:none; }
+table.cmp tr:hover td { background:var(--soft); }
+table.cmp .nm b { font-size:14px; } table.cmp .nm span { display:block; font-size:12px; color:var(--muted); }
+table.cmp .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; background:var(--c); }
+table.cmp .rng { display:block; font-size:11.5px; color:var(--muted); }
+table.cmp .best { color:var(--good-text); font-weight:800; }
+.cmpwrap { padding:4px 6px; overflow-x:auto; }
+.note { font-size:12px; color:var(--muted); line-height:1.5; margin-top:8px; }
+.legend { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+@media (max-width:860px) { .legend { grid-template-columns:1fr 1fr; } }
+.lg { padding:12px 14px; } .lg p { margin:6px 0 0; font-size:12.5px; color:var(--ink2); line-height:1.4; }
+.lg .ex { font-size:11.5px; color:var(--muted); margin-top:4px; }
+.cols3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+@media (max-width:860px) { .cols3 { grid-template-columns:1fr; } }
+.capcol { padding:14px 16px; } .capcol h4 { margin:0 0 8px; font-size:14px; display:flex; gap:8px; align-items:center; }
+.cap { padding:9px 0; border-top:1px solid var(--line); } .cap b { font-size:13.5px; } .cap p { margin:2px 0 0; font-size:12.5px; color:var(--ink2); }
+.src { display:grid; grid-template-columns:1.4fr 2fr 70px; gap:12px; align-items:center; padding:9px 14px; }
+.src + .src { border-top:1px solid var(--line); }
+.src .n b { font-size:13.5px; } .src .n span { display:block; font-size:11.5px; color:var(--muted); }
+.bar { position:relative; height:12px; background:var(--soft); border-radius:999px; overflow:hidden; }
+.bar .pot { position:absolute; inset:0 auto 0 0; background:#dcd7fb; border-radius:999px; }
+.bar .now { position:absolute; inset:0 auto 0 0; background:var(--accent); border-radius:999px; transition:width 1s cubic-bezier(.2,.8,.2,1); }
+.src .sc { font-size:13px; font-weight:700; text-align:right; white-space:nowrap; } .src .sc span { color:var(--muted); font-weight:500; }
+.src.top { background:#f4f2ff; border-radius:12px; }
+.ai { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+@media (max-width:860px) { .ai { grid-template-columns:1fr 1fr; } }
+.tbl { width:100%; border-collapse:collapse; font-size:13px; }
+.tbl th { text-align:left; font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; padding:10px 14px; border-bottom:1px solid var(--line); }
+.tbl td { padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; line-height:1.45; color:var(--ink2); }
+.tbl td:first-child { color:var(--ink); font-weight:600; } .tbl tr:last-child td { border-bottom:none; }
+.road { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+@media (max-width:960px) { .road { grid-template-columns:1fr 1fr; } }
+.ph { padding:14px 16px; position:relative; } .ph .w { font-size:12px; font-weight:700; color:var(--accent); }
+.ph h4 { margin:4px 0 6px; font-size:14.5px; } .ph p { margin:0; font-size:12.5px; color:var(--ink2); line-height:1.45; }
+.ph .g { margin-top:8px; font-size:11.5px; color:var(--muted); } .ph.done { border-color:#cdeccd; background:#f6fcf6; }
+.opt { padding:16px; } .opt .v { display:flex; align-items:center; gap:4px; margin:10px 0 8px; } .opt .v .k { font-size:12px; font-weight:650; color:var(--muted); }
+.opt .v .dots i { width:10px; height:10px; } .opt p { margin:0; font-size:12.5px; color:var(--ink2); line-height:1.45; }
+.opt.rec { border:2px solid var(--accent); }
+.val { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+@media (max-width:960px) { .val { grid-template-columns:1fr 1fr; } }
+.vl { padding:12px 14px; } .vl b { font-size:13.5px; } .vl p { margin:4px 0 0; font-size:12.5px; color:var(--ink2); line-height:1.4; }
+"""
+
+_BRIEF_JS = r"""
+const root = document.getElementById('root');
+function chip(t, k) { return `<span class="chip ${k || ''}">${t}</span>`; }
+function sec(icon, title, extra) { return `<h2 class="sec">${icon} ${title} ${extra || ''}</h2>`; }
+let h = '';
+if (D.view === 'answer') {
+  const p = D.plan;
+  const nb = p.names.length;
+  h += `<div class="hero card fade"><div><div class="eb">${D.campaign.emoji} ${D.campaign.title} · ${D.campaign.when} · ${D.campaign.boards} boards</div>
+    <h3>Book ${p.names.join(', ').replace(/, ([^,]*)$/, ' and $1')} (${nb} board${nb === 1 ? '' : 's'}).</h3>
+    <p>Together they reach about <b>${fmtP(p.audience)} ${D.campaign.aud}</b> a month, each person counted once;
+    ${fmtP(p.dup)} people who pass more than one of them are not counted twice. No other mix of ${nb} boards reaches more.</p>
+    <div class="boards">${p.boards.map(b => `<span class="bd" style="--c:${b.color}"><i></i>${b.label}</span>`).join('')}</div></div>
+    <div class="stats"><div class="st"><div class="v" id="s1">–</div><div class="k">${D.campaign.aud} reached a month</div></div>
+      <div class="st"><div class="v" id="s2">${nb}</div><div class="k">boards booked, as the brief asks</div></div>
+      <div class="st"><div class="v" id="s3">–</div><div class="k">counted twice, removed</div></div></div></div>`;
+} else if (D.view === 'table') {
+  h += sec('📊', 'How the four billboards compare', chip(D.label_note, 'accent'));
+  h += `<div class="card cmpwrap fade"><table class="cmp"><tr><th>Billboard</th><th>Impressions / day</th><th>Unique people / month</th>
+    <th>${D.aud_cap} / month</th><th title="Our 1-4 rating, no prices used">Price level</th><th title="Target audience for the price level (a rating)">Value</th></tr>`;
+  D.rows.forEach(r => { h += `<tr><td class="nm"><span class="dot" style="--c:${r.color}"></span><b>${r.label}</b>${r.in_plan ? ' ⭐' : ''}<span>${r.road}</span></td>
+    <td>${fmtP(r.imp)}</td><td>${fmtP(r.uniq)}<span class="rng">${fmtP(r.uniq_lo)}–${fmtP(r.uniq_hi)}</span></td><td>${fmtP(r.rel)}</td>
+    <td>${dots(r.price_dots, 4)}</td><td class="${r.best ? 'best' : ''}">${dots(r.value_dots, 4)}${r.best ? ' 💎' : ''}</td></tr>`; });
+  h += `</table></div><div class="note">⭐ in the recommended plan · 💎 most audience for its price level. Price level is our 1-4 rating; no prices are used.
+    Unique people show the low–high range: how often a person passes each month is the weakest input until mobile data is connected.</div>`;
+  h += sec('🏷️', 'How to read every number');
+  h += `<div class="legend">${D.legend.map((l, i) => `<div class="lg card fade" style="animation-delay:${.05 * i}s">${chip(l[0], l[1])}<p>${l[2]}</p><div class="ex">e.g. ${l[3]}</div></div>`).join('')}</div>`;
+} else if (D.view === 'real') {
+  h += sec('🔍', 'How much can be solved today', chip('Area 1', 'accent'));
+  const cols = [['today', '✅', 'Achievable today', 'good'], ['estimate', '📐', 'Estimate today, measured later', 'accent'], ['concept', '💡', 'Concept: needs a partner', 'crit']];
+  h += `<div class="cols3">${cols.map((c, i) => `<div class="capcol card fade" style="animation-delay:${.06 * i}s"><h4>${c[1]} ${c[2]}</h4>
+    ${D.caps.filter(x => x.status === c[0]).map(x => `<div class="cap"><b>${x.what}</b><p>${x.why}</p></div>`).join('')}</div>`).join('')}</div>`;
+  h += sec('📡', 'How solid each data source is: today → once connected', chip('Area 2 · live from the source registry', 'accent'));
+  h += `<div class="card fade" style="padding:6px">${D.sources.map(s => `<div class="src ${s.top ? 'top' : ''}"><div class="n"><b>${s.name}</b><span>${s.status}${s.top ? ' · biggest single gain' : ''}</span></div>
+    <div class="bar" title="Today ${s.score} · once connected ${s.potential}"><div class="pot" style="width:${s.potential}%"></div><div class="now" style="width:0" data-w="${s.score}"></div></div>
+    <div class="sc">${s.score}<span> → ${s.potential}</span></div></div>`).join('')}</div>
+    <div class="note">Confidence 0–100: who provides the data, how directly it measures audiences and how fresh it is. Dark bar = today, light bar = once connected.</div>`;
+  h += sec('🤖', 'What the AI does, and what it never does');
+  h += `<div class="ai">${D.ai.map((a, i) => `<div class="st card fade" style="animation-delay:${.05 * i}s"><div class="v">${a.v}</div><div class="k">${a.k}</div></div>`).join('')}</div>
+    <div class="note">${D.ai_note}</div>`;
+  h += sec('📲', 'Re-engaging people who passed', chip('Area 5', 'accent'));
+  h += `<div class="card fade"><table class="tbl"><tr><th>Route</th><th>Feasibility</th><th>Precision</th></tr>
+    ${D.routes.map(r => `<tr><td>${r.route}</td><td>${r.feasibility.startsWith('Feasible today') ? chip('✅ ' + r.feasibility, 'good') : chip(r.feasibility, 'warn')}</td><td>${r.precision}</td></tr>`).join('')}</table></div>
+    <div class="note">UAE Personal Data Protection Law: consented, grouped data only. Meta and Google target areas of about 1 km, not exact passers-by.</div>`;
+} else {
+  h += sec('🗺️', 'Roadmap', chip('Plan, not computed', 'warn'));
+  h += `<div class="road">${D.roadmap.map((r, i) => `<div class="ph card fade ${r.when === 'Done' ? 'done' : ''}" style="animation-delay:${.06 * i}s"><div class="w">${r.when === 'Done' ? '✅ Done' : r.when}</div>
+    <h4>${r.phase}</h4><p>${r.adds}</p><div class="g">Go-ahead: ${r.gate}</div></div>`).join('')}</div><div class="note"><b>${D.roadmap_total}</b></div>`;
+  h += sec('🧩', 'Options: what each one needs', chip('Plan, not computed', 'warn'));
+  h += `<div class="cols3">${D.costs.map((c, i) => `<div class="opt card fade ${c.recommended ? 'rec' : ''}" style="animation-delay:${.06 * i}s">
+    ${chip((c.recommended ? '⭐ ' : '') + c.option, c.recommended ? 'accent' : '')}<div class="v"><span class="k">Data needed</span>${dots(c.data_needed, 3)}</div><p>${c.what}</p></div>`).join('')}</div>
+    <div class="note">Development is in-house. Maintenance: ${D.maintenance}</div>`;
+  h += sec('⚠️', 'Risks and how we handle them');
+  h += `<div class="card fade"><table class="tbl"><tr><th>Risk</th><th>Impact</th><th>How we handle it</th></tr>
+    ${D.risks.map(r => `<tr><td>${r.risk}</td><td>${r.impact}</td><td>${r.handle}</td></tr>`).join('')}</table></div>`;
+  h += sec('🏆', 'Business value');
+  h += `<div class="val">${D.value.map((v, i) => `<div class="vl card fade" style="animation-delay:${.05 * i}s"><b>${v.title}</b><p>${v.text}</p></div>`).join('')}</div>
+    <div class="note"><b>What it will not do at first:</b> ${D.not_at_first}</div>`;
+}
+root.innerHTML = h;
+if (D.view === 'answer') { tween(document.getElementById('s1'), D.plan.audience, fmtP, 1100);
+  tween(document.getElementById('s3'), D.plan.dup, fmtP, 1100); }
+setTimeout(() => document.querySelectorAll('.now').forEach(b => b.style.width = b.dataset.w + '%'), reduce ? 0 : 200);
+fit();
+"""
+
+
+def brief_html(data: dict) -> str:
+    """One section of 'The brief, answered' (data['view']: answer / table / real / path)."""
+    return _doc(_BRIEF_CSS, '<div id="root"></div>', _BRIEF_JS, data)

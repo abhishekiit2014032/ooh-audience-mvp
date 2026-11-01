@@ -1,11 +1,13 @@
 {
- "updated_at": "2026-11-01T15:06:09+00:00",
+ "updated_at": "2026-11-01T17:39:18+00:00",
  "searches": {
   "H1": "2026-11-01",
   "H2": "2026-11-01",
   "H3": "2026-11-01",
   "H4": "2026-11-01",
-  "cars": "2026-11-01"
+  "cars": "2026-11-01",
+  "property": "2026-11-01",
+  "shopping": "2026-11-01"
  },
  "facts": {
   "19b05eb1e5ad": {
@@ -57,20 +59,22 @@
    "event_end": null,
    "figure_year": 2024,
    "tags": [
-    "general",
+    "shopping",
     "luxury",
-    "families"
+    "families",
+    "general"
    ],
    "quote": "More than 111 million visitors arrived through the mall’s doors in 2024 which easily sees it surpass its previous record of 105 million visitors from the previous year.",
    "source_url": "https://www.timeoutdubai.com/news/dubai-mall-2025",
    "source_title": "Dubai Mall opens The District",
    "confidence": 0.85,
-   "note": "2024 figure; this search found no confirmed 2025 figure",
+   "note": "2024 figure; no 2025 total found in these results.",
    "measure": "count",
    "near": [
     "Dubai Mall",
     "Downtown Dubai",
-    "Burj Khalifa"
+    "Burj Khalifa",
+    "Dubai Opera"
    ],
    "id": "06a504fbcf5c",
    "placements": [
@@ -78,7 +82,7 @@
    ],
    "status": "kept",
    "reason": "",
-   "search": "H1",
+   "search": "shopping",
    "source": "online",
    "found_at": "2026-11-01",
    "enabled": true
@@ -94,13 +98,14 @@
    "event_end": null,
    "figure_year": 2025,
    "tags": [
-    "business"
+    "business",
+    "property"
    ],
-   "quote": "Dubai World Trade Centre (DWTC) welcomed 2.97 million participants across 401 events in 2025, as rising international attendance and a growing exhibition calendar reinforced Dubai’s position as a global business and events hub.",
+   "quote": "Dubai World Trade Centre (DWTC) welcomed 2.97 million participants across 401 events in 2025, as rising international attendance and a growing exhibition calendar reinforced Dubai's position as a global business and events hub.",
    "source_url": "https://www.arabianbusiness.com/business/tourism-hospitality/dubais-dwtc-draws-nearly-3-million-participants-in-2025-as-international-attendance-climbs",
-   "source_title": "Dubai's DWTC draws nearly 3 million participants in 2025 as international attendance climbs",
+   "source_title": "Dubai's DWTC draws nearly 3 million participants in 2025 as international attendance climbs - Arabian Business",
    "confidence": 0.85,
-   "note": "Total across 401 events in 2025",
+   "note": "All 401 DWTC events in 2025, not only property shows",
    "measure": "count",
    "near": [
     "Dubai World Trade Centre"
@@ -111,7 +116,7 @@
    ],
    "status": "kept",
    "reason": "",
-   "search": "H1",
+   "search": "property",
    "source": "online",
    "found_at": "2026-11-01",
    "enabled": true
@@ -1579,6 +1584,374 @@
    "status": "kept",
    "reason": "",
    "search": "cars",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "01ece91a0464": {
+   "kind": "event_attendance",
+   "what": "Cityscape Dubai",
+   "place": "Dubai World Trade Centre",
+   "value": 10000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "property",
+    "business"
+   ],
+   "quote": "It is the biggest Dubai real estate event of 2025, taking place at the Dubai World Trade Centre, with 10,000 attendees expected from 12 to 14 November.",
+   "source_url": "https://theoptimus.ae/cityscape-dubai-2025-the-ultimate-guide-to-the-uaes-largest-real-estate-exhibition/",
+   "source_title": "Cityscape Dubai 2025 Guide to UAE Largest Real Estate Exhibition",
+   "confidence": 0.5,
+   "note": "Source page also says 40,000+ and 10-12 Nov; 2025 edition, outside every campaign window",
+   "measure": "expected",
+   "near": [
+    "Dubai World Trade Centre",
+    "DIFC",
+    "Downtown Dubai"
+   ],
+   "id": "01ece91a0464",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "property",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "8965d5a9ce53": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai residential handovers H2 2026",
+   "place": "Dubai",
+   "value": 32000.0,
+   "unit": "homes",
+   "period": "total",
+   "event_start": "2026-07-01",
+   "event_end": "2026-12-31",
+   "figure_year": 2026,
+   "tags": [
+    "property"
+   ],
+   "quote": "Around 32,000 new residential units are expected to be handed over in Dubai in the second half of 2026, says new report published by Cushman & Wakefield Core",
+   "source_url": "https://www.khaleejtimes.com/business/dubai-set-for-highest-annual-home-deliveries-since-2008-as-new-launches-slow",
+   "source_title": "Dubai set for highest annual home deliveries since 2008 as new launches slow",
+   "confidence": 0.8,
+   "note": "Dubai-wide forecast for H2 2026; quote is the article subheadline",
+   "measure": "expected",
+   "near": [],
+   "id": "8965d5a9ce53",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "property",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "5e94d7442293": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai residential deliveries H1 2026",
+   "place": "Dubai",
+   "value": 24800.0,
+   "unit": "homes",
+   "period": "total",
+   "event_start": "2026-01-01",
+   "event_end": "2026-06-30",
+   "figure_year": 2026,
+   "tags": [
+    "property"
+   ],
+   "quote": "Dubai adds 24,800 new homes in H1 2026, easing prices and rents as the residential market enters a steadier growth cycle with more choice for buyers and tenants.",
+   "source_url": "https://gulfnews.com/business/property/dubai-homebuyers-get-more-choice-as-24800-new-units-enter-the-market-1.500625443",
+   "source_title": "Dubai Property Market 2026: 24,800 New Homes Boost Supply as Prices and Rents Ease",
+   "confidence": 0.85,
+   "note": "Dubai-wide H1 2026 count from Cavendish Maxwell; no area breakdown",
+   "measure": "count",
+   "near": [],
+   "id": "5e94d7442293",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "property",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "22771e4a8dc4": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai residential completions 2026",
+   "place": "Dubai",
+   "value": 56600.0,
+   "unit": "homes",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2026,
+   "tags": [
+    "property"
+   ],
+   "quote": "Dubai contributes about 56,600 homes, Abu Dhabi adds around 3,200 and the Northern Emirates, led by Sharjah, deliver roughly 7,450 more units across the remainder of the year.",
+   "source_url": "https://nukta.com/uae-property-market-new-homes",
+   "source_title": "UAE property market to add over 69,000 homes in 2026 as supply surges",
+   "confidence": 0.7,
+   "note": "Colliers estimate for Dubai, 2026; scope may cover only the rest of year",
+   "measure": "expected",
+   "near": [],
+   "id": "22771e4a8dc4",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "property",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "6236e54bb828": {
+   "kind": "new_homes_or_offices",
+   "what": "DAMAC handovers 2026",
+   "place": "Dubai",
+   "value": 8800.0,
+   "unit": "homes",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2026,
+   "tags": [
+    "property"
+   ],
+   "quote": "DAMAC Properties has announced plans to hand over 8,800 residential units across Dubai in 2026.",
+   "source_url": "https://thegulfpulse.com/damac-handovers-2026-dubai-homes/",
+   "source_title": "DAMAC handovers 2026 to reach 8,800 homes",
+   "confidence": 0.75,
+   "note": "One developer's planned handovers across Dubai; no area breakdown",
+   "measure": "expected",
+   "near": [],
+   "id": "6236e54bb828",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "property",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "0c04099fb96a": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai residential deliveries Q2 2026",
+   "place": "Dubai",
+   "value": 13218.0,
+   "unit": "homes",
+   "period": "total",
+   "event_start": "2026-04-01",
+   "event_end": "2026-06-30",
+   "figure_year": 2026,
+   "tags": [
+    "property"
+   ],
+   "quote": "More than 13,218 residential units were delivered in the second quarter of 2026, keeping completions broadly on track, the report said.",
+   "source_url": "https://www.khaleejtimes.com/business/dubai-set-for-highest-annual-home-deliveries-since-2008-as-new-launches-slow",
+   "source_title": "Dubai set for highest annual home deliveries since 2008 as new launches slow",
+   "confidence": 0.8,
+   "note": "Q2 2026 only, Dubai-wide; Cushman & Wakefield Core",
+   "measure": "count",
+   "near": [],
+   "id": "0c04099fb96a",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "property",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "a70ae2684575": {
+   "kind": "new_homes_or_offices",
+   "what": "Dubai population growth 2026",
+   "place": "Dubai",
+   "value": 226885.0,
+   "unit": "residents",
+   "period": "total",
+   "event_start": "2026-01-01",
+   "event_end": "2026-09-28",
+   "figure_year": 2026,
+   "tags": [
+    "property",
+    "general"
+   ],
+   "quote": "Dubai: Dubai's population has increased by 226,885 people since the start of 2026, reaching 4,807,185 by midday Monday, according to figures from the Dubai Data and Statistics Establishment, part of Digital Dubai.",
+   "source_url": "https://gulfnews.com/uae/dubai-population-rises-by-226885-since-start-of-2026-1.500692623",
+   "source_title": "Dubai population rises by 226,885 since start of 2026",
+   "confidence": 0.85,
+   "note": "New residents emirate-wide, start of 2026 to late September",
+   "measure": "count",
+   "near": [],
+   "id": "a70ae2684575",
+   "placements": [],
+   "status": "kept",
+   "reason": "",
+   "search": "property",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "373fd455e2aa": {
+   "kind": "event_attendance",
+   "what": "Dubai Shopping Festival",
+   "place": "Dubai",
+   "value": 3000000.0,
+   "unit": "people",
+   "period": "event",
+   "event_start": "2026-12-04",
+   "event_end": "2027-01-17",
+   "figure_year": 2026,
+   "tags": [
+    "shopping",
+    "families",
+    "general"
+   ],
+   "quote": "There will be 3,000,000 people attending and a predicted event spend (USD) of $276,202,752 at the event in 2026.",
+   "source_url": "https://www.predicthq.com/major-events/top-events/dubai-shopping-festival",
+   "source_title": "Dubai Shopping Festival 2026 - PredictHQ",
+   "confidence": 0.5,
+   "note": "Third-party forecast, not official; covers whole city. Dates from whatson.ae.",
+   "measure": "expected",
+   "near": [
+    "Dubai Mall",
+    "Mall of the Emirates",
+    "Dubai Marina Mall",
+    "Downtown Dubai",
+    "Dubai Marina",
+    "JBR",
+    "Al Barsha"
+   ],
+   "id": "373fd455e2aa",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "shopping",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "bd3be6c3742e": {
+   "kind": "venue_footfall",
+   "what": "Dubai Mall",
+   "place": "Dubai Mall",
+   "value": 105000000.0,
+   "unit": "visitors",
+   "period": "year",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2023,
+   "tags": [
+    "shopping",
+    "luxury",
+    "families",
+    "general"
+   ],
+   "quote": "More than 111 million visitors arrived through the mall’s doors in 2024 which easily sees it surpass its previous record of 105 million visitors from the previous year.",
+   "source_url": "https://www.timeoutdubai.com/news/dubai-mall-2025",
+   "source_title": "Dubai Mall opens The District",
+   "confidence": 0.8,
+   "note": "2023 figure; shows the year-on-year trend.",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Downtown Dubai",
+    "Burj Khalifa"
+   ],
+   "id": "bd3be6c3742e",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "shopping",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": true
+  },
+  "9c6cedaa5da4": {
+   "kind": "venue_footfall",
+   "what": "Dubai Mall",
+   "place": "Dubai Mall",
+   "value": 650000.0,
+   "unit": "visitors",
+   "period": "day",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": null,
+   "tags": [
+    "shopping",
+    "general"
+   ],
+   "quote": "Dubai Mall receives over 80 million visitors annually—peaking at 650,000+ on weekends and pre-Eid Saturdays.",
+   "source_url": "https://www.alibaba.com/product-insights/dubai-mall-store-opening-times-and-visitor-guide.html",
+   "source_title": "Dubai Mall Store Opening Times And Visitor Guide",
+   "confidence": 0.3,
+   "note": "Switched off: product-listing page, not a reliable source for mall footfall",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Downtown Dubai",
+    "Burj Khalifa"
+   ],
+   "id": "9c6cedaa5da4",
+   "placements": [
+    "H1"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "shopping",
+   "source": "online",
+   "found_at": "2026-11-01",
+   "enabled": false
+  },
+  "95aff6e5888b": {
+   "kind": "venue_footfall",
+   "what": "Dubai international visitors",
+   "place": "Dubai",
+   "value": 9880000.0,
+   "unit": "visitors",
+   "period": "total",
+   "event_start": null,
+   "event_end": null,
+   "figure_year": 2025,
+   "tags": [
+    "shopping",
+    "general"
+   ],
+   "quote": "In the first half of 2025, Dubai welcomed over 9.88 million visitors — an increase of six per cent.",
+   "source_url": "https://www.khaleejtimes.com/uae/dubai-placed-among-the-top-5-tourist-cities-as-global-appeal-grows",
+   "source_title": "Dubai placed among the top 5 tourist cities as global appeal grows",
+   "confidence": 0.75,
+   "note": "First half of 2025 only (six months); whole emirate, not one place.",
+   "measure": "count",
+   "near": [
+    "Dubai Mall",
+    "Mall of the Emirates",
+    "Downtown Dubai",
+    "Dubai Marina",
+    "JBR"
+   ],
+   "id": "95aff6e5888b",
+   "placements": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "status": "kept",
+   "reason": "",
+   "search": "shopping",
    "source": "online",
    "found_at": "2026-11-01",
    "enabled": true

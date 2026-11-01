@@ -44,7 +44,7 @@ PROMPT = """Placement facts (JSON):
 
 Write two parts, separated by a blank line:
 1. Persona: one or two sentences on who this placement mostly reaches (age, commute pattern, place context).
-2. Why it fits the brief ({brand}): two or three sentences citing the unique audience, the car-relevant reach and one place signal, with their labels."""
+2. Why it fits the brief ({brand}): two or three sentences citing the unique audience, the target-audience reach and one place signal, with their labels."""
 
 
 def facts_for(placement, reach_metrics: dict, profile) -> dict:
@@ -58,8 +58,8 @@ def facts_for(placement, reach_metrics: dict, profile) -> dict:
         "unique_monthly_audience": (f"{fmt_num(m['unique_month'].value)} "
                                     f"(range {fmt_num(m['unique_month'].low)} to "
                                     f"{fmt_num(m['unique_month'].high)}, {m['unique_month'].label})"),
-        "car_relevant_reach": f"{fmt_num(profile.relevant_reach.value)} ({profile.relevant_reach.label})",
-        "car_interest_share": f"{profile.interest_share.value:.0%} ({profile.interest_share.label})",
+        "target_audience_reach": f"{fmt_num(profile.relevant_reach.value)} ({profile.relevant_reach.label})",
+        "target_interest_share": f"{profile.interest_share.value:.0%} ({profile.interest_share.label})",
         "commuter_share_of_traffic": f"{profile.commuter_share:.0%} (ASSUMPTION, default commuter curve)",
         "points_of_interest_1km": profile.poi_counts,
         "segments": profile.segments,
@@ -78,8 +78,8 @@ def template_narrative(facts: dict) -> str:
                f"{commuter} of daily traffic falls in the weekday commuter peaks (ASSUMPTION, default "
                f"curve). Within 1 km the mapped places are mostly {places}.")
     why = (f"{facts['placement']} reaches an estimated {facts['unique_monthly_audience']} unique people "
-           f"a month. At a car-interest share of {facts['car_interest_share']} that is about "
-           f"{facts['car_relevant_reach']} car-relevant people. "
+           f"a month. At an interest share of {facts['target_interest_share']} that is about "
+           f"{facts['target_audience_reach']} people in the target audience. "
            f"{facts['segments']['Behavioural'][2]}.")
     return f"{persona}\n\n{why}"
 

@@ -45,7 +45,7 @@ class Placement(BaseModel):
     loop_seconds: float = 1
     slot_seconds: float = 1
     cone_radius_m: float = 400
-    cost_per_month_aed: float
+    price_level: int = Field(2, ge=1, le=4)   # ASSUMPTION rating: 1 = cheapest of our boards, 4 = most expensive
 
     @property
     def label(self) -> str:
@@ -69,7 +69,7 @@ class Campaign(BaseModel):
     brand_category: str
     plan_start: date
     plan_end: date
-    budget_aed: float
+    boards: int = Field(2, ge=1)   # how many billboards the brief books
     baseline_start: date
     baseline_end: date
     # Who the campaign is for. The target audience = unique audience x interest share.
@@ -79,6 +79,7 @@ class Campaign(BaseModel):
     audience: str = "people interested in cars"      # plural noun phrase used in sentences
     audience_short: str = "car fans"                 # short form for tiles and labels
     interest_share: float | None = None              # ASSUMPTION until Meta values are entered; None = config default
+    fit_tilt: float | None = None                    # ASSUMPTION; how far local fit moves each board's share; None = config default
     meta_interest: str | None = "automobiles"        # Meta interest key; None = everyone who passes
     creative_hint: str = ""
     news_tags: list[str] = Field(default_factory=lambda: ["cars"])  # crowd-event tags that match this audience

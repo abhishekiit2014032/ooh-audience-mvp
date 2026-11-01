@@ -40,7 +40,7 @@ def params() -> Params:
 def placement() -> Placement:
     # Faces south (180): it serves traffic driving north towards it.
     return Placement(id="T1", name="Test face", lat=LAT, lon=LON, corridor="Test Road", facing_bearing_deg=180,
-                     type="static", width_m=12, height_m=8, cost_per_month_aed=100000)
+                     type="static", width_m=12, height_m=8, price_level=2)
 
 
 @pytest.fixture

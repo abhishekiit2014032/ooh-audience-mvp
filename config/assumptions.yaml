@@ -325,6 +325,20 @@ parameters:
     description: Share of visitors to a themed event (e.g. a motor show) who belong to a campaign's audience when the theme matches (e.g. car fans at a car show). Other events use the normal interest share.
     source: Assumption
 
+  # ---------------------------------------------------------------- audience fit
+  fit_tilt:
+    value: 0.5
+    low: 0.25
+    high: 0.75
+    label: ASSUMPTION
+    group: Audience fit
+    unit: weight 0-1
+    min: 0.0
+    max: 1.0
+    step: 0.05
+    description: How far local fit (config/knowledge.yaml fit signals, e.g. car showrooms for a car launch, premium and business districts for a property launch, malls for a retail festival) moves each board's share of the campaign audience. 0 = the same share everywhere; 1 = fully in proportion to fit. The average share across boards stays as configured.
+    source: Assumption; replace with Meta interest shares per board once real values are entered
+
 # Per road class: lanes per direction when OSM has no lanes tag, a utilisation multiplier
 # relative to the motorway utilisation above, and a fallback speed when OSM has no maxspeed.
 # All ASSUMPTIONS. Motorway 5 / trunk 4 / primary 3 lanes come from the solution design doc.

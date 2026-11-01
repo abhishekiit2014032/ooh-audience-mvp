@@ -91,9 +91,30 @@ def _age_share(age: dict[str, float], bands: tuple[str, ...]) -> float:
     return float(sum(v for k, v in age.items() if k in bands))
 
 
+# What a campaign's industry looks for around a board, and how Meta names its interests.
+CATEGORY_PLACES = {"automotive": ("Car showrooms and services", "car showrooms, rentals and services"),
+                   "real_estate": ("Offices and business", "offices and business places"),
+                   "retail": ("Retail and malls", "shops and malls")}
+INTEREST_LABELS = {"automobiles": "Automobiles", "suv": "SUVs", "luxury_vehicles": "Luxury vehicles",
+                   "real_estate": "Real estate", "shopping": "Shopping"}
+META_FILTERS = {"automotive": "Automobiles, SUVs, Luxury vehicles", "real_estate": "Real estate, Property investment",
+                "retail": "Shopping, Shopping malls, Fashion"}
+
+
+def category_key(brand_category: str) -> str:
+    """'automotive_suv' -> 'automotive'; unknown categories fall back to automotive."""
+    return next((k for k in CATEGORY_PLACES if brand_category.startswith(k)), "automotive")
+
+
+def place_line(category: str, poi_counts: dict) -> str:
+    cat, words = CATEGORY_PLACES[category_key(category)]
+    return f"{poi_counts.get(cat, 0)} {words} within 1 km"
+
+
 def build_profile(placement: Placement, pois: gpd.GeoDataFrame, unique: Metric,
                   impressions_month: Metric, params: Params, road_share: float,
-                  interest_key: str | None = "automobiles", audience: str = "car-interest") -> Profile:
+                  interest_key: str | None = "automobiles", audience: str = "car-interest",
+                  category: str = "automotive") -> Profile:
     meta_all = load_json_input("meta_reach.json")
     meta = meta_all["placements"].get(placement.id, {})
     meta_is_sample = bool(meta_all.get("is_sample", True)) or not meta
@@ -137,11 +158,12 @@ def build_profile(placement: Placement, pois: gpd.GeoDataFrame, unique: Metric,
         "Behavioural": [
             f"Daily drivers: {road_share:.0%} of impressions come from road traffic",
             f"Commuter pattern: {commuter_share:.0%} of daily traffic in 7-10 am and 5-8 pm peaks",
-            f"{poi_counts.get('Car showrooms and services', 0)} car showrooms, rentals and services within 1 km",
+            place_line(category, poi_counts),
         ],
         "Interest": [
-            f"Automobiles / SUVs: {interest.value:.0%} of the audience ({interest.label})",
-            "Meta interest filters to use: Automobiles, SUVs, Luxury vehicles",
+            f"{INTEREST_LABELS.get(interest_key or '', 'Everyone passing')}: {interest.value:.0%} of the audience "
+            f"({interest.label})",
+            f"Meta interest filters to use: {META_FILTERS.get(category_key(category), 'none (everyone passing)')}",
         ],
     }
 
@@ -161,3 +183,21 @@ def build_profile(placement: Placement, pois: gpd.GeoDataFrame, unique: Metric,
 
     return Profile(placement.id, meta, meta_is_sample, poi_counts, commuter_share, dsc, segments,
                    interest, relevant, relevant_imp, triangulation)
+
+
+def tilt_interest(prof: Profile, unique: Metric, impressions_month: Metric, factor: float, fit: float) -> Profile:
+    """Scale the campaign-audience share by a local-fit factor (mean 1 across boards, so the campaign's
+    overall share is unchanged; only the split between boards moves). The result is an ASSUMPTION."""
+    import dataclasses
+
+    i = prof.interest_share
+    v, lo, hi = (min(1.0, x * factor) for x in (i.value, i.low, i.high))
+    interest = Metric(v, lo, hi, weakest(i.label, "ASSUMPTION"),
+                      f"{i.source}; x {factor:.2f} for local fit {fit:.0%} (ASSUMPTION, fit_tilt)", i.unit)
+    label = weakest(unique.label, interest.label)
+    relevant = Metric(unique.value * v, unique.low * v, unique.high * v, label,
+                      "Unique monthly audience x interest share (tilted by local fit)", "people/month")
+    rel_imp = Metric(impressions_month.value * v, impressions_month.low * v, impressions_month.high * v, label,
+                     "Monthly impressions x interest share (tilted by local fit)", "impressions/month")
+    return dataclasses.replace(prof, interest_share=interest, relevant_reach=relevant,
+                               relevant_impressions_month=rel_imp)

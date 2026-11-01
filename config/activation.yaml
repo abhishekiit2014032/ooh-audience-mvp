@@ -1,0 +1,21 @@
+# Campaign performance page: SIMULATED activation results (label SAMPLE).
+# No QR, Meta / Google or location-partner data is connected yet. These rates turn the engine's
+# computed views and audiences into an example of what the report will look like. Replace each block
+# with the real report once it exists (Bitly for QR, Meta Ads Manager / Google Ads, the partner's study).
+
+qr:
+  scans_per_10k_views: 2.5        # QR scans per 10,000 views of our ad (SAMPLE)
+  visit_share: 0.4                # share of scans that go on to browse the offer page (SAMPLE)
+  action_share: 0.06              # share of those visits that book (a test drive, viewing, voucher) (SAMPLE)
+
+area_ads:                         # Meta and Google: people living in or recently in about 1 km of the board
+  radius_km: 1
+  reach_share: 0.55               # share of the Meta audience in the radius the ads reach in the month (SAMPLE)
+  control_action_rate: 0.0011     # bookings per person reached in the comparison area with no billboard (SAMPLE)
+  lift: 0.32                      # extra action rate where people also passed the billboard (SAMPLE)
+
+partner:                          # specialist location partner (e.g. MEmob+, Azira): CONCEPT
+  consented_share: 0.22           # passers-by whose phones share location with consent (ASSUMPTION)
+  match_share: 0.6                # of those, matched and reachable across apps and websites (ASSUMPTION)
+  control_visit_rate: 0.004       # showroom / sales-centre visits per person, control group (SAMPLE)
+  lift: 0.28                      # visit lift for exposed people vs control (SAMPLE)

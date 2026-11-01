@@ -92,3 +92,87 @@ def test_scores_are_0_to_100_with_a_best_location(world):
             if k in ("target", "value"):
                 assert max(vals) == pytest.approx(100), (c.id, k)
         assert all(0 <= t <= 100 for t in sc["total"].values())
+
+
+def test_three_industries_read_different_facts(world):
+    """Car, property and retail campaigns must not be the same filter with a new name."""
+    _, pcfg, _, facts = world
+    used = {c.id: {p.fact.id for p in knowledge.select(facts, c) if p.used} for c in pcfg.campaign_options()}
+    cats = {c.brand_category.split("_")[0] for c in pcfg.campaign_options()}
+    assert len(cats) == 3, cats
+    ids = list(used)
+    for i, a in enumerate(ids):
+        for b in ids[i + 1:]:
+            assert used[a] ^ used[b], (a, b)          # each pair differs in what it uses
+    by = {f.id: f for f in facts}
+    assert any("shopping" in by[i].tags for i in used["retail_festival"])
+    assert any("property" in by[i].tags or "premium" in by[i].tags for i in used["property_launch"])
+
+
+def test_fit_tilt_keeps_the_average_share_and_moves_the_plan(world):
+    """Local fit moves each board's campaign-audience share, not the campaign's overall share."""
+    from ooh.pipeline import compute, prepare
+
+    _, pall, params, _ = world
+    preps = prepare(pall, params, allow_download=False)
+    plans = {}
+    for c in pall.campaign_options():
+        pcfg = pall.with_campaign(c.id)
+        flat = Params(load_assumptions(), {"interest_share": c.interest_share, "fit_tilt": 0.0})
+        tilted = Params(load_assumptions())                        # the campaign's own share and tilt
+        r0, r1 = compute(preps, pcfg, flat), compute(preps, pcfg, tilted)
+        s0 = [r.profile.interest_share.value for r in r0.placements.values()]
+        s1 = [r.profile.interest_share.value for r in r1.placements.values()]
+        assert len(set(s0)) == 1                                   # flat without the tilt
+        assert sum(s1) / len(s1) == pytest.approx(s0[0], rel=1e-6)  # same average with it
+        assert len(set(round(x, 6) for x in s1)) == (1 if not c.fit_tilt else len(s1))  # SUV: the brief's flat share
+        assert all(r.profile.interest_share.label == "ASSUMPTION" for r in r1.placements.values())
+        plans[c.id] = {s.placement for s in r1.plan}
+    premium = {p.id for p in pall.placements if p.area.split("/")[0].strip() in knowledge.PREMIUM_AREAS}
+    assert plans["property_launch"] & premium
+    # No prices: the plan is the best mix for the brief's number of boards (SUV 3, the others 2).
+    assert all(len(plans[c.id]) == c.boards for c in pall.campaign_options())
+    assert len({frozenset(p) for p in plans.values()}) >= 2
+
+
+def test_stress_test_reports_the_pick_and_where_it_tips(world):
+    """Every assumption at its low and high end: the base plan is the app's plan; flips name a tipping point."""
+    from ooh.pipeline import compute, plan_ids, prepare, stress_test
+
+    _, pall, params, _ = world
+    preps = prepare(pall, params, allow_download=False)
+    pcfg = pall.with_campaign("property_launch")
+    p = Params(load_assumptions(), {"interest_share": pcfg.campaign.interest_share})
+    res = compute(preps, pcfg, p)
+    df = stress_test(preps, pcfg, p, events=res.events)
+    assert all(tuple(b) == plan_ids(res) for b in df["base_plan"])
+    assert (df["swing"] >= 0).all()
+    for r in df[~df["holds"]].itertuples():
+        lo, hi = sorted([r.low, r.high])
+        assert lo <= r.tip_value <= hi and tuple(r.tip_plan) != plan_ids(res)
+    assert "budget" not in set(df["parameter"])                    # no money in the brief any more
+
+
+def test_suv_brief_reproduces_the_solution_brief_table(world):
+    """The AI Solution Brief quotes these figures (Section 4); the engine must keep producing them."""
+    from ooh import duplication
+    from ooh.pipeline import compute, prepare
+
+    _, pall, params, _ = world
+    pcfg = pall.with_campaign("suv_launch")
+    preps = prepare(pcfg, params, allow_download=False)
+    res = compute(preps, pcfg, Params(load_assumptions()))
+    doc = {"H1": (112, 419, 126), "H2": (75, 282, 85), "H3": (107, 402, 121), "H4": (84, 315, 95)}
+    for pid, (imp, uniq, rel) in doc.items():
+        r = res.placements[pid]
+        rr = r.profile.relevant_reach.value
+        assert (round(r.metrics["impressions_day"].value / 1e3), round(r.metrics["unique_month"].value / 1e3),
+                round(rr / 1e3)) == (imp, uniq, rel), pid
+    u = res.placements["H1"].metrics["unique_month"]
+    assert (round(u.low / 1e3), round(u.high / 1e3)) == (185, 940)
+    plan = [s.placement for s in res.plan]
+    aud = duplication.combined_relevant(plan, res.plan_items, res.overlap)
+    naive = sum(res.placements[i].profile.relevant_reach.value for i in plan)
+    # No prices: the brief books 3 boards and the best 3 are DIFC, Dubai Marina and Al Quoz.
+    assert len(plan) == pcfg.campaign.boards == 3
+    assert sorted(plan) == ["H1", "H3", "H4"] and round(aud / 1e3) == 310 and naive > aud

@@ -2,7 +2,7 @@
 
     python scripts/refresh_people.py              # every location, once a day
     python scripts/refresh_people.py --force      # search again today
-    python scripts/refresh_people.py --only H3    # one location (or "cars" for car events)
+    python scripts/refresh_people.py --only H3    # one location, or an industry topic: cars, property, shopping
 
 Uses Claude with web search (needs ANTHROPIC_API_KEY). Writes data/signals/people.json; the
 dashboard only reads that file.
@@ -24,7 +24,7 @@ from ooh.footprint import KINDS, refresh  # noqa: E402
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--force", action="store_true", help="search again even if searched today")
-    parser.add_argument("--only", nargs="*", help="placement ids (or 'cars') to search")
+    parser.add_argument("--only", nargs="*", help="placement ids or topics (cars, property, shopping) to search")
     args = parser.parse_args()
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(message)s")
     store = refresh(load_placements(), force=args.force, only=args.only)

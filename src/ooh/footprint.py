@@ -60,7 +60,20 @@ KINDS: dict[str, dict] = {
     "transit_ridership": {"icon": "🚇", "label": "Metro riders"},
     "traffic_count": {"icon": "🚗", "label": "Traffic count"},
 }
-TAGS = ["cars", "luxury", "business", "families", "sports", "culture", "general"]
+TAGS = ["cars", "property", "shopping", "luxury", "business", "families", "sports", "culture", "general"]
+
+
+CITY_WIDE = {"dubai", "uae", "united_arab_emirates", "dubai_wide", "all_of_dubai"}
+
+
+def derived_tags(kind: str, what: str, tags: list[str]) -> list[str]:
+    """Tags implied by what a number is: new homes are property evidence, mall crowds are shopping."""
+    out = set(tags)
+    if kind == "new_homes_or_offices":
+        out.add("property")
+    if kind in ("venue_footfall", "event_attendance") and re.search(r"\b(mall|souk|market|outlet|shopping)\b", what, re.I):
+        out.add("shopping")
+    return sorted(out)
 
 
 # --------------------------------------------------------------------------- the fact
@@ -270,21 +283,23 @@ SEARCH_SYSTEM = (
     "estimate, round or compute a number. Answer with JSON only."
 )
 
-SEARCH_PROMPT = """Today is {today}. Our car campaigns run between {start} and {end}.
+SEARCH_PROMPT = """Today is {today}. Our campaigns (a car launch, a property launch and a shopping festival) run
+between {start} and {end}.
 
 Find NUMBERS that show how many people are at, or come to, this location in Dubai: {label}
 (nearby places: {places}).
 
 Look for:
 - event_attendance: events at these places between {start} and {end} (exhibitions, concerts, races,
-  festivals, motor shows, car meets, sports). Give the announced or expected attendance. If this year's
+  festivals, motor shows, property shows, shopping festivals, sports). Give the announced or expected attendance. If this year's
   figure is not published, give the most recent edition's attendance, its year in figure_year, and this
   year's dates in event_start / event_end.
 - venue_footfall: visitors per year or month to a mall, attraction or district here.
 - new_homes_or_offices: homes, offices, hotel rooms or residents being added here.
 - transit_ridership: riders at a nearby metro or tram station.
 - traffic_count: vehicles per day or hour on the roads here.
-Flag anything about cars (motor shows, car launches, supercar meets) with the tag "cars".
+Tag cars (motor shows, car launches, supercar meets) "cars", property (property shows, new communities,
+residents moving in) "property", and shopping (shopping festivals, mall crowds, big sales) "shopping".
 {hints}
 How to search: run several different searches (for example "<place> visitors per year",
 "<place> events {month} attendance", "<place> new residential units", "<nearest metro station> ridership").
@@ -302,17 +317,27 @@ JSON only:
   "value": <number>, "unit": "people" | "visitors" | "riders" | "vehicles" | "homes" | "offices" | "hotel rooms" | "residents" | "employees",
   "period": "event" | "hour" | "day" | "week" | "month" | "year" | "total" (total = a count that exists, e.g. residents),
   "event_start": "YYYY-MM-DD" or null, "event_end": "YYYY-MM-DD" or null, "figure_year": <int> or null,
-  "tags": ["cars" | "luxury" | "business" | "families" | "sports" | "culture" | "general"],
+  "tags": ["cars" | "property" | "shopping" | "luxury" | "business" | "families" | "sports" | "culture" | "general"],
   "quote": "<exact sentence>", "source_url": "<url>", "source_title": "<page title>", "confidence": 0.0-1.0,
   "measure": "count" (people actually counted) | "expected" (announced or forecast) | "capacity" (how many a venue or road can hold, not a count),
   "note": "<= 15 words of caveats: which edition, capacity not a count, whole road not this stretch"}}]}}"""
 
-CARS_LABEL = "car events anywhere in Dubai (motor shows, car festivals, supercar meets, car launches)"
+# One Dubai-wide search per campaign industry (the first news tag of each campaign), with a headline filter.
+TOPICS = {
+    "cars": ("car events anywhere in Dubai (motor shows, car festivals, supercar meets, car launches)",
+             r"\b(car|cars|motor|auto|supercar|vehicle)\b"),
+    "property": ("property events and new homes anywhere in Dubai (property shows such as Cityscape, new "
+                 "communities handing over homes, residents moving in, property-show visitor numbers)",
+                 r"\b(property|real estate|homes|residential|off-plan|developer|cityscape)\b"),
+    "shopping": ("shopping events anywhere in Dubai (Dubai Shopping Festival, mall sales, retail festivals, "
+                 "mall visitor numbers)",
+                 r"\b(shopping|mall|retail|sale|souk|outlet)\b"),
+}
 
 
 @dataclass
 class Search:
-    key: str            # placement id or "cars"
+    key: str            # placement id or a topic in TOPICS
     label: str
     places: list[str]
 
@@ -320,7 +345,8 @@ class Search:
 def searches_for(pcfg: PlacementConfig) -> list[Search]:
     out = [Search(p.id, f"{p.label} ({p.name})", list(p.nearby_places) or [p.area]) for p in pcfg.placements]
     every = sorted({n for p in pcfg.placements for n in p.nearby_places})
-    out.append(Search("cars", CARS_LABEL, every))
+    topics = [t for c in pcfg.campaign_options() for t in c.news_tags[:1] if t in TOPICS]
+    out += [Search(t, TOPICS[t][0], every) for t in dict.fromkeys(topics)]
     return out
 
 
@@ -383,10 +409,10 @@ def _headlines_for(key: str) -> list[str]:
         arts = Ledger.load().articles.values()
     except Exception:
         return []
-    rows = sorted((a for a in arts if key in a.get("placements", []) or key == "cars"),
+    rows = sorted((a for a in arts if key in a.get("placements", []) or key in TOPICS),
                   key=lambda a: a.get("published", ""), reverse=True)
-    if key == "cars":
-        rows = [a for a in rows if re.search(r"\b(car|cars|motor|auto|supercar|vehicle)\b", a["title"], re.I)]
+    if key in TOPICS:
+        rows = [a for a in rows if re.search(TOPICS[key][1], a["title"], re.I)]
     return [f"{a.get('published', '')[:10]} | {a['title']}" for a in rows]
 
 
@@ -467,8 +493,9 @@ def group_facts(facts: list[dict], kept_only: bool = True) -> list[FactGroup]:
             period=lead.get("period", "event"), value=statistics.median(vals), low=min(vals), high=max(vals),
             event_start=d(lead.get("event_start")), event_end=d(lead.get("event_end") or lead.get("event_start")),
             figure_year=lead.get("figure_year"),
-            tags=sorted({t for r in rows for t in r.get("tags", [])}),
-            placements=sorted({p for r in rows for p in r.get("placements", [])}),
+            tags=derived_tags(lead["kind"], lead["what"], sorted({t for r in rows for t in r.get("tags", [])})),
+            placements=([] if _slug(lead.get("place", "")) in CITY_WIDE   # a city-wide total is not one board's crowd
+                        else sorted({p for r in rows for p in r.get("placements", [])})),
             sources=[{"title": r.get("source_title") or r.get("source", ""), "url": r.get("source_url", ""),
                       "quote": r.get("quote", "")} for r in rows],
             confidence=max(r.get("confidence", 0) for r in rows), note=lead.get("note", ""),
@@ -537,7 +564,7 @@ class LocationPulse:
         return sum(e.extra_target for e in self.events)
 
     @property
-    def car_events(self) -> list[CrowdEvent]:
+    def match_events(self) -> list[CrowdEvent]:
         return [e for e in self.events if e.matches_campaign]
 
 
@@ -594,7 +621,7 @@ def pulse_for_results(res, pcfg: PlacementConfig, campaign: Campaign, params: Pa
     return campaign_pulse(group_facts(facts), pcfg, campaign, params, people_day, shares)
 
 
-def plan_with_crowds(res, pulse: dict[str, LocationPulse], budget_aed: float):
+def plan_with_crowds(res, pulse: dict[str, LocationPulse], boards: int):
     """Re-run the plan builder with each face's crowd-event people added. Returns (plan, items)."""
     import dataclasses
 
@@ -603,4 +630,4 @@ def plan_with_crowds(res, pulse: dict[str, LocationPulse], budget_aed: float):
     items = [dataclasses.replace(it, unique=it.unique + pulse[it.id].extra_people,
                                  relevant=it.relevant + pulse[it.id].extra_target)
              if it.id in pulse else it for it in res.plan_items]
-    return duplication.greedy_plan(items, res.overlap, budget_aed), items
+    return duplication.best_plan(items, res.overlap, boards), items

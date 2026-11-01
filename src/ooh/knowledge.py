@@ -38,6 +38,30 @@ def rules() -> dict:
 # --------------------------------------------------------------------------- the fact
 
 
+RATING_WORDS = {1: "Low", 2: "Medium", 3: "High", 4: "Very high"}
+
+
+def rating(level: int, of: int = 4) -> str:
+    """A 1-4 rating as dots: used instead of a number whenever the number rests on our assumption."""
+    level = max(1, min(of, int(round(level))))
+    return "●" * level + "○" * (of - level)
+
+
+def rush_level(commuter_share: float) -> int:
+    """Rush hours are 6 of 24 hours: 25 % of the day is flat traffic, above 45 % is very peaky."""
+    return 4 if commuter_share >= .45 else 3 if commuter_share >= .35 else 2 if commuter_share >= .25 else 1
+
+
+def share_level(share: float) -> int:
+    """A campaign's audience share of passers-by as a rating."""
+    return 4 if share >= .40 else 3 if share >= .25 else 2 if share >= .10 else 1
+
+
+def rating_level(share: float) -> int:
+    """0-1 (share of the best, or of the day) to a 1-4 rating."""
+    return 4 if share >= .75 else 3 if share >= .5 else 2 if share >= .25 else 1
+
+
 @dataclass
 class Fact:
     id: str
@@ -83,10 +107,10 @@ def _slug(s: str) -> str:
 
 POI_TAGS = {
     "Car showrooms and services": ["cars", "drivers"],
-    "Retail and malls": ["families", "luxury", "general"],
+    "Retail and malls": ["shopping", "families", "luxury"],
     "Hotels and tourism": ["luxury", "tourists"],
     "Offices and business": ["business", "premium"],
-    "Food and leisure": ["families", "general"],
+    "Food and leisure": ["families", "leisure"],
 }
 PREMIUM_AREAS = {"DIFC", "Downtown", "Dubai Marina"}  # same rule as the audience profile (ASSUMPTION)
 
@@ -94,7 +118,7 @@ PREMIUM_AREAS = {"DIFC", "Downtown", "Dubai Marina"}  # same rule as the audienc
 # --------------------------------------------------------------------------- build
 
 
-def _placement_facts(pid: str, r, params: Params, price_rank: int, n: int) -> list[Fact]:
+def _placement_facts(pid: str, r, params: Params) -> list[Fact]:
     p, reach, prof, m = r.prep.placement, r.reach, r.profile, r.metrics
     base = reach.scenarios["base"]
     flows = base.flows
@@ -158,9 +182,10 @@ def _placement_facts(pid: str, r, params: Params, price_rank: int, n: int) -> li
         sources=["rta", "metro"] if reach.metro else ["rta"], trust="ESTIMATE", feeds=["fit", "profile"],
         tags=["drivers"])
     add("rush", topic="audience", title="Traffic in the two rush hours (7-10 am, 5-8 pm)",
-        display=f"{prof.commuter_share:.0%} of the day", value=prof.commuter_share, unit="share",
-        sources=["assumptions"], trust="ASSUMPTION", feeds=["fit", "profile"], tags=["commuters", "drivers"],
-        detail="Standard Dubai commuter curve")
+        display=f"{rating(rush_level(prof.commuter_share))} {RATING_WORDS[rush_level(prof.commuter_share)]}",
+        value=prof.commuter_share, unit="share", sources=["assumptions"], trust="ASSUMPTION",
+        feeds=["fit", "profile"], tags=["commuters", "drivers"],
+        detail="A rating, not a measured share: it comes from a standard Dubai commuter curve, not counts at this board")
     meta, label = prof.meta, ("SAMPLE" if prof.meta_is_sample else "ESTIMATE")
     age = meta.get("age", {})
     if age:
@@ -181,8 +206,10 @@ def _placement_facts(pid: str, r, params: Params, price_rank: int, n: int) -> li
             else "Used as the campaign audience share")
     premium = p.area.split("/")[0].strip() in PREMIUM_AREAS
     add("premium", topic="audience", title="Income signal",
-        display="Premium area" if premium else "Mixed-income area", value=1.0 if premium else 0.0, unit="flag",
+        display=f"{rating(4)} Premium area" if premium else f"{rating(2)} Mixed-income area",
+        value=1.0 if premium else 0.0, unit="flag",
         sources=["assumptions"], trust="ASSUMPTION", feeds=["fit", "profile"],
+        detail="Our rating from the district (DIFC, Downtown, Marina and similar are premium); no income data is used",
         tags=["premium", "luxury"] if premium else ["general"])
 
     # ---- places nearby (OSM points of interest within 1 km)
@@ -199,11 +226,12 @@ def _placement_facts(pid: str, r, params: Params, price_rank: int, n: int) -> li
         sources=["inventory"], trust="VERIFIED", feeds=["forecast"], tags=["general"])
     add("size", topic="media", title="Face size", display=f"{p.width_m:g} × {p.height_m:g} m",
         value=p.face_area_m2, unit="m²", sources=["inventory"], trust="VERIFIED", feeds=["reach"])
-    ordinal = {2: "2nd", 3: "3rd"}.get(price_rank, f"{price_rank}th")
-    word = "cheapest" if price_rank == 1 else "most expensive" if price_rank == n else f"{ordinal} cheapest"
-    add("price", topic="media", title="Price level", display=f"{word} of our {n} boards",
-        value=float(p.cost_per_month_aed), unit="AED/month", sources=["inventory"], trust="ASSUMPTION",
-        feeds=["value"], core=True, detail="Planning price until media-owner quotes arrive")
+    lvl = p.price_level
+    add("price", topic="media", title="Price level", display=f"{rating(lvl)} {RATING_WORDS[lvl]}",
+        value=float(lvl), unit="rating 1-4", sources=["inventory"], trust="ASSUMPTION",
+        feeds=["value"], core=True,
+        detail="Our rating of how expensive this board is next to the others (1 = cheapest, 4 = most expensive). "
+               "No prices are used; the rating is replaced when media-owner quotes arrive.")
     return out
 
 
@@ -211,15 +239,17 @@ def _brief_facts(pcfg: PlacementConfig, params: Params) -> list[Fact]:
     out = []
     for c in pcfg.campaign_options():
         share = c.interest_share if c.interest_share is not None else params.base("interest_share")
-        tag = [f"campaign:{c.id}", "cars"]
+        tag = [f"campaign:{c.id}", *c.news_tags[:1]]
         out.append(Fact(f"brief:{c.id}:audience", "all", "audience", f"{c.title}: who we are after",
-                        f"{c.audience_short}: {share:.0%} of passers-by" if share < 1 else f"{c.audience_short}: everyone",
+                        (f"{c.audience_short}: {rating(share_level(share))} {RATING_WORDS[share_level(share)]} share of passers-by"
+                         if share < 1 else f"{c.audience_short}: everyone"),
                         ["briefs"], "ASSUMPTION", ["target"], tag, share, "share", core=True,
                         detail=c.audience))
-        out.append(Fact(f"brief:{c.id}:window", "all", "media", f"{c.title}: when and how much",
-                        f"{c.plan_start:%d %b} – {c.plan_end:%d %b %Y}", ["briefs"], "VERIFIED",
-                        ["value", "timing", "forecast"], tag, c.budget_aed, "AED", core=True,
-                        start=c.plan_start, end=c.plan_end, detail="Budget sets how many boards the plan can buy"))
+        out.append(Fact(f"brief:{c.id}:window", "all", "media", f"{c.title}: when and how many boards",
+                        f"{c.plan_start:%d %b} – {c.plan_end:%d %b %Y} · {c.boards} boards", ["briefs"], "VERIFIED",
+                        ["timing", "forecast"], tag, float(c.boards), "boards", core=True,
+                        start=c.plan_start, end=c.plan_end,
+                        detail="The brief books this many boards; the plan picks the mix that reaches the most target people"))
     return out
 
 
@@ -299,11 +329,9 @@ def _delivery_facts(res) -> list[Fact]:
 
 def build(res, pcfg: PlacementConfig, params: Params) -> list[Fact]:
     """Every fact the app knows, campaign-free. Fast: reads results and files only."""
-    costs = sorted(r.prep.placement.cost_per_month_aed for r in res.placements.values())
     facts: list[Fact] = []
     for pid, r in res.placements.items():
-        rank = costs.index(r.prep.placement.cost_per_month_aed) + 1
-        facts += _placement_facts(pid, r, params, rank, len(costs))
+        facts += _placement_facts(pid, r, params)
     facts += _brief_facts(pcfg, params) + _dsc_fact() + _people_facts(pcfg)
     facts += _road_event_facts(res, pcfg, params) + _delivery_facts(res)
     return facts
@@ -381,7 +409,7 @@ def score_locations(res, pcfg: PlacementConfig, campaign: Campaign, facts: list[
     R = rules()
     pids = list(res.placements)
     rel = {pid: r.profile.relevant_reach.value for pid, r in res.placements.items()}
-    cost = {pid: r.prep.placement.cost_per_month_aed for pid, r in res.placements.items()}
+    level = {pid: r.prep.placement.price_level for pid, r in res.placements.items()}
     label = {pid: r.prep.placement.label for pid, r in res.placements.items()}
 
     def scaled(raw: dict) -> dict:
@@ -394,30 +422,14 @@ def score_locations(res, pcfg: PlacementConfig, campaign: Campaign, facts: list[
     t = scaled(rel)
     crit["target"] = {pid: {"score": t[pid], "why": f"{people(rel[pid])} {campaign.audience_short} a month"} for pid in pids}
 
-    per = {pid: rel[pid] / cost[pid] if cost[pid] else 0 for pid in pids}
+    per = {pid: rel[pid] / level[pid] for pid in pids}
     v = scaled(per)
     best_v = max(per, key=per.get)
-    crit["value"] = {pid: {"score": v[pid], "why": ("best audience for the price" if pid == best_v else
-                                                   f"{per[best_v] / per[pid]:.1f}× less audience per unit of price than "
+    crit["value"] = {pid: {"score": v[pid], "why": ("most audience for its price level" if pid == best_v else
+                                                   f"{per[best_v] / per[pid]:.1f}× less audience per price level than "
                                                    f"{label[best_v]}" if per[pid] else "no audience")} for pid in pids}
 
-    signals = R["fit_signals"].get(campaign.id, R["fit_signals"]["default"])
-    raw_sig: dict[str, dict] = {}
-    for key in signals:
-        vals = {}
-        for pid in pids:
-            if key.startswith("poi:"):
-                f = by_fact.get(f"{pid}:poi_{_slug(key[4:])}")
-            else:
-                f = by_fact.get(f"{pid}:{ {'premium': 'premium', 'road_share': 'road_share', 'commuters': 'rush'}[key] }")
-            vals[pid] = float(f.value) if f and f.value is not None else 0.0
-        raw_sig[key] = vals
-    fit_raw = {pid: 0.0 for pid in pids}
-    wsum = sum(signals.values()) or 1.0
-    for key, w in signals.items():
-        top = max(raw_sig[key].values())
-        for pid in pids:
-            fit_raw[pid] += w * (raw_sig[key][pid] / top if top > 0 else 0.0) / wsum
+    fit_raw, raw_sig, signals = fit_scores(res.placements, campaign)
     names = {"premium": "premium area", "road_share": "drivers", "commuters": "rush-hour traffic"}
 
     def fit_why(pid: str) -> str:
@@ -464,6 +476,36 @@ def score_locations(res, pcfg: PlacementConfig, campaign: Campaign, facts: list[
 
 
 # --------------------------------------------------------------------------- the flow graph
+
+
+def fit_inputs(placements: dict) -> dict[str, dict[str, float]]:
+    """Local signals per board (the same numbers the knowledge facts carry): places within 1 km,
+    premium-area flag, share of views from drivers, share of traffic in the rush hours."""
+    out = {}
+    for pid, r in placements.items():
+        base = r.reach.scenarios["base"]
+        sig = {f"poi:{k}": float(v) for k, v in r.profile.poi_counts.items()}
+        sig["premium"] = 1.0 if r.prep.placement.area.split("/")[0].strip() in PREMIUM_AREAS else 0.0
+        sig["road_share"] = base.road_impressions_day / base.impressions_day if base.impressions_day else 1.0
+        sig["commuters"] = float(r.profile.commuter_share)
+        out[pid] = sig
+    return out
+
+
+def fit_scores(placements: dict, campaign: Campaign) -> tuple[dict, dict, dict]:
+    """Audience fit 0-1 per board for one campaign: weighted signals, each scaled to the best board.
+    Used by the Score page and by the pipeline (local fit tilts each board's campaign-audience share)."""
+    R = rules()
+    signals = R["fit_signals"].get(campaign.id, R["fit_signals"]["default"])
+    inputs = fit_inputs(placements)
+    raw = {key: {pid: inputs[pid].get(key, 0.0) for pid in inputs} for key in signals}
+    wsum = sum(signals.values()) or 1.0
+    fit = {pid: 0.0 for pid in inputs}
+    for key, w in signals.items():
+        top = max(raw[key].values(), default=0.0)
+        for pid in inputs:
+            fit[pid] += w * (raw[key][pid] / top if top > 0 else 0.0) / wsum
+    return fit, raw, signals
 
 
 def score_int(x: float) -> int:

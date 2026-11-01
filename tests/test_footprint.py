@@ -77,7 +77,7 @@ def test_campaign_window_and_conversion(params):
     assert e.extra_people == pytest.approx(35000 * pass_share)
     assert e.matches_campaign and e.extra_target == pytest.approx(e.extra_people * params.base("news_audience_match_share"))
     # the same fact sits outside the December campaign: context only, nothing modelled
-    dec = fp.campaign_pulse(groups, pcfg, camps["luxury_launch"], params, people_day, shares)["H1"]
+    dec = fp.campaign_pulse(groups, pcfg, camps["property_launch"], params, people_day, shares)["H1"]
     assert not dec.events and len(dec.later) == 1 and dec.extra_people == 0
 
 
@@ -117,3 +117,12 @@ def test_same_dated_crowd_in_two_units_is_counted_once():
          "status": "kept", "placements": ["H1"]}
     b = {**a, "what": "Burj Khalifa-Dubai Mall Metro Station on New Year's Eve", "period": "event", "source_url": URL + "/x"}
     assert len(fp.group_facts([a, b])) == 1
+
+
+def test_each_industry_gets_its_own_search_and_tags():
+    pcfg = load_placements()
+    keys = [s.key for s in fp.searches_for(pcfg)]
+    assert {"cars", "property", "shopping"} <= set(keys)
+    assert fp.derived_tags("new_homes_or_offices", "JLT", ["general"]) == ["general", "property"]
+    assert "shopping" in fp.derived_tags("venue_footfall", "Mall of the Emirates", ["families"])
+    assert fp.derived_tags("event_attendance", "Dubai Run", ["sports"]) == ["sports"]
