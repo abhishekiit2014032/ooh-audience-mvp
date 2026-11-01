@@ -7,3 +7,4 @@ data/cache/osmnx_http/
 data/cache/api/
 data/outputs/
 .DS_Store
+docs/
