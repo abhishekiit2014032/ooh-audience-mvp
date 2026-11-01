@@ -11,6 +11,16 @@ Guide*. **It runs end to end with no API keys**, and every number carries a labe
 
 **Public URL:** _not deployed yet. See [Deploy](#deploy); paste the Streamlit Community Cloud URL here._
 
+
+
+## ▶ Watch the 7-minute explainer
+
+0:00 The problem and the solution · 3:29 From idea to implementation · 6:49 Sheikh Zayed Road use case
+
+
+https://github.com/user-attachments/assets/f7fd8d8c-85d7-47c3-9291-941c0bfea8d2
+
+
 ## Quick start
 
 ```bash
