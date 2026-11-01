@@ -79,6 +79,7 @@ class Results:
     narratives: dict[str, dict] = field(default_factory=dict)
     forecasts: dict[str, "signals_mod.CampaignForecast"] = field(default_factory=dict)
     events: list[dict] = field(default_factory=list)
+    plan_items: list[duplication.PlacementSummary] = field(default_factory=list)  # inputs to the plan builder
 
 
 # --------------------------------------------------------------------------- stage 1
@@ -177,7 +178,7 @@ def compute(preps: dict[str, GeoPrep], pcfg: PlacementConfig, params: Params,
         rows.append(activation.radius_row(p.id, p.name, s.lon, s.lat, s.facing_bearing_deg, radius, half))
 
     return Results(
-        forecasts=forecasts, events=events,
+        forecasts=forecasts, events=events, plan_items=items,
         placements=results, overlap=mat, overlap_rules=rules, plan=plan,
         naive_unique=duplication.naive_sum(items), combined_unique_all=combined_all,
         delivery=deliv, delivery_label=deliv_label,

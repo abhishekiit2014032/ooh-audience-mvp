@@ -131,9 +131,19 @@ Both are noted in `config/placements.yaml`.
 
 ## Pages
 
-| Page | What it shows |
+The app opens on four executive pages (white theme, animated, one decision each). The original technical
+pages sit below them under **Analyst toolkit**.
+
+| Executive page | The decision it supports |
 | --- | --- |
-| Map | Dark basemap, pins, exposure cones, visible segments coloured by V, tooltip with factor breakdown |
+| Decision | Which billboards to book for the budget: recommended mix, de-duplicated car-interested reach, cost per person, unspent budget, and why the left-out board did not make it. Toggle billboards or move the budget to try other mixes instantly |
+| Billboard league | Each billboard on its own: price, audience with likely range, cost per car-interested person; sortable by value, size or price |
+| Audience | Who passes each board and when (age, gender, rush-hour share, nearby car showrooms), with a creative and scheduling "so what" |
+| Campaign health | Delivered vs planned views per billboard, status, weekly trend, and road events that change the forecast |
+
+| Analyst page | What it shows |
+| --- | --- |
+| Map | Light basemap, pins, exposure cones, visible segments coloured by V, tooltip with factor breakdown |
 | Data sources | Animated diagram: every source flows into the engine (geospatial reach model + Claude) and on to the analytics. Hover or click to trace a source or output; confidence score per source with its breakdown |
 | Placement detail | The planner's five questions, reach funnel (low/base/high), hourly impressions, persona card |
 | Compare locations | H1 to H4: daily impressions, unique monthly, relevant reach, AED per 1,000 relevant impressions |
@@ -144,9 +154,9 @@ Both are noted in `config/placements.yaml`.
 | Area signals | Online news turned into dated events (closures, roadworks, major events) with on/off switches, their effect on each face, cited sources, and the full ledger including what was filtered out as noise |
 | Assumptions and sources | Every parameter with label and source, data sources, snapping log, known limits |
 
-The sidebar has a slider for every scalar assumption in `config/assumptions.yaml`. The seven key ones are
-on top; the rest are under "All other assumptions". It also has an editable road-class table, a placement
-picker and a reset button. Geometry is cached once, so a slider change only re-runs the arithmetic.
+The sidebar's **Analyst controls** have a slider for every scalar assumption in `config/assumptions.yaml`. The seven
+key ones are under "Key assumptions"; the rest are under "All other assumptions". It also has an editable
+road-class table, a reset button and, on the pages that need it, a billboard picker. Geometry is cached once, so a slider change only re-runs the arithmetic.
 
 ## Confidence score per data source
 

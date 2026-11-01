@@ -93,21 +93,26 @@ class PlanStep:
     naive_relevant: float
 
 
+def combined_relevant(ids: list[str], items: list[PlacementSummary], mat: pd.DataFrame) -> float:
+    """De-duplicated relevant reach of a set of placements (same rule as combined_unique, in relevant people)."""
+    if not ids:
+        return 0.0
+    by_id = {p.id: p for p in items}
+    total = sum(by_id[i].relevant for i in ids)
+    ov = sum(mat.loc[a, b] * (by_id[a].interest_share + by_id[b].interest_share) / 2
+             for k, a in enumerate(ids) for b in ids[k + 1:])
+    return max(total - ov, max(by_id[i].relevant for i in ids))
+
+
 def greedy_plan(items: list[PlacementSummary], mat: pd.DataFrame, budget_aed: float) -> list[PlanStep]:
     """Add the placement with the highest incremental relevant reach per AED until the budget runs out."""
     chosen: list[str] = []
-    by_id = {p.id: p for p in items}
     rel = {p.id: p.relevant for p in items}
     spent = 0.0
     steps: list[PlanStep] = []
 
     def combined_rel(ids: list[str]) -> float:
-        if not ids:
-            return 0.0
-        total = sum(rel[i] for i in ids)
-        ov = sum(mat.loc[a, b] * (by_id[a].interest_share + by_id[b].interest_share) / 2
-                 for k, a in enumerate(ids) for b in ids[k + 1:])
-        return max(total - ov, max(rel[i] for i in ids))
+        return combined_relevant(ids, items, mat)
 
     while True:
         current = combined_rel(chosen)

@@ -6,7 +6,8 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 APP = str(Path(__file__).resolve().parents[1] / "app" / "streamlit_app.py")
-PAGES = ["Map", "Data sources", "Placement detail", "Compare locations", "Duplication and plan", "Planned vs actual",
+PAGES = ["Decision", "Billboard league", "Audience", "Campaign health",
+         "Map", "Data sources", "Placement detail", "Compare locations", "Duplication and plan", "Planned vs actual",
          "Sensitivity", "Activation", "Area signals", "Assumptions and sources"]
 
 

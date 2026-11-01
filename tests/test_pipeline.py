@@ -48,3 +48,14 @@ def test_delivery_and_activation_outputs(results):
     zones = json.loads(results.zones_geojson)
     assert len(zones["features"]) == 4
     assert results.radius_csv.count("\n") == 5
+
+
+
+def test_combined_relevant_matches_plan(results):
+    """The executive plan builder prices any mix with the same rule the greedy plan uses."""
+    from ooh import duplication
+
+    ids = [s.placement for s in results.plan]
+    assert ids
+    got = duplication.combined_relevant(ids, results.plan_items, results.overlap)
+    assert abs(got - results.plan[-1].combined_relevant) < 1e-6

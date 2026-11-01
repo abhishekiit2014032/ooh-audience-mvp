@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import io
 import sys
+from datetime import date
+from itertools import combinations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +22,8 @@ import streamlit as st  # noqa: E402
 import streamlit.components.v1 as components  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 
+from ooh import duplication  # noqa: E402
+from ooh import exec_ui  # noqa: E402
 from ooh import narrative as narrative_mod  # noqa: E402
 from ooh import signals as signals_mod  # noqa: E402
 from ooh import sources as sources_mod  # noqa: E402
@@ -31,20 +35,28 @@ from ooh.geometry import cone_polygon_lonlat  # noqa: E402
 from ooh.metrics import Metric, fmt_num  # noqa: E402
 from ooh.pipeline import Results, compute, prepare, sensitivity  # noqa: E402
 
-st.set_page_config(page_title="OOH Audience Intelligence", layout="wide")
+st.set_page_config(page_title="OOH Decision Room", page_icon="📍", layout="wide")
 
-PAGES = [
+# Executive pages answer one decision each; the analyst toolkit keeps the full technical detail.
+EXEC_PAGES = ["Decision", "Billboard league", "Audience", "Campaign health"]
+ANALYST_PAGES = [
     "Map",
-    "Data sources",
     "Placement detail",
     "Compare locations",
     "Duplication and plan",
     "Planned vs actual",
     "Sensitivity",
-    "Activation",
     "Area signals",
+    "Activation",
+    "Data sources",
     "Assumptions and sources",
 ]
+PAGES = EXEC_PAGES + ANALYST_PAGES
+PAGE_ICONS = {"Decision": "🎯", "Billboard league": "🏆", "Audience": "👥", "Campaign health": "📈", "Map": "🗺️",
+              "Placement detail": "🔎", "Compare locations": "📊", "Duplication and plan": "🔁",
+              "Planned vs actual": "📦", "Sensitivity": "🎚️", "Area signals": "📰", "Activation": "📲",
+              "Data sources": "🧠", "Assumptions and sources": "📚"}
+PID_PAGES = {"Map", "Placement detail", "Planned vs actual", "Sensitivity"}
 MAIN_SLIDERS = ["utilisation", "occupancy", "monthly_frequency", "cone_radius_m", "half_angle_deg",
                 "interest_share", "obstruction_factor"]
 BADGE_COLORS = {
@@ -54,11 +66,11 @@ BADGE_COLORS = {
     "SAMPLE": ("#842029", "#f8d7da"),
     "CONCEPT": ("#41464b", "#e2e3e5"),
 }
-PLOT_LAYOUT = dict(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                   margin=dict(l=10, r=10, t=70, b=10), font=dict(size=13),
+PLOT_LAYOUT = dict(template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                   margin=dict(l=10, r=10, t=70, b=10), font=dict(size=13, color="#1d1b2e"),
                    title=dict(x=0, xanchor="left", y=0.98, yanchor="top"))
 LEGEND_TOP = dict(orientation="h", y=1.02, yanchor="bottom", x=1, xanchor="right")
-SERIES = ["#4C9AFF", "#F5A524", "#36B37E", "#E5484D"]
+SERIES = exec_ui.FACE_COLORS
 _to_wgs = Transformer.from_crs("EPSG:32640", "EPSG:4326", always_xy=True)
 
 
@@ -122,17 +134,55 @@ def event_faces(ev: dict, pcfg) -> str:
 
 MOTION_CSS = """
 <style>
-@keyframes oohFadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes oohPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(54,179,126,.55); } 70% { box-shadow: 0 0 0 7px rgba(54,179,126,0); } }
+:root { --ooh-accent:#6250d6; --ooh-soft:#f6f5fc; --ooh-line:#ecebf3; --ooh-ink:#1d1b2e; --ooh-muted:#8a889c; }
+[data-testid="stMain"] .block-container { padding-top: 2.2rem; max-width: 1280px; }
+@keyframes oohFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes oohPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(12,163,12,.45); } 70% { box-shadow: 0 0 0 7px rgba(12,163,12,0); } }
 [data-testid="stMain"] [data-testid="stElementContainer"],
-[data-testid="stMain"] [data-testid="stExpander"] { animation: oohFadeUp .28s ease-out both; }
-.ooh-card { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-.ooh-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,.35); border-color: #4C9AFF !important; }
-.ooh-live { display:inline-block; width:8px; height:8px; border-radius:50%; background:#36B37E; margin-right:6px;
+[data-testid="stMain"] [data-testid="stExpander"] { animation: oohFadeUp .35s cubic-bezier(.2,.8,.2,1) both; }
+.ooh-card { background:#fff; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            box-shadow: 0 1px 2px rgba(29,27,46,.05); }
+.ooh-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(98,80,214,.14); border-color: #6250d6 !important; }
+.ooh-live { display:inline-block; width:8px; height:8px; border-radius:50%; background:#0ca30c; margin-right:6px;
             animation: oohPulse 1.8s infinite; vertical-align: middle; }
-[data-testid="stSidebar"] label { transition: color .15s ease, transform .15s ease; }
-[data-testid="stSidebar"] [role="radiogroup"] label:hover { color: #4C9AFF; transform: translateX(3px); }
-[data-testid="stPlotlyChart"], [data-testid="stDeckGlJsonChart"] { border-radius: 10px; overflow: hidden; }
+/* page header */
+.ooh-head { margin: 0 0 14px; }
+.ooh-eyebrow { display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+               color:var(--ooh-accent); background:#efedfc; border-radius:999px; padding:4px 12px; }
+.ooh-title { font-size: 2.1rem !important; font-weight: 800 !important; letter-spacing: -.02em; margin: 10px 0 4px !important;
+             padding: 0 !important; line-height: 1.15 !important; color: var(--ooh-ink); }
+.ooh-sub { color: #55536a; font-size: 1.02rem; margin: 0; max-width: 780px; }
+.ooh-analyst { display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+               color:#55536a; background:#f6f5fc; border:1px solid #ecebf3; border-radius:999px; padding:3px 10px; margin-bottom:4px; }
+/* sidebar navigation */
+[data-testid="stSidebar"] { border-right: 1px solid var(--ooh-line); }
+.ooh-brand { display:flex; align-items:center; gap:10px; margin: 0 0 14px; }
+.ooh-brand .logo { width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:20px;
+                   background: linear-gradient(135deg, #8b7cf0, #6250d6); box-shadow: 0 6px 16px rgba(98,80,214,.3); }
+.ooh-brand b { font-size: 1.05rem; color: var(--ooh-ink); display:block; line-height:1.2; }
+.ooh-brand span { font-size: .8rem; color: var(--ooh-muted); }
+[data-testid="stSidebar"] [role="radiogroup"] { gap: 2px; padding-top: 22px; position: relative; width: 100%; }
+[data-testid="stSidebar"] [role="radiogroup"]::before { content: "DECIDE"; position:absolute; top:0; left:10px;
+    font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--ooh-muted); }
+[data-testid="stSidebar"] [role="radiogroup"] > div { width: 100%; position: relative; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"] { width: 100%; padding: 7px 10px; border-radius: 10px; margin: 0;
+    cursor: pointer; transition: background .15s ease, transform .15s ease; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"] > div > div:not([data-testid="stMarkdownContainer"]) { display: none; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:hover { background: #efedfc; transform: translateX(3px); }
+[data-testid="stSidebar"] [role="radiogroup"] > div[data-selected="true"] [data-testid="stRadioOption"] {
+    background: #efedfc; box-shadow: inset 3px 0 0 #6250d6; }
+[data-testid="stSidebar"] [role="radiogroup"] > div[data-selected="true"] p { font-weight: 700; color: #6250d6; }
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(5) { margin-top: 30px; }
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(5)::before { content: "ANALYST TOOLKIT"; position:absolute;
+    top:-20px; left:10px; font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--ooh-muted); }
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(n+5) p { font-size: .9rem; }
+[data-testid="stSidebar"] [role="radiogroup"] > div:nth-of-type(-n+4) p { font-size: 1rem; font-weight: 600; }
+/* tidy containers */
+[data-testid="stPlotlyChart"], [data-testid="stDeckGlJsonChart"] { border-radius: 14px; overflow: hidden; }
+[data-testid="stPlotlyChart"] { border: 1px solid var(--ooh-line); padding: 6px 8px; background:#fff; }
+[data-testid="stDataFrame"] { border-radius: 12px; overflow: hidden; }
+[data-testid="stExpander"] details { border-radius: 12px; }
+iframe { border: 0; }
 @media (prefers-reduced-motion: reduce) {
   [data-testid="stMain"] [data-testid="stElementContainer"], [data-testid="stMain"] [data-testid="stExpander"],
   .ooh-live { animation: none; }
@@ -150,7 +200,7 @@ def kpi_strip(items: list[tuple[str, float, str, str]]) -> None:
                         for t, v, u, l in items])
     components.html(f"""
 <div id="k" style="display:grid;grid-template-columns:repeat({len(items)},1fr);gap:12px;
-     font-family:'Source Sans Pro','Source Sans 3',-apple-system,sans-serif;color:#e6e9ef"></div>
+     font-family:system-ui,-apple-system,sans-serif;color:#1d1b2e"></div>
 <script>
 const D = {data}; const root = document.getElementById('k');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -158,14 +208,14 @@ function fmt(x) {{ const a = Math.abs(x); if (a >= 1e6) return (x/1e6).toFixed(2
   if (a >= 1e4) return (x/1e3).toFixed(1) + 'k'; return Math.round(x).toLocaleString(); }}
 D.forEach((d, i) => {{
   const c = document.createElement('div');
-  c.style.cssText = 'background:linear-gradient(160deg,#182033,#11161f);border:1px solid #2a3242;border-radius:12px;' +
+  c.style.cssText = 'background:linear-gradient(160deg,#ffffff,#f7f6fc);border:1px solid #ecebf3;border-radius:14px;' +
     'padding:12px 14px;transition:transform .18s,border-color .18s;opacity:0;transform:translateY(6px)';
-  c.onmouseenter = () => {{ c.style.transform = 'translateY(-3px)'; c.style.borderColor = '#4C9AFF'; }};
-  c.onmouseleave = () => {{ c.style.transform = 'none'; c.style.borderColor = '#2a3242'; }};
-  c.innerHTML = `<div style="font-size:12.5px;color:#8b93a7">${{d.t}}
+  c.onmouseenter = () => {{ c.style.transform = 'translateY(-3px)'; c.style.borderColor = '#6250d6'; }};
+  c.onmouseleave = () => {{ c.style.transform = 'none'; c.style.borderColor = '#ecebf3'; }};
+  c.innerHTML = `<div style="font-size:12.5px;color:#55536a">${{d.t}}
      <span style="background:${{d.c[1]}};color:${{d.c[0]}};border-radius:4px;padding:0 5px;font-size:10px;font-weight:700;margin-left:4px">${{d.l}}</span></div>
      <div style="font-size:30px;font-weight:700;line-height:1.25"><span class="n">0</span>
-     <span style="font-size:13px;font-weight:400;color:#8b93a7">${{d.u}}</span></div>`;
+     <span style="font-size:13px;font-weight:400;color:#8a889c">${{d.u}}</span></div>`;
   root.appendChild(c);
   setTimeout(() => {{ c.style.transition = 'opacity .35s, transform .35s, border-color .18s';
                      c.style.opacity = 1; c.style.transform = 'none'; }}, 40 + i * 70);
@@ -204,14 +254,14 @@ def label_line(text: str, label: str) -> None:
 
 
 def v_color(v: float, vmax: float) -> list[int]:
-    """Dark blue (low visibility) to yellow (high)."""
+    """Light blue (low visibility) to deep navy (high): one-hue sequential ramp for a light basemap."""
     t = 0.0 if vmax <= 0 else min(1.0, v / vmax)
-    stops = [(0.0, (49, 54, 149)), (0.35, (69, 117, 180)), (0.65, (116, 196, 118)), (1.0, (254, 224, 76))]
+    stops = [(0.0, (134, 182, 239)), (0.35, (57, 135, 229)), (0.7, (37, 106, 191)), (1.0, (13, 54, 107))]
     for (t0, c0), (t1, c1) in zip(stops, stops[1:]):
         if t <= t1:
             k = (t - t0) / (t1 - t0) if t1 > t0 else 0
-            return [int(c0[i] + k * (c1[i] - c0[i])) for i in range(3)] + [230]
-    return [254, 224, 76, 230]
+            return [int(c0[i] + k * (c1[i] - c0[i])) for i in range(3)] + [235]
+    return [13, 54, 107, 235]
 
 
 def lonlat_path(geom) -> list[list[float]]:
@@ -224,18 +274,23 @@ def lonlat_path(geom) -> list[list[float]]:
 
 
 def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
-    st.sidebar.title("OOH Audience Intelligence")
-    page = st.sidebar.radio("Page", PAGES, key="page")
-    pid = st.sidebar.selectbox("Placement", [p.id for p in pcfg.placements],
-                               format_func=lambda i: f"{i} · {next(p.name for p in pcfg.placements if p.id == i)}",
-                               key="pid")
+    st.sidebar.markdown(
+        f"<div class='ooh-brand'><div class='logo'>📍</div><div><b>OOH Decision Room</b>"
+        f"<span>{pcfg.campaign.brand} · Dubai</span></div></div>", unsafe_allow_html=True)
+    page = st.sidebar.radio("Page", PAGES, key="page", label_visibility="collapsed",
+                            format_func=lambda x: f"{PAGE_ICONS.get(x, '')}\u2002{x}")
+    ids = [p.id for p in pcfg.placements]
+    keep = st.session_state.get("pid_keep", ids[0])
+    if page in PID_PAGES:
+        pid = st.sidebar.selectbox("Billboard", ids, index=ids.index(keep) if keep in ids else 0,
+                                   format_func=lambda i: f"{i} · {next(p.name for p in pcfg.placements if p.id == i)}",
+                                   key="pid")
+        st.session_state["pid_keep"] = pid
+    else:
+        pid = keep if keep in ids else ids[0]
 
-    if st.sidebar.button("Reset all assumptions", width="stretch"):
-        for key in list(st.session_state.keys()):
-            if key.startswith("param_") or key == "road_editor":
-                del st.session_state[key]
-        st.rerun()
-
+    st.sidebar.divider()
+    st.sidebar.caption("🎛️ ANALYST CONTROLS · every number in the app follows these")
     overrides: dict[str, float] = {}
 
     def control(key: str, container) -> None:
@@ -251,9 +306,14 @@ def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
         if abs(value - p.value) > 1e-12:
             overrides[key] = float(value)
 
-    st.sidebar.subheader("Key assumptions")
-    for key in MAIN_SLIDERS:
-        control(key, st.sidebar)
+    with st.sidebar.expander("Key assumptions"):
+        if st.button("↺ Reset all assumptions", width="stretch"):
+            for key in list(st.session_state.keys()):
+                if key.startswith("param_") or key == "road_editor":
+                    del st.session_state[key]
+            st.rerun()
+        for key in MAIN_SLIDERS:
+            control(key, st)
 
     with st.sidebar.expander("All other assumptions"):
         groups: dict[str, list[str]] = {}
@@ -275,25 +335,334 @@ def sidebar(acfg: AssumptionConfig, pcfg) -> tuple[str, str, dict, tuple, bool]:
         if edited.equals(base_df):
             road_rows = ()
 
-    has_claude = env_key("ANTHROPIC_API_KEY") is not None
-    use_llm = st.sidebar.toggle("Claude narratives", value=False, disabled=not has_claude,
-                                help="Needs ANTHROPIC_API_KEY. Off by default: each new set of numbers is one "
-                                     "API call (cached on disk). Without it a template writes the narrative.")
-    keys = {k: env_key(k) is not None for k in ["TOMTOM_API_KEY", "DUBAI_PULSE_KEY", "MAPILLARY_TOKEN",
-                                               "ANTHROPIC_API_KEY"]}
-    st.sidebar.caption("API keys: " + ", ".join(f"{k.split('_')[0].title()} {'set' if v else 'not set'}"
-                                                for k, v in keys.items()))
+    with st.sidebar.expander("AI and data connections"):
+        has_claude = env_key("ANTHROPIC_API_KEY") is not None
+        use_llm = st.toggle("Claude narratives", value=False, disabled=not has_claude,
+                            help="Needs ANTHROPIC_API_KEY. Off by default: each new set of numbers is one "
+                                 "API call (cached on disk). Without it a template writes the narrative.")
+        keys = {k: env_key(k) is not None for k in ["TOMTOM_API_KEY", "DUBAI_PULSE_KEY", "MAPILLARY_TOKEN",
+                                                   "ANTHROPIC_API_KEY"]}
+        st.caption("API keys: " + ", ".join(f"{k.split('_')[0].title()} {'set' if v else 'not set'}"
+                                            for k, v in keys.items()))
+    if overrides or road_rows:
+        st.sidebar.warning(f"{len(overrides) + (1 if road_rows else 0)} assumption(s) changed from the defaults.")
     return page, pid, overrides, road_rows, use_llm
 
 
 # --------------------------------------------------------------------------- pages
 
 
-def page_map(res: Results, params: Params) -> None:
+# --------------------------------------------------------------------------- executive pages
+
+
+def html_block(doc: str, height: int) -> None:
+    """Render a self-contained HTML block; it grows to fit its content after load."""
+    components.html(doc, height=height, scrolling=False)
+
+
+def page_header(eyebrow: str, title: str, subtitle: str) -> None:
+    st.markdown(exec_ui.header_html(eyebrow, title, subtitle), unsafe_allow_html=True)
+
+
+def analyst_tag() -> None:
+    st.markdown("<span class='ooh-analyst'>🧰 Analyst toolkit · full technical detail</span>",
+                unsafe_allow_html=True)
+
+
+def trust_of(*labels: str) -> list[str]:
+    worst = max(labels, key=lambda l: ["VERIFIED", "ESTIMATE", "ASSUMPTION", "SAMPLE", "CONCEPT"].index(l)
+                if l in exec_ui.TRUST else 1)
+    return list(exec_ui.TRUST.get(worst, ("Estimate", "")))
+
+
+def face_rows(res: Results) -> list[dict]:
+    """One row per billboard, in config order, with the numbers the executive pages use."""
+    plan_ids = {s.placement for s in res.plan}
+    rows = []
+    for i, (pid, r) in enumerate(res.placements.items()):
+        p, rr = r.prep.placement, r.profile.relevant_reach
+        rows.append({"id": pid, "name": p.name, "area": p.area.split(" / ")[0], "area_full": p.area,
+                     "type": p.type.title(), "cost": float(p.cost_per_month_aed), "rel": float(rr.value),
+                     "rel_lo": float(rr.low), "rel_hi": float(rr.high),
+                     "cpp": float(p.cost_per_month_aed / rr.value) if rr.value else 0.0,
+                     "color": exec_ui.FACE_COLORS[i % len(exec_ui.FACE_COLORS)], "in_plan": pid in plan_ids,
+                     "label": rr.label, "sov": float(p.share_of_voice), "unique": float(r.metrics["unique_month"].value)})
+    return rows
+
+
+def plan_options(res: Results, budget: float, step: int = 10_000) -> dict:
+    """De-duplicated relevant reach for every mix of billboards, and the plan builder's pick at each budget."""
+    items, mat = res.plan_items, res.overlap
+    ids = [it.id for it in items]
+    subsets = {}
+    for k in range(1, len(ids) + 1):
+        for combo in combinations(ids, k):
+            subsets[",".join(sorted(combo))] = {"rel": float(duplication.combined_relevant(list(combo), items, mat))}
+    total = sum(it.cost_aed for it in items)
+    top = int(np.ceil(max(budget * 1.5, total + step * 5) / step) * step)
+    picks = {str(b): [s.placement for s in duplication.greedy_plan(items, mat, b)] for b in range(0, top + 1, step)}
+    return {"subsets": subsets, "picks": picks, "budget_max": top, "step": step,
+            "budget": int(round(budget / step) * step)}
+
+
+def news_events(res: Results, params: Params) -> list[dict]:
+    """Switched-on road events that move at least one billboard's forecast, with their effect per face.
+
+    ``delta`` is in views of our ad (placement impressions × share of voice), matching the delivery figures.
+    """
+    by_id = {e["id"]: e for e in res.events}
+    hits: dict[str, dict] = {}
+    for pid, f in res.forecasts.items():
+        sov = float(res.placements[pid].prep.placement.share_of_voice)
+        for h in f.applied:
+            ev = hits.setdefault(h["event"], {"faces": {}})
+            face = ev["faces"].setdefault(pid, {"delta": 0.0, "day_change": h["change"], "campaign": 0.0})
+            face["delta"] += float(h["impressions_delta"]) * sov
+            face["campaign"] = face["delta"] / (f.baseline.value * sov) if f.baseline.value and sov else 0.0
+            face["day_change"] = min(face["day_change"], h["change"])
+    out = []
+    for eid, hit in hits.items():
+        e = by_id.get(eid, {"type": "event", "date": eid.split("|")[-1]})
+        d = date.fromisoformat(str(e["date"])[:10])
+        out.append({"id": eid, "date": d, "type": EVENT_LABELS.get(e["type"], e["type"]),
+                    "note": e.get("note") or e.get("corridor") or "",
+                    "where": e.get("stretch") or e.get("corridor") or ", ".join(e.get("areas", [])),
+                    "hours": event_hours(e, params) if "type" in e else "", "confidence": e.get("confidence"),
+                    "faces": hit["faces"],
+                    "source": e.get("source", "")})
+    return sorted(out, key=lambda x: x["date"])
+
+
+def delivery_summary(res: Results) -> pd.DataFrame:
+    g = res.delivery.groupby("placement").agg(planned=("planned", "sum"), forecast=("forecast", "sum"),
+                                              actual=("actual", "sum"))
+    g["index"] = g["actual"] / g["planned"]
+    g["news"] = g["forecast"] / g["planned"] - 1
+    return g
+
+
+def page_decision(res: Results, pcfg, params: Params) -> None:
+    budget = float(pcfg.campaign.budget_aed)
+    faces = face_rows(res)
+    by_id = {f["id"]: f for f in faces}
+    opts = plan_options(res, budget)
+    trust = trust_of(*[f["label"] for f in faces])
+    start = pcfg.campaign.plan_start
+    page_header(f"🎯 The decision · {pcfg.campaign.brand} · {start:%B %Y}",
+                f"Where should our {exec_ui.aed(budget)} a month go?",
+                f"We scored {len(faces)} billboards on how many car-interested people each one reaches per dirham, "
+                "without counting the same driver twice. Here is the mix we recommend. Tap the cards to try your own.")
+    html_block(exec_ui.decision_html({"faces": faces, "trust": trust, **opts}), height=560)
+
+    # Three answers a board member asks next, plus the obvious "why not the flagship?"
+    plan_ids = [s.placement for s in res.plan]
+    deliv = delivery_summary(res)
+    scope = [i for i in plan_ids if i in deliv.index] or list(deliv.index)
+    d = deliv.loc[scope]
+    expected = float(d["actual"].sum() / d["planned"].sum()) if d["planned"].sum() else 1.0
+    status = ("Looks on track", "good") if expected >= 0.97 else ("Keep an eye on it", "warn") if expected >= 0.9 else \
+        ("Likely behind plan", "crit")
+    light = [pid for pid, r in d.iterrows() if r["index"] < 0.97]
+    started = date.today() > pcfg.campaign.plan_start
+    events = news_events(res, params)
+    plan_rel = [f for f in faces if f["in_plan"]] or faces
+    lo_x = sum(f["rel_lo"] for f in plan_rel) / sum(f["rel"] for f in plan_rel)
+    hi_x = sum(f["rel_hi"] for f in plan_rel) / sum(f["rel"] for f in plan_rel)
+    meter = {"VERIFIED": 5, "ESTIMATE": 3, "ASSUMPTION": 2, "SAMPLE": 2, "CONCEPT": 1}
+    worst = max((f["label"] for f in faces), key=lambda l: meter.get(l, 3) * -1)
+    tiles = [
+        {"emoji": "📦", "q": "Will it deliver?", "a": f"{expected:.0%}", "unit": "of planned views expected",
+         "text": ((f"For our pick ({', '.join(scope)}), " if plan_ids else "Across all billboards, ")
+                  + ("based on a simulated month: no media-owner play logs or live traffic counts are connected yet. "
+                     if not started else "simulated until play logs and live counts are connected. ")
+                  + (f"{', '.join(light)} may run a little light." if light else "Every board is at or above plan.")),
+         "chips": [(f"{'✅' if status[1] == 'good' else '👀' if status[1] == 'warn' else '🔴'} {status[0]}", status[1]),
+                   ("Simulated", "warn")]},
+    ]
+    hits_plan = [(e, {k: v for k, v in e["faces"].items() if k in plan_ids}) for e in events]
+    hits_plan = [(e, f) for e, f in hits_plan if f]
+    others = sorted({k for e in events for k in e["faces"] if k not in plan_ids})
+    if hits_plan:
+        e, fs = hits_plan[0]
+        worst_face = min(fs.items(), key=lambda kv: kv[1]["delta"])
+        small = abs(worst_face[1]["campaign"]) < 0.02
+        tiles.append({"emoji": "🚧", "q": "Anything in the way?",
+                      "a": f"{len(hits_plan)} road event{'s' if len(hits_plan) > 1 else ''}", "unit": "for our pick",
+                      "text": (f"<b>{e['date']:%a %d %b}</b>: {e['note'] or e['type']}. "
+                               f"{worst_face[0]} loses about {exec_ui.people(abs(worst_face[1]['delta']))} views of our "
+                               f"ad that day ({worst_face[1]['campaign']:+.1%} over the month)."),
+                      "chips": [("Small effect" if small else "Material effect", "good" if small else "warn"),
+                                ("From news headlines", "accent")]})
+    else:
+        tiles.append({"emoji": "🌤️", "q": "Anything in the way?", "a": "All clear", "unit": "for our pick",
+                      "text": ("No closures, roadworks or big events are expected near the boards we recommend this month."
+                               + (f" The only one found affects {', '.join(others)}, which is not in our pick."
+                                  if others else "")),
+                      "chips": [("From news headlines", "accent")]})
+    tiles.append({"emoji": "🔍", "q": "How sure are we?", "a": trust[0], "unit": "", "meter": meter.get(worst, 3),
+                  "text": (f"Good for ranking the billboards; treat the head counts as a range. Reach could land between "
+                           f"{lo_x:.1f}× and {hi_x:.1f}× our central figure, mostly depending on how often the same "
+                           "people repeat the trip. Traffic is estimated from road capacity, not live counters."),
+                  "chips": [("Ranking: reliable", "good"), ("Head counts: ± a lot", "warn")]})
+
+    why = None
+    left_out = [f for f in faces if f["id"] not in plan_ids]
+    if plan_ids and left_out:
+        f = max(left_out, key=lambda x: x["rel"])
+        best = min(faces, key=lambda x: x["cpp"])
+        key_plan = ",".join(sorted(plan_ids))
+        key_with = ",".join(sorted(plan_ids + [f["id"]]))
+        inc = opts["subsets"][key_with]["rel"] - opts["subsets"][key_plan]["rel"]
+        spent = sum(by_id[i]["cost"] for i in plan_ids)
+        points = []
+        if f["cpp"] >= max(x["cpp"] for x in faces) - 1e-9:
+            points.append(f"<b>Priciest per person:</b> AED {f['cpp']:.2f} for each car-interested person, against "
+                          f"AED {best['cpp']:.2f} for {best['id']}, the best value.")
+        else:
+            points.append(f"<b>Cost per person:</b> AED {f['cpp']:.2f}, against AED {best['cpp']:.2f} for {best['id']}.")
+        mat = res.overlap
+        partner = max(plan_ids, key=lambda x: mat.loc[f["id"], x] / min(mat.loc[f["id"], f["id"]], mat.loc[x, x]))
+        share = mat.loc[f["id"], partner] / min(mat.loc[f["id"], f["id"]], mat.loc[partner, partner])
+        rule = str(res.overlap_rules.loc[f["id"], partner])
+        smaller = partner if mat.loc[partner, partner] <= mat.loc[f["id"], f["id"]] else f["id"]
+        other = f["id"] if smaller == partner else partner
+        if share >= 0.2:
+            points.append(f"<b>Same drivers:</b> about {share:.0%} of the people who pass {smaller} also pass {other}"
+                          f"{' (same road, same direction)' if 'same corridor' in rule else ''}, so much of its audience "
+                          "is already covered.")
+        need = spent + f["cost"] - budget
+        points.append(f"<b>Small gain:</b> adding it would bring only {exec_ui.people(inc)} extra people for "
+                      f"{exec_ui.aed(f['cost'])} a month (AED {f['cost'] / max(inc, 1):.2f} per extra person)"
+                      + (f", and the budget would need to grow by {exec_ui.aed(need)}." if need > 0 else "."))
+        why = {"title": f"Why isn't {f['id']} ({f['name']}) in the plan?", "points": points}
+    html_block(exec_ui.insights_html({"tiles": tiles, "why": why}), height=470)
+    st.caption("Head counts are people per month, counted once even if they pass several times. "
+               "\"Car-interested\" = share of the audience with an interest in cars or SUVs. "
+               "Billboard prices are planning assumptions until media-owner quotes arrive. "
+               "Full method in the Analyst toolkit.")
+
+
+def page_league(res: Results) -> None:
+    faces = face_rows(res)
+    page_header("🏆 Billboard league", "Which billboard gives us the most for the money?",
+                "Each billboard on its own: price, audience and cost per car-interested person. "
+                "Re-sort to see who wins on value, size or price.")
+    best_cpp = min(f["cpp"] for f in faces)
+    max_rel = max(f["rel"] for f in faces)
+    max_cpp = max(f["cpp"] for f in faces)
+    rows = []
+    for f in faces:
+        tags = [("⭐ In our plan", "accent") if f["in_plan"] else ("Not in plan", "")]
+        if f["cpp"] == best_cpp:
+            tags.append(("💎 Best value", "good"))
+        if f["rel"] == max_rel:
+            tags.append(("📣 Biggest audience", ""))
+        if f["cpp"] == max_cpp and len(faces) > 1:
+            tags.append(("💸 Priciest per person", "warn"))
+        slots = round(1 / f["sov"]) if f["sov"] else 1
+        rows.append({**f, "name": f"{f['name']} · {f['area_full']}", "tags": tags,
+                     "type_note": (f"Digital screen · our ad is 1 of {slots} in rotation" if f["type"] == "Digital"
+                                   and slots > 1 else f"{f['type']} · our ad shows all day"),
+                     "cpp_note": "best value" if f["cpp"] == best_cpp else f"{f['cpp'] / best_cpp - 1:+.0%} vs best"})
+    note = ("Car-interested people = unique people passing each month × the share interested in cars. "
+            "The bar shows our central figure; the faint band is the likely range. Two billboards on the same road "
+            "share many drivers, which is why the Decision page does not simply add them up.")
+    html_block(exec_ui.league_html({"rows": rows, "trust": trust_of(*[f["label"] for f in faces]), "note": note}),
+               height=600)
+
+
+def page_audience(res: Results) -> None:
+    faces = face_rows(res)
+    page_header("👥 Audience", "Who will see our ad, and when?",
+                "Use this to brief the creative and, on digital screens, to schedule it. ⭐ marks billboards in our plan.")
+    out = []
+    for f in sorted(faces, key=lambda x: (not x["in_plan"], -x["rel"])):
+        r = res.placements[f["id"]]
+        prof, meta = r.profile, r.profile.meta
+        age = meta.get("age", {})
+        male = float(meta.get("gender", {}).get("male", 0.5))
+        core = sum(v for k, v in age.items() if k in ("25-34", "35-44", "45-54"))
+        premium = any("premium" in s for s in prof.segments.get("Demographic", []))
+        cars = int(prof.poi_counts.get("Car showrooms and services", 0))
+        top_poi = [k.lower() for k, v in sorted(prof.poi_counts.items(), key=lambda kv: -kv[1])[:2] if v]
+        hourly = [float(x) for x in r.reach.scenarios["base"].hourly_impressions]
+        rush = sum(hourly[7:10] + hourly[17:20]) / sum(hourly) if sum(hourly) else 0
+        share = prof.interest_share.value
+        tenths = round(core * 10)
+        if f["type"] == "Digital":
+            sowhat = (f"<b>So what:</b> this is a digital screen, so we can choose when to run. Weight the SUV creative to "
+                      f"the 7–10 am and 5–8 pm rush, when {rush:.0%} of views happen. Our ad shares the screen with "
+                      f"{round(1 / f['sov']) - 1} others, so keep it to one image and one line.")
+        else:
+            sowhat = (f"<b>So what:</b> a static board shows one message all day to drivers at motorway speed. "
+                      f"Design for a two-second glance: the car, the brand and one line.")
+        if cars >= 10:
+            sowhat += f" With {cars} car showrooms and services within 1 km, a 'test drive nearby' call to action fits."
+        out.append({
+            "id": f["id"], "area": f["area"], "color": f["color"], "in_plan": f["in_plan"], "type": f["type"],
+            "avatar": "💼" if premium else "🚙",
+            "headline": f"{'Premium-area' if premium else 'Everyday'} commuters through {f['area_full']}",
+            "blurb": (f"{tenths} in 10 are aged 25–54 and {male:.0%} are men. Nearly all of them are in cars "
+                      f"(the view count is road traffic){', plus a few metro riders' if r.reach.metro else ''}. "
+                      + (f"Around the board you mostly find {' and '.join(top_poi)}." if top_poi else "")),
+            "stats": [["🎯", f"{tenths} in 10", "aged 25–54"],
+                      ["🚗", f"{exec_ui.people(f['rel'])}", f"car-interested people a month ({share:.0%} of the audience)"],
+                      ["⏰", f"{rush:.0%}", "of views in the two rush hours"],
+                      ["🏬", f"{cars}", "car showrooms and services within 1 km"]],
+            "hourly": hourly, "age": {k.replace("-", "–"): float(v) for k, v in age.items()}, "male": male,
+            "sowhat": sowhat})
+    html_block(exec_ui.audience_html({"faces": out}), height=760)
+    label = "SAMPLE" if any(res.placements[f["id"]].profile.meta_is_sample for f in faces) else "ESTIMATE"
+    st.caption(f"Age, gender and car interest come from Meta audience estimates ({exec_ui.TRUST[label][0].lower()}: "
+               f"{exec_ui.TRUST[label][1].lower()}). Hourly shape is a standard Dubai commuter curve (assumption). "
+               "Nearby places are from OpenStreetMap.")
+
+
+def page_health(res: Results, pcfg, params: Params) -> None:
+    faces = face_rows(res)
+    c = pcfg.campaign
+    page_header("📈 Campaign health", "Is the campaign delivering what we paid for?",
+                f"Campaign {c.plan_start:%d %b} – {c.plan_end:%d %b %Y}. Views delivered against the plan for each "
+                "billboard (⭐ = in our pick), and anything on the roads that changes the forecast.")
+    g = delivery_summary(res)
+    rows = []
+    for f in faces:
+        if f["id"] not in g.index:
+            continue
+        r = g.loc[f["id"]]
+        weeks = res.delivery[res.delivery["placement"] == f["id"]]["delivery_index"].astype(float).tolist()
+        rows.append({"id": f["id"], "area": f["area"], "color": f["color"], "index": float(r["index"]), "in_plan": f["in_plan"],
+                     "planned": float(r["planned"]), "actual": float(r["actual"]), "news": float(r["news"]),
+                     "news_views": float(r["forecast"] - r["planned"]), "weeks": weeks})
+    events = []
+    for e in news_events(res, params):
+        chips = [(f"{pid}: {v['day_change']:+.0%} that day · {exec_ui.people(abs(v['delta']))} views", "crit")
+                 for pid, v in e["faces"].items()]
+        if e.get("confidence"):
+            chips.append((f"{e['confidence']:.0%} confident", ""))
+        chips.append(("From news" if e["source"] != "manual" else "Added by planner", "accent"))
+        hours = e["hours"].split(" (")[0] if e["hours"] else ""
+        events.append({"mon": f"{e['date']:%b}".upper(), "day": e["date"].day, "wd": f"{e['date']:%a}",
+                       "title": f"{e['type']}: {e['note']}" if e["note"] else e["type"],
+                       "text": " · ".join(x for x in [e["where"], hours] if x), "chips": chips})
+    total_p, total_a = float(g["planned"].sum()), float(g["actual"].sum())
+    html_block(exec_ui.health_html({
+        "overall": total_a / total_p if total_p else 1.0, "planned": total_p, "actual": total_a,
+        "ok": 0.97, "watch": 0.90, "faces": rows, "events": events,
+        "foot": ("📌 Delivered views are <b>simulated</b> until the media owner's play logs and live traffic counts are "
+                 "connected. Road events come from news headlines, dated by AI and checked against sources; analysts "
+                 "can switch each one on or off under Area signals. Views = advertiser impressions (our slot only).")}),
+        height=640)
+
+
+# --------------------------------------------------------------------------- analyst pages
+
+
+def page_map(res: Results, params: Params, pid: str) -> None:
     st.header("Placements, exposure cones and visible road segments")
     view_mode = st.radio("View", ["All placements", "Selected placement (sidebar)"], horizontal=True,
                          key="map_view", label_visibility="collapsed")
-    st.caption("Segments are coloured by visibility score V (blue = low, yellow = high). Hover for the "
+    st.caption("Segments are coloured by visibility score V (light blue = low, deep navy = high). Hover for the "
                "factor breakdown and volume source.")
     radius, half = params.base("cone_radius_m"), params.base("half_angle_deg")
     seg_rows, cone_rows, pin_rows, metro_rows = [], [], [], []
@@ -325,8 +694,8 @@ def page_map(res: Results, params: Params) -> None:
                                      f"({fmt_num(u.low)}–{fmt_num(u.high)}) {u.label}<br/>Snapped to {s.road_name} "
                                      f"({s.snap_distance_m:.0f} m)")})
     layers = [
-        pdk.Layer("PolygonLayer", cone_rows, get_polygon="polygon", get_fill_color=[255, 255, 255, 28],
-                  get_line_color=[255, 255, 255, 140], line_width_min_pixels=1, pickable=True),
+        pdk.Layer("PolygonLayer", cone_rows, get_polygon="polygon", get_fill_color=[98, 80, 214, 26],
+                  get_line_color=[98, 80, 214, 150], line_width_min_pixels=1, pickable=True),
         pdk.Layer("PathLayer", seg_rows, get_path="path", get_color="color", width_min_pixels=4,
                   pickable=True),
         pdk.Layer("PathLayer", metro_rows, get_path="path", get_color=[229, 72, 77, 220], width_min_pixels=3,
@@ -335,16 +704,16 @@ def page_map(res: Results, params: Params) -> None:
                   get_fill_color=[229, 72, 77, 255], get_line_color=[255, 255, 255], line_width_min_pixels=2,
                   stroked=True, radius_min_pixels=6, pickable=True),
         pdk.Layer("TextLayer", pin_rows, get_position="position", get_text="label", get_size=15,
-                  get_color=[255, 255, 255], get_pixel_offset=[0, -18]),
+                  get_color=[29, 27, 46], get_pixel_offset=[0, -18]),
     ]
     if view_mode == "All placements":
         lats = [r.prep.snapped.lat for r in res.placements.values()]
         lons = [r.prep.snapped.lon for r in res.placements.values()]
         view = pdk.ViewState(latitude=float(np.mean(lats)), longitude=float(np.mean(lons)), zoom=11.0, pitch=0)
     else:
-        focus = res.placements[st.session_state.get("pid", "H1")].prep.snapped
+        focus = res.placements[pid].prep.snapped
         view = pdk.ViewState(latitude=focus.lat, longitude=focus.lon, zoom=14.6, pitch=0)
-    st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=view, map_provider="carto", map_style="dark",
+    st.pydeck_chart(pdk.Deck(layers=layers, initial_view_state=view, map_provider="carto", map_style="light",
                              tooltip={"html": "{tooltip}", "style": {"fontSize": "12px"}}), height=560)
     st.caption("Basemap © CARTO, data © OpenStreetMap contributors. Switch to 'Selected placement' to zoom "
                "into the face picked in the sidebar.")
@@ -906,8 +1275,18 @@ def main() -> None:
     results = get_results(okey, road_rows, ekey, ledger_stamp())
     params = Params(build_cfg(road_rows), overrides)
 
-    if page == "Map":
-        page_map(results, params)
+    if page in ANALYST_PAGES:
+        analyst_tag()
+    if page == "Decision":
+        page_decision(results, pcfg, params)
+    elif page == "Billboard league":
+        page_league(results)
+    elif page == "Audience":
+        page_audience(results)
+    elif page == "Campaign health":
+        page_health(results, pcfg, params)
+    elif page == "Map":
+        page_map(results, params, pid)
     elif page == "Data sources":
         page_sources()
     elif page == "Placement detail":

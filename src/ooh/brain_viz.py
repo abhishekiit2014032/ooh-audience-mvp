@@ -30,14 +30,14 @@ def brain_html(data: dict | None = None) -> str:
 _TEMPLATE = r"""<!doctype html>
 <html><head><meta charset="utf-8">
 <style>
-  :root { --bg:#0e1117; --card:#161b26; --line:#2a3242; --text:#e6e9ef; --muted:#8b93a7;
-          --geo:#4C9AFF; --ai:#a78bfa; --live:#36B37E; --cached:#4C9AFF; --configured:#22b8cf;
-          --ondemand:#22b8cf; --sample:#F5A524; --off:#5b6375; }
+  :root { --bg:#ffffff; --card:#f8f7fd; --line:#e3e1ee; --text:#1d1b2e; --muted:#6b6980;
+          --geo:#2a78d6; --ai:#6250d6; --live:#0ca30c; --cached:#2a78d6; --configured:#22b8cf;
+          --ondemand:#22b8cf; --sample:#eda100; --off:#b4b2c4; }
   html,body { margin:0; background:var(--bg); color:var(--text);
-              font-family: "Source Sans Pro","Source Sans 3",-apple-system,Segoe UI,Roboto,sans-serif; }
+              font-family: system-ui,-apple-system,"Segoe UI",sans-serif; }
   svg { width:100%; height:auto; display:block; }
   .card rect.bg { fill:var(--card); stroke:var(--line); stroke-width:1; transition: stroke .2s, fill .2s; }
-  .card:hover rect.bg, .card.focus rect.bg { stroke:#c9d4ff; fill:#1b2232; }
+  .card:hover rect.bg, .card.focus rect.bg { stroke:#6250d6; fill:#efedfc; }
   .card { cursor:pointer; transition: opacity .25s; }
   .name { font-size:14px; font-weight:600; fill:var(--text); }
   .sub { font-size:11px; fill:var(--muted); }
@@ -57,13 +57,13 @@ _TEMPLATE = r"""<!doctype html>
   @keyframes breathe { 0%,100% { transform:scale(1); } 50% { transform:scale(1.025); } }
   .ring { transition: stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1); }
   .neuron { transition: opacity .4s, r .4s; }
-  #tip { position:fixed; pointer-events:none; max-width:330px; background:#1b2232; border:1px solid #33405a;
-         border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.45; box-shadow:0 10px 30px rgba(0,0,0,.5);
+  #tip { position:fixed; pointer-events:none; max-width:330px; background:#ffffff; border:1px solid #e3e1ee;
+         border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.45; box-shadow:0 12px 32px rgba(40,30,90,.16);
          opacity:0; transform:translateY(4px); transition: opacity .15s, transform .15s; z-index:5; }
   #tip.show { opacity:1; transform:none; }
   #tip h4 { margin:0 0 4px; font-size:14px; }
   #tip .row { display:flex; justify-content:space-between; gap:12px; color:var(--muted); }
-  #tip .bar { height:5px; background:#2a3242; border-radius:3px; margin:2px 0 5px; overflow:hidden; }
+  #tip .bar { height:5px; background:#ecebf3; border-radius:3px; margin:2px 0 5px; overflow:hidden; }
   #tip .bar i { display:block; height:100%; background:var(--geo); }
   #tip .tag { display:inline-block; border-radius:4px; padding:0 6px; font-size:10.5px; font-weight:700; margin-right:4px; }
   @media (prefers-reduced-motion: reduce) { .pulse,.breathe { animation:none; } .ring { transition:none; } }
@@ -115,7 +115,7 @@ const gEdges = el("g"), gParticles = el("g"), gBrain = el("g"), gCards = el("g")
 // ---------- brain: two hemispheres from overlapping lobes
 const lobes = [[520,300,72],[468,365,74],[497,447,70],[560,470,58],[572,330,74],[556,398,70],[520,380,60]];
 const brain = el("g", {class: reduce ? "" : "breathe"}, gBrain);
-el("ellipse", {cx:CX, cy:CY, rx:205, ry:170, fill:"#3d5bd9", opacity:.18, filter:"url(#glow)"}, brain);
+el("ellipse", {cx:CX, cy:CY, rx:205, ry:170, fill:"#6250d6", opacity:.10, filter:"url(#glow)"}, brain);
 const L = el("g", {"clip-path":"url(#clipL)"}, brain), R = el("g", {"clip-path":"url(#clipR)"}, brain);
 lobes.forEach(([x,y,r]) => {
   el("circle", {cx:x, cy:y, r, fill:"url(#gGeo)"}, L);
@@ -147,11 +147,11 @@ text(brain, 515, 410, "counts every number", "lobe-sub");
 text(brain, 688, 372, "Claude", "lobe-label");
 text(brain, 688, 391, eg.ai.status === "active" ? "explains, dates events" : "templates (no key)", "lobe-sub");
 // computed numbers -> Claude arc
-const arc = el("path", {id:"arc", d:"M545 262 C 580 205, 620 205, 655 262", fill:"none", stroke:"#c4b5fd",
+const arc = el("path", {id:"arc", d:"M545 262 C 580 205, 620 205, 655 262", fill:"none", stroke:"#6250d6",
   "stroke-width":1.8, "stroke-dasharray":"3 4", opacity:.8}, gBrain);
 text(gBrain, CX, 214, "computed numbers only", "sub", {"text-anchor":"middle"});
 // Claude -> reach model: dated events from news (effect sizes from config)
-const arc2 = el("path", {id:"arc2", d:"M655 505 C 625 565, 575 565, 545 505", fill:"none", stroke:"#fbbf24",
+const arc2 = el("path", {id:"arc2", d:"M655 505 C 625 565, 575 565, 545 505", fill:"none", stroke:"#eda100",
   "stroke-width":1.8, "stroke-dasharray":"3 4", opacity:.85}, gBrain);
 text(gBrain, CX, 580, "dated events · sizes from config", "sub", {"text-anchor":"middle"});
 
@@ -193,11 +193,11 @@ outputs.forEach((o, i) => {
   const sx = fromAi ? 770 : 760, sy = CY + (y - CY) * 0.35;
   const p = el("path", {id:`e-out-${o.id}`, d:curve(sx, sy, OUT_X, y), stroke: fromAi ? "var(--ai)" : "var(--geo)",
     class:"edge"}, gEdges);
-  const parts = particles(p, fromAi ? "#c4b5fd" : "#8fc0ff", 2, 3.2, gParticles);
+  const parts = particles(p, fromAi ? "#6250d6" : "#2a78d6", 2, 3.2, gParticles);
   edgeEls.push({el:p, parts, out:o.id, engine:o.engine});
 });
-particles(arc, "#e9d5ff", 2, 2.4, gParticles);
-particles(arc2, "#fde68a", 2, 2.4, gParticles);
+particles(arc, "#6250d6", 2, 2.4, gParticles);
+particles(arc2, "#eda100", 2, 2.4, gParticles);
 
 // ---------- source cards with score rings
 const cards = {};
@@ -211,7 +211,7 @@ sources.forEach((s, i) => {
   text(g, 14, 39, `${s.status}${s.phase !== "MVP" ? " · " + s.phase : ""}${s.context_only ? " · context only" : ""}`, "sub");
   // score ring
   const r = 15, C = 2 * Math.PI * r;
-  el("circle", {cx:SRC_W - 26, cy:25, r, fill:"none", stroke:"#2a3242", "stroke-width":4}, g);
+  el("circle", {cx:SRC_W - 26, cy:25, r, fill:"none", stroke:"#ecebf3", "stroke-width":4}, g);
   const ring = el("circle", {cx:SRC_W - 26, cy:25, r, fill:"none", stroke:color, "stroke-width":4,
     "stroke-dasharray":C, "stroke-dashoffset":C, "stroke-linecap":"round", class:"ring",
     transform:`rotate(-90 ${SRC_W - 26} 25)`}, g);
